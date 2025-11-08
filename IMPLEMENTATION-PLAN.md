@@ -1,8 +1,13 @@
-# AI Music Idle Game - Implementation Plan
+# Music Industry Simulator - Implementation Plan
 
 ## Overview
 
-This implementation plan breaks down the AI Music Idle Game into discrete, parallelizable tasks that can be executed as individual Claude Code prompts. Each section is designed to be copy-pasted directly into Claude Code.
+This implementation plan breaks down the Music Industry Simulator (AI Music Idle Game) into discrete, parallelizable tasks that can be executed as individual Claude Code prompts. Each section is designed to be copy-pasted directly into Claude Code.
+
+**Status Update (after rebase):**
+- ✅ README.md is already written (see Task 7.2 - marked as complete)
+- ✅ Documentation has been enhanced with implementation notes
+- ✅ Project name standardized to "music-industry-simulator"
 
 **Key Principles:**
 - Tasks within each phase can be worked on in parallel
@@ -17,7 +22,7 @@ This implementation plan breaks down the AI Music Idle Game into discrete, paral
 ### Task 0.1: Initialize SvelteKit Project (MUST DO FIRST)
 
 ```
-Initialize a new SvelteKit project with Svelte 5, TypeScript, and TailwindCSS for the AI Music Idle Game.
+Initialize a new SvelteKit project with Svelte 5, TypeScript, and TailwindCSS for the Music Industry Simulator.
 
 Requirements:
 1. Use `npx sv create .` to initialize in current directory
@@ -38,7 +43,8 @@ Requirements:
    - game-accent: #3b82f6
 8. Create .gitignore with node_modules, build, .svelte-kit, etc.
 9. Update package.json scripts to include test commands
-10. Create README.md with project overview and setup instructions
+
+NOTE: README.md is already written - skip that step!
 
 Success criteria:
 - npm run dev starts development server
@@ -313,11 +319,12 @@ Create comprehensive word lists for procedurally generating song and artist name
 
 Requirements:
 1. Create src/lib/data/words.ts with arrays:
-   - ADJECTIVES: 100+ adjectives (e.g., "Electric", "Midnight", "Velvet")
-   - NOUNS: 100+ nouns (e.g., "Dreams", "Thunder", "Waves")
+   - ADJECTIVES: 50-100 adjectives (e.g., "Electric", "Midnight", "Velvet")
+   - NOUNS: 50-100 nouns (e.g., "Dreams", "Thunder", "Waves")
    - PLACES: 50+ places (e.g., "Tokyo", "Paradise", "Underground")
    - VERBS: 50+ verbs (e.g., "Running", "Dancing", "Falling")
    - EMOTIONS: 50+ emotions (e.g., "Lonely", "Euphoric", "Lost")
+   - COLORS: 20-30 colors (e.g., "Crimson", "Azure", "Neon")
 2. Include variety: abstract, concrete, edgy, commercial, artistic
 3. Export all arrays as constants
 
@@ -325,10 +332,12 @@ Files to create:
 - src/lib/data/words.ts
 
 Reference:
-- Naming System section in game-details.md
+- Naming System section in game-details.md (lines 237-246)
+- Implementation notes specify: "Aim for 50-100 words per category for variety"
 
 Success criteria:
-- At least 300 total words across categories
+- 50-100 words per major category (adjectives, nouns, verbs)
+- At least 300 total words across all categories
 - Mix of serious and humorous options
 - All words appropriate for game theme
 ```
@@ -595,9 +604,14 @@ Requirements:
    - processLegacyArtists(state: GameState, deltaTime: number): void
 2. When prestiging:
    - Save current artist as legacy artist
-   - Keep only last 2-3 legacy artists
-   - Legacy artists generate passive income
+   - IMPORTANT: Legacy artist fading mechanic (see game-details.md lines 149-153):
+     * Keep the 2-3 most recent legacy artists active
+     * When a 4th prestige occurs, the oldest legacy artist "retires"
+     * Retired artists stop generating income (use array.shift())
+     * This prevents infinite exponential growth while maintaining progression feel
+   - Legacy artists generate passive income (80% of current rate)
    - Calculate experience multiplier from peak fans
+   - Cross-promotion: legacy artists slowly funnel fans to new artist
    - Reset money, songs, fans, queue
    - Keep tech upgrades and industry control
 3. Prestige unlocks at tech tier milestones (3, 5, 6, 7)
@@ -1055,13 +1069,16 @@ Requirements:
 1. Update src/lib/systems/monopoly.ts:
    - calculateIndustryControl(state: GameState): number
    - updateControlProgress(state: GameState): void
-2. Progress fills based on:
-   - Fan milestones (10k, 100k, 1M, 10M)
-   - Tech tier achievements
-   - Prestige count
-   - Platform ownership
-   - Phase unlocks
-3. Progress persists through prestige
+2. Progress fills based on (see game-details.md lines 442-447 for percentage suggestions):
+   - Fan milestones (10k, 100k, 1M, 10M) - suggest 2-5% each
+   - Tech tier achievements (local models, own software, AI agents) - suggest 5-10% each
+   - Phase unlocks (streaming → physical → concerts → platform ownership) - suggest 5-8% each
+   - Each prestige adds a chunk - suggest 5-10% per prestige
+   - Platform ownership (streaming platform, algorithm control, Billboard, Grammys, etc.) - suggest 3-7% each
+3. Implementation notes:
+   - Store industryControl as 0-100 number in GameState
+   - Progress persists through prestige (never reset this value)
+   - Victory modal triggers when reaching 100%
 4. Reaches 100% after 3-5 prestiges (as designed)
 5. Trigger victory screen at 100%
 
@@ -1187,33 +1204,25 @@ Success criteria:
 - Game loads and runs correctly on GitHub Pages
 ```
 
-### Task 7.2: Create README Documentation
+### Task 7.2: Create README Documentation ✅ ALREADY COMPLETE
 
 ```
-Write comprehensive README.md with project overview, setup, and contribution guidelines.
+✅ SKIP THIS TASK - README.md is already written!
 
-Requirements:
-1. Update README.md with sections:
-   - Project title and description
-   - Game overview (what is it?)
-   - How to play (brief tutorial)
-   - Tech stack used
-   - Local development setup
-   - Running tests
-   - Building for production
-   - Deployment process
-   - Project structure
-   - Contributing guidelines
-   - License
-2. Add screenshots (if available)
-3. Link to live game on GitHub Pages
-4. Include design philosophy notes
+The README has been completed and includes:
+- ✅ Project title and description
+- ✅ Game overview and gameplay
+- ✅ Documentation links
+- ✅ Tech stack
+- ✅ Getting started instructions
+- ✅ Testing commands
+- ✅ Development notes
+- ✅ Roadmap with checkboxes
+- ✅ Feature breakdown by phase
+- ✅ Contributing guidelines for multi-agent workflow
+- ✅ License information
 
-Success criteria:
-- Clear setup instructions
-- Easy to understand for new contributors
-- All commands documented
-- Professional presentation
+The README is comprehensive and professional. No action needed.
 ```
 
 ### Task 7.3: Create CHANGELOG
@@ -1340,6 +1349,8 @@ Success criteria:
 **Phase 6**: Sequential tasks (must be done in order after Phase 1-5)
 
 **Phase 7**: Sequential tasks (must be done after Phase 6)
+- ✅ Task 7.2 already complete (README written)
+- Still need: 7.1 (deployment), 7.3 (changelog)
 
 **Phase 8**: Optional parallel tasks
 

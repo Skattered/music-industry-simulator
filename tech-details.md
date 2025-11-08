@@ -24,7 +24,7 @@
 ### Deployment
 - **Platform**: GitHub Pages
 - **Build**: GitHub Actions workflow
-- **URL**: `https://[username].github.io/ai-music-idle-game/`
+- **URL**: `https://[username].github.io/music-industry-simulator/`
 
 ### Testing
 - **Unit Tests**: Vitest
@@ -59,9 +59,6 @@
 │   │   │   ├── tours.ts         # Concert tour system
 │   │   │   ├── exploitation.ts  # Activated abilities
 │   │   │   └── monopoly.ts      # Platform ownership
-│   │   ├── stores/
-│   │   │   ├── gameState.ts     # Svelte writable store for game state
-│   │   │   └── ui.ts            # UI state (modals, notifications)
 │   │   ├── components/
 │   │   │   ├── ResourceBar.svelte
 │   │   │   ├── SongGenerator.svelte
@@ -122,12 +119,12 @@ All code examples below use pseudocode patterns. Actual implementation should us
 ### Svelte 5 Runes State Management
 
 ```typescript
-// src/lib/stores/gameState.ts
-// Note: Svelte 5 uses runes ($state, $derived, $effect) instead of stores
-// This is pseudocode showing the pattern - actual implementation uses runes
+// src/lib/game/state.svelte.ts
+// Svelte 5 uses runes ($state, $derived, $effect) for reactivity
+// State is defined in .svelte.ts files or component <script> blocks
 
-// State would be defined with $state rune in components or .svelte.ts files
-// Example pattern (in a component or svelte.ts file):
+// Example pattern for game state management:
+// This would typically be in the root +page.svelte or a shared .svelte.ts file
 
 let gameState = $state<GameState>(loadGame() || getInitialState());
 
@@ -140,7 +137,7 @@ let canPrestige = $derived(
   gameState.unlockedSystems.prestige && gameState.techTier >= 3
 );
 
-// Effects use $effect
+// Effects use $effect for side effects like auto-saving
 $effect(() => {
   // Auto-save when state changes
   saveGame(gameState);
@@ -819,28 +816,24 @@ To allow multiple agents to work simultaneously without conflicts:
 ```yaml
 # .github/workflows/deploy.yml
 
-name: Build and Deploy to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-deploy:
+  build-deploy:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-    
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -853,14 +846,16 @@ jobs:
       
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build'
       
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: # Optional: your custom domain
+        uses: actions/deploy-pages@v4
 ```
 
 ---
@@ -871,7 +866,7 @@ jobs:
 
 ```json
 {
-  "name": "ai-music-idle-game",
+  "name": "music-industry-simulator",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -923,7 +918,7 @@ const config = {
       strict: true
     }),
     paths: {
-      base: process.env.NODE_ENV === 'production' ? '/ai-music-idle-game' : ''
+      base: process.env.NODE_ENV === 'production' ? '/music-industry-simulator' : ''
     }
   }
 };
@@ -1094,33 +1089,44 @@ describe('Song System', () => {
 
 ```typescript
 // tests/components/SongGenerator.test.ts
-import { render, fireEvent } from '@testing-library/svelte';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { render } from '@testing-library/svelte';
+import { describe, it, expect } from 'vitest';
 import SongGenerator from '../../src/lib/components/SongGenerator.svelte';
-import { gameStore } from '../../src/lib/stores/gameState';
+import type { GameState } from '../../src/lib/game/types';
 
 describe('SongGenerator Component', () => {
-  beforeEach(() => {
-    gameStore.reset();
-  });
-  
-  it('renders correctly', () => {
-    const { getByText } = render(SongGenerator);
+  it('renders correctly with initial state', () => {
+    const gameState: GameState = {
+      money: 100,
+      techTier: 1,
+      songQueue: [],
+      songGenerationSpeed: 30000
+    } as GameState;
+    
+    const { getByText } = render(SongGenerator, { props: { gameState } });
     expect(getByText('Generate Songs')).toBeInTheDocument();
   });
   
   it('disables buttons when player cannot afford', () => {
-    gameStore.update(state => ({ ...state, money: 0 }));
-    const { getByText } = render(SongGenerator);
+    const gameState: GameState = {
+      money: 0,
+      techTier: 1,
+      songQueue: []
+    } as GameState;
     
+    const { getByText } = render(SongGenerator, { props: { gameState } });
     const button = getByText('x5') as HTMLButtonElement;
     expect(button.disabled).toBe(true);
   });
   
-  it('enables buttons when player can afford', async () => {
-    gameStore.update(state => ({ ...state, money: 100, techTier: 1 }));
-    const { getByText } = render(SongGenerator);
+  it('enables buttons when player can afford', () => {
+    const gameState: GameState = {
+      money: 100,
+      techTier: 1,
+      songQueue: []
+    } as GameState;
     
+    const { getByText } = render(SongGenerator, { props: { gameState } });
     const button = getByText('x5') as HTMLButtonElement;
     expect(button.disabled).toBe(false);
   });
@@ -1156,12 +1162,12 @@ describe('SongGenerator Component', () => {
 ```bash
 # Create new SvelteKit project with Svelte 5
 # Use the new 'sv' CLI (announced with Svelte 5)
-npx sv create ai-music-idle-game
+npx sv create music-industry-simulator
 # Choose: SvelteKit, TypeScript, Tailwind CSS, Vitest
 
 # Or clone existing repository
-git clone https://github.com/[username]/ai-music-idle-game.git
-cd ai-music-idle-game
+git clone https://github.com/[username]/music-industry-simulator.git
+cd music-industry-simulator
 
 # Install dependencies
 npm install

@@ -146,7 +146,11 @@ When you create a new artist:
 - Previous artist becomes a "legacy artist"
   - Frozen in time at current stats
   - Continues earning at same rate (or slightly reduced)
-  - Older legacy artists (after 2-3 resets) fade away and stop earning
+  - **Legacy artist fading mechanic:**
+    - Keep the 2-3 most recent legacy artists active
+    - When a 4th prestige occurs, the oldest legacy artist "retires"
+    - Retired artists stop generating income (array.shift() implementation)
+    - This prevents infinite exponential growth while maintaining progression feel
 - New artist starts with:
   - 0 songs
   - 0 fans
@@ -239,7 +243,11 @@ Creates narrative of "starting a new band with better tools/experience."
 - Generated from curated word lists
 - Examples: "[Adjective] [Noun]" or "[Word] in [Place]"
 - Adds personality and humor to the game
-- **TODO:** Create word lists for song titles and artist names
+- **Implementation Note:** Word lists should be defined in `src/lib/data/names.ts`
+  - Suggested categories: adjectives, nouns, verbs, places, emotions, colors
+  - Song titles: Combine 2-3 words from different lists
+  - Artist names: Use similar mad-lib approach or single memorable words
+  - Aim for 50-100 words per category for variety
 
 ---
 
@@ -417,7 +425,10 @@ Each phase starts as the **active focus**, then becomes **passive/automated** as
 - Exact duration and cost scaling for activated abilities
 - Victory screen and end game presentation
 - Audio/visual feedback and animations
-- How many legacy artists remain active after multiple prestiges (suggested: 2-3 most recent)
+
+**Note on resolved items:**
+- ✅ Legacy artist count: Keep 2-3 most recent (see Prestige System section)
+- ✅ Word list implementation: See Naming System section for guidance
 
 ---
 
@@ -429,12 +440,19 @@ Each phase starts as the **active focus**, then becomes **passive/automated** as
 - Reaches 100% = "You Control the Music Industry" ending
 - Expected completion: 3-5 prestige runs, 8-12 hours total
 
+**Implementation Notes:**
+- Store `industryControl` as 0-100 number in GameState
+- Progress bar component shows visual fill percentage
+- Persist through prestige (never reset this value)
+- Victory modal triggers when reaching 100%
+- Victory screen should celebrate player's achievement with stats summary
+
 ### What Fills the Progress Bar
-- Reaching major fan thresholds (10k, 100k, 1M, etc.)
-- Unlocking major tech tiers (local models, own software, AI agents)
-- Hitting scale milestones (streaming → physical → concerts → platform ownership)
-- Each prestige adds a chunk
-- Owning monopoly upgrades (streaming platform, algorithm control, Billboard, Grammys, etc.)
+- Reaching major fan thresholds (10k, 100k, 1M, etc.) - suggest 2-5% each
+- Unlocking major tech tiers (local models, own software, AI agents) - suggest 5-10% each
+- Hitting scale milestones (streaming → physical → concerts → platform ownership) - suggest 5-8% each
+- Each prestige adds a chunk - suggest 5-10% per prestige
+- Owning monopoly upgrades (streaming platform, algorithm control, Billboard, Grammys, etc.) - suggest 3-7% each
 
 ### Expected Progression Arc (3-5 Prestiges)
 

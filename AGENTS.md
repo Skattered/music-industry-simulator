@@ -798,7 +798,7 @@ const config = {
     }),
     paths: {
       // CRITICAL: Must match your repo name
-      base: process.env.NODE_ENV === 'production' ? '/ai-music-idle-game' : ''
+      base: process.env.NODE_ENV === 'production' ? '/music-industry-simulator' : ''
     }
   }
 };

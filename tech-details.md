@@ -1254,9 +1254,10 @@ The implementation is complete when:
 ## Questions & Support
 
 If implementation details need clarification:
-1. Reference the game design doc: `ai-music-idle-game-design.md`
-2. Check this file for technical details
-3. Create GitHub issue with questions
-4. Tag appropriate system label
+1. Reference the game design doc: `game-details.md`
+2. Check the tech spec: `tech-details.md`
+3. Check the agent guide: `AGENTS.md`
+4. Create GitHub issue with questions
+5. Tag appropriate system label
 
 Good luck building the AI Music Empire! 🎵

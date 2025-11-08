@@ -895,11 +895,12 @@ The implementation is complete when:
 
 If implementation details need clarification:
 
-1. **Check the design doc**: `ai-music-idle-game-design.md`
-2. **Check this file**: Re-read relevant sections
-3. **Check Svelte 5 docs**: https://svelte.dev/docs/svelte/overview
-4. **Create an issue**: Tag with appropriate label
-5. **Ask in PR comments**: Tag another agent for help
+1. **Check the design doc**: `game-details.md`
+2. **Check the tech spec**: `tech-details.md`
+3. **Check this file**: Re-read relevant sections
+4. **Check Svelte 5 docs**: https://svelte.dev/docs/svelte/overview
+5. **Create an issue**: Tag with appropriate label
+6. **Ask in PR comments**: Tag another agent for help
 
 ## Resources
 

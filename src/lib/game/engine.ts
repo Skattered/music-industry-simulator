@@ -7,7 +7,7 @@
  */
 
 import type { GameState, QueuedSong, ActiveBoost, Tour } from './types';
-import { TICK_RATE, SAVE_KEY, BACKUP_KEY } from './config';
+import { TICK_RATE, SAVE_KEY, BACKUP_KEY, TRENDING_MULTIPLIER } from './config';
 
 /**
  * Callback function type for save operations
@@ -232,7 +232,7 @@ export class GameEngine {
 
 			// Apply trending bonus if applicable
 			if (song.isTrending) {
-				songIncome *= 2.0; // TRENDING_MULTIPLIER from config
+				songIncome *= TRENDING_MULTIPLIER;
 			}
 
 			totalIncome += songIncome;

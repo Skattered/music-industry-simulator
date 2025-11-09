@@ -74,6 +74,7 @@ export function createNewGameState(): GameState {
 
 		// Exploitation & Boosts
 		activeBoosts: [],
+		boostUsageCounts: {},
 
 		// Physical & Concerts
 		physicalAlbums: [],

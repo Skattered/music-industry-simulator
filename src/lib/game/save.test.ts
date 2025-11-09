@@ -34,7 +34,7 @@ const localStorageMock = (() => {
 })();
 
 // Setup localStorage mock
-Object.defineProperty(global, 'localStorage', {
+Object.defineProperty(globalThis, 'localStorage', {
 	value: localStorageMock,
 	writable: true
 });
@@ -377,14 +377,13 @@ describe('Save/Load System', () => {
 			const state = createValidGameState();
 			saveGame(state);
 
-			// Mock URL.createObjectURL
-			const mockUrl = 'blob:http://localhost/test-blob';
-			global.URL.createObjectURL = vi.fn(() => mockUrl);
-
 			const result = exportSave();
 
-			expect(result).toBe(mockUrl);
-			expect(URL.createObjectURL).toHaveBeenCalled();
+			// Should return a data URL, not a blob URL
+			expect(result).not.toBeNull();
+			expect(result).toContain('data:application/json;charset=utf-8,');
+			// Verify it contains encoded JSON
+			expect(result).toContain('%22state%22');
 		});
 
 		it('should return null if no save exists', () => {
@@ -484,40 +483,19 @@ describe('Save/Load System', () => {
 			state.money = 2000;
 			saveGame(state);
 
-			// Mock URL methods
-			global.URL.createObjectURL = vi.fn((blob: Blob) => {
-				// Return a mock URL, actual reading will be handled below
-				return 'blob:mock-url';
-			});
+			// Export returns a data URL
+			const dataUrl = exportSave();
+			expect(dataUrl).not.toBeNull();
+			expect(dataUrl).toContain('data:application/json;charset=utf-8,');
 
-			// Export and read blob content asynchronously
-			const blobContent: string = await new Promise((resolve) => {
-				const reader = new FileReader();
-				reader.onload = () => {
-					resolve(reader.result as string);
-				};
-				// The exportSave function should trigger a download with a Blob.
-				// We need to get the blob that was passed to createObjectURL.
-				// Since exportSave likely creates a Blob and calls createObjectURL,
-				// we can spy on the call to get the blob.
-				let blobArg: Blob | undefined;
-				const origCreateObjectURL = global.URL.createObjectURL;
-				global.URL.createObjectURL = vi.fn((blob: Blob) => {
-					blobArg = blob;
-					return origCreateObjectURL(blob);
-				});
-				exportSave();
-				global.URL.createObjectURL = origCreateObjectURL;
-				if (blobArg) {
-					reader.readAsText(blobArg);
-				}
-			});
+			// Decode the data URL to get the JSON content
+			const jsonContent = decodeURIComponent(dataUrl!.replace('data:application/json;charset=utf-8,', ''));
 
 			// Clear localStorage
 			deleteSave();
 
 			// Import
-			const importResult = importSave(blobContent);
+			const importResult = importSave(jsonContent);
 			expect(importResult).toBe(true);
 
 			const loaded = loadGame();

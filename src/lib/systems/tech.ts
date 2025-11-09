@@ -174,18 +174,23 @@ export function getSongGenerationCost(state: GameState): number {
 		.filter((upgrade): upgrade is UpgradeDefinition => upgrade !== undefined)
 		.filter((upgrade) => upgrade.effects.songCost !== undefined);
 
-	// Find the upgrade with the highest tier (progression is enforced by prerequisites)
-	const highestTierUpgrade = upgradesWithCost.reduce<UpgradeDefinition | undefined>(
-		(max, upgrade) => {
-			if (!max) return upgrade;
-			if (upgrade.tier > max.tier) return upgrade;
-			return max;
+	// Find the upgrade with the lowest cost (progression is enforced by prerequisites,
+	// so the most advanced upgrade will have the lowest cost)
+	const bestUpgrade = upgradesWithCost.reduce<UpgradeDefinition | undefined>(
+		(best, upgrade) => {
+			if (!best) return upgrade;
+			// Compare by tier first (higher is better)
+			if (upgrade.tier > best.tier) return upgrade;
+			if (upgrade.tier < best.tier) return best;
+			// Same tier - compare by cost (lower is better)
+			if (upgrade.effects.songCost! < best.effects.songCost!) return upgrade;
+			return best;
 		},
 		undefined
 	);
 
-	if (highestTierUpgrade) {
-		return highestTierUpgrade.effects.songCost!;
+	if (bestUpgrade) {
+		return bestUpgrade.effects.songCost!;
 	}
 
 	// Default to base cost from config

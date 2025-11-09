@@ -109,10 +109,9 @@ export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): 
 
 	// Apply income multiplier
 	if (effects.incomeMultiplier !== undefined) {
-		// Update all existing songs with new income rate
-		const baseIncome = state.songs[0]?.incomePerSecond || 1.0;
+		// Multiply each song's current income by the multiplier
 		state.songs.forEach((song) => {
-			song.incomePerSecond = baseIncome * effects.incomeMultiplier!;
+			song.incomePerSecond = song.incomePerSecond * effects.incomeMultiplier!;
 		});
 	}
 
@@ -173,24 +172,24 @@ export function getAvailableTechUpgrades(state: GameState): UpgradeDefinition[] 
  * @returns Cost in dollars to generate one song
  */
 export function getSongGenerationCost(state: GameState): number {
-	// Find all upgrades that set songCost, sorted by tier then by upgrade order
+	// Find the purchased upgrade with the highest tier that sets songCost
 	const upgradesWithCost = Object.keys(state.upgrades)
 		.map((id) => getUpgradeById(id))
 		.filter((upgrade): upgrade is UpgradeDefinition => upgrade !== undefined)
-		.filter((upgrade) => upgrade.effects.songCost !== undefined)
-		.sort((a, b) => {
-			// Sort by tier first
-			if (a.tier !== b.tier) {
-				return a.tier - b.tier;
-			}
-			// Then by cost (higher cost = earlier in tier, lower cost = later in tier)
-			// This works because within a tier, costs decrease as you progress
-			return (b.effects.songCost ?? 1) - (a.effects.songCost ?? 1);
-		});
+		.filter((upgrade) => upgrade.effects.songCost !== undefined);
 
-	// Return the last one (most advanced)
-	if (upgradesWithCost.length > 0) {
-		return upgradesWithCost[upgradesWithCost.length - 1].effects.songCost!;
+	// Find the upgrade with the highest tier (progression is enforced by prerequisites)
+	const highestTierUpgrade = upgradesWithCost.reduce<UpgradeDefinition | undefined>(
+		(max, upgrade) => {
+			if (!max) return upgrade;
+			if (upgrade.tier > max.tier) return upgrade;
+			return max;
+		},
+		undefined
+	);
+
+	if (highestTierUpgrade) {
+		return highestTierUpgrade.effects.songCost!;
 	}
 
 	// Default to base cost from config

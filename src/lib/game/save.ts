@@ -270,9 +270,8 @@ export function exportSave(): string | null {
 		// Create a formatted JSON string (pretty-printed for readability)
 		const formatted = JSON.stringify(parsed, null, 2);
 
-		// Create data URL
-		const blob = new Blob([formatted], { type: 'application/json' });
-		const dataUrl = URL.createObjectURL(blob);
+		// Create data URL (no memory leak risk)
+		const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(formatted);
 
 		return dataUrl;
 	} catch (error) {

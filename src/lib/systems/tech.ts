@@ -1,0 +1,245 @@
+/**
+ * Tech Tier Upgrade System
+ *
+ * Manages technology progression, upgrade purchases, and effect application.
+ * Handles all 7 tech tiers with 3 sub-tiers each.
+ */
+
+import type { GameState, UpgradeDefinition } from '../game/types';
+import {
+	getAllTechUpgrades,
+	getUpgradeById,
+	getAvailableUpgrades,
+	calculateTechTier,
+	doesTierUnlockPrestige
+} from '../data/tech-upgrades';
+
+/**
+ * Get all available tech upgrades
+ * @returns Array of all tech upgrade definitions
+ */
+export function getTechUpgrades(): UpgradeDefinition[] {
+	return getAllTechUpgrades();
+}
+
+/**
+ * Check if player can afford a specific upgrade
+ * @param state - Current game state
+ * @param upgradeId - ID of the upgrade to check
+ * @returns True if player can afford the upgrade
+ */
+export function canAffordUpgrade(state: GameState, upgradeId: string): boolean {
+	const upgrade = getUpgradeById(upgradeId);
+	if (!upgrade) return false;
+
+	// Check if already purchased
+	if (state.upgrades[upgradeId]) return false;
+
+	// Check if player has enough money
+	if (state.money < upgrade.cost) return false;
+
+	// Check prerequisites
+	if (upgrade.prerequisites && upgrade.prerequisites.length > 0) {
+		const allPrereqsMet = upgrade.prerequisites.every((prereqId) =>
+			Boolean(state.upgrades[prereqId])
+		);
+		if (!allPrereqsMet) return false;
+	}
+
+	return true;
+}
+
+/**
+ * Purchase a tech upgrade and apply its effects
+ * @param state - Current game state (will be mutated)
+ * @param upgradeId - ID of the upgrade to purchase
+ * @returns True if purchase was successful, false otherwise
+ */
+export function purchaseTechUpgrade(state: GameState, upgradeId: string): boolean {
+	// Validate purchase
+	if (!canAffordUpgrade(state, upgradeId)) {
+		return false;
+	}
+
+	const upgrade = getUpgradeById(upgradeId);
+	if (!upgrade) return false;
+
+	// Deduct cost
+	state.money -= upgrade.cost;
+
+	// Record purchase
+	state.upgrades[upgradeId] = {
+		purchasedAt: Date.now(),
+		tier: upgrade.tier
+	};
+
+	// Apply effects
+	applyTechEffects(state, upgrade);
+
+	// Update tech tier and sub-tier
+	const { tier, subTier } = calculateTechTier(new Set(Object.keys(state.upgrades)));
+	state.techTier = tier;
+	state.techSubTier = subTier;
+
+	// Check for prestige unlock
+	unlockPrestigePoints(state);
+
+	return true;
+}
+
+/**
+ * Apply the effects of a tech upgrade to the game state
+ * @param state - Current game state (will be mutated)
+ * @param upgrade - The upgrade definition whose effects to apply
+ */
+export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): void {
+	const { effects } = upgrade;
+
+	// Apply song cost change
+	if (effects.songCost !== undefined) {
+		// Song cost is tracked implicitly through tech tier
+		// The actual cost calculation happens in the song generation system
+		// This effect is passive and doesn't require state mutation here
+	}
+
+	// Apply song generation speed change
+	if (effects.songSpeed !== undefined) {
+		state.songGenerationSpeed = effects.songSpeed;
+	}
+
+	// Apply income multiplier
+	if (effects.incomeMultiplier !== undefined) {
+		// Update all existing songs with new income rate
+		const baseIncome = state.songs[0]?.incomePerSecond || 1.0;
+		state.songs.forEach((song) => {
+			song.incomePerSecond = baseIncome * effects.incomeMultiplier!;
+		});
+	}
+
+	// Unlock systems
+	if (effects.unlockGPU) {
+		state.unlockedSystems.gpu = true;
+	}
+
+	if (effects.unlockPrestige) {
+		state.unlockedSystems.prestige = true;
+	}
+
+	if (effects.unlockPhysicalAlbums) {
+		state.unlockedSystems.physicalAlbums = true;
+	}
+
+	if (effects.unlockTours) {
+		state.unlockedSystems.tours = true;
+	}
+
+	if (effects.unlockPlatformOwnership) {
+		state.unlockedSystems.platformOwnership = true;
+	}
+
+	if (effects.unlockMonopoly) {
+		state.unlockedSystems.monopoly = true;
+	}
+
+	if (effects.unlockTrendResearch) {
+		state.unlockedSystems.trendResearch = true;
+	}
+}
+
+/**
+ * Check if prestige should be unlocked based on current tech tier
+ * Prestige unlocks at tiers 3, 5, 6, and 7
+ * @param state - Current game state (will be mutated if prestige unlocked)
+ */
+export function unlockPrestigePoints(state: GameState): void {
+	if (doesTierUnlockPrestige(state.techTier)) {
+		state.unlockedSystems.prestige = true;
+	}
+}
+
+/**
+ * Get upgrades available for purchase given current game state
+ * @param state - Current game state
+ * @returns Array of purchasable upgrades
+ */
+export function getAvailableTechUpgrades(state: GameState): UpgradeDefinition[] {
+	const purchasedIds = new Set(Object.keys(state.upgrades));
+	return getAvailableUpgrades(purchasedIds);
+}
+
+/**
+ * Get the current song generation cost based on tech tier
+ * @param state - Current game state
+ * @returns Cost in dollars to generate one song
+ */
+export function getSongGenerationCost(state: GameState): number {
+	// Find all upgrades that set songCost, sorted by tier then by upgrade order
+	const upgradesWithCost = Object.keys(state.upgrades)
+		.map((id) => getUpgradeById(id))
+		.filter((upgrade): upgrade is UpgradeDefinition => upgrade !== undefined)
+		.filter((upgrade) => upgrade.effects.songCost !== undefined)
+		.sort((a, b) => {
+			// Sort by tier first
+			if (a.tier !== b.tier) {
+				return a.tier - b.tier;
+			}
+			// Then by cost (higher cost = earlier in tier, lower cost = later in tier)
+			// This works because within a tier, costs decrease as you progress
+			return (b.effects.songCost ?? 1) - (a.effects.songCost ?? 1);
+		});
+
+	// Return the last one (most advanced)
+	if (upgradesWithCost.length > 0) {
+		return upgradesWithCost[upgradesWithCost.length - 1].effects.songCost!;
+	}
+
+	// Default to base cost from config
+	return 1; // BASE_SONG_COST
+}
+
+/**
+ * Calculate the total income multiplier from all purchased tech upgrades
+ * @param state - Current game state
+ * @returns The cumulative income multiplier
+ */
+export function getTechIncomeMultiplier(state: GameState): number {
+	const purchasedUpgrades = Object.keys(state.upgrades)
+		.map((id) => getUpgradeById(id))
+		.filter((upgrade): upgrade is UpgradeDefinition => upgrade !== undefined);
+
+	// Find the highest income multiplier (they don't stack, just use the best one)
+	let maxMultiplier = 1.0;
+	for (const upgrade of purchasedUpgrades) {
+		if (upgrade.effects.incomeMultiplier !== undefined) {
+			maxMultiplier = Math.max(maxMultiplier, upgrade.effects.incomeMultiplier);
+		}
+	}
+
+	return maxMultiplier;
+}
+
+/**
+ * Get a summary of the current tech progression
+ * @param state - Current game state
+ * @returns Object with tech tier info and stats
+ */
+export function getTechProgressionSummary(state: GameState) {
+	const purchasedCount = Object.keys(state.upgrades).length;
+	const totalCount = getAllTechUpgrades().length;
+	const availableUpgrades = getAvailableTechUpgrades(state);
+	const nextUpgrade = availableUpgrades[0]; // First available is typically the next in sequence
+
+	return {
+		currentTier: state.techTier,
+		currentSubTier: state.techSubTier,
+		purchasedUpgrades: purchasedCount,
+		totalUpgrades: totalCount,
+		progressPercentage: (purchasedCount / totalCount) * 100,
+		nextUpgrade: nextUpgrade || null,
+		availableUpgradesCount: availableUpgrades.length,
+		prestigeUnlocked: state.unlockedSystems.prestige,
+		songGenerationSpeed: state.songGenerationSpeed,
+		songGenerationCost: getSongGenerationCost(state),
+		incomeMultiplier: getTechIncomeMultiplier(state)
+	};
+}

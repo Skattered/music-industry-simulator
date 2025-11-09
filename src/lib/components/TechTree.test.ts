@@ -9,7 +9,7 @@
  * - User interactions
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import TechTree from './TechTree.svelte';
 import type { GameState } from '$lib/game/types';

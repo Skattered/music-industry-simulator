@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { GameState, TechTier, UpgradeDefinition } from '$lib/game/types';
 	import { purchaseTechUpgrade, canAffordUpgrade } from '$lib/systems/tech';
-	import { TECH_TIER_NAMES, getUpgradesByTier } from '$lib/data/tech-upgrades';
+	import { TECH_TIER_NAMES, getUpgradesByTier, getUpgradeById } from '$lib/data/tech-upgrades';
 
 	// Props
 	let { gameState = $bindable() }: { gameState: GameState } = $props();
@@ -52,15 +52,7 @@
 
 		return upgrade.prerequisites
 			.filter((prereqId) => !gameState.upgrades[prereqId])
-			.map((prereqId) => {
-				// Find the prerequisite upgrade from all upgrades
-				for (let tier = 1; tier <= 7; tier++) {
-					const tierUpgrades = getUpgradesByTier(tier as TechTier);
-					const found = tierUpgrades.find((u) => u.id === prereqId);
-					if (found) return found;
-				}
-				return null;
-			})
+			.map((prereqId) => getUpgradeById(prereqId))
 			.filter((u): u is UpgradeDefinition => u !== null);
 	}
 
@@ -140,18 +132,22 @@
 
 				<div class="upgrades grid grid-cols-1 md:grid-cols-3 gap-4">
 					{#each getUpgradesByTier(tier) as upgrade (upgrade.id)}
+						{@const purchased = isPurchased(upgrade.id)}
+						{@const locked = isLocked(upgrade)}
+						{@const affordable = canAffordUpgrade(gameState, upgrade.id)}
+						{@const effects = formatEffects(upgrade)}
 						<div
 							class="upgrade-card border rounded-lg p-4 transition-all"
-							class:bg-gray-100={isPurchased(upgrade.id)}
-							class:opacity-50={isLocked(upgrade)}
-							class:border-green-500={isPurchased(upgrade.id)}
-							class:border-gray-300={!isPurchased(upgrade.id) && !isLocked(upgrade)}
-							class:border-red-300={isLocked(upgrade)}
+							class:bg-gray-100={purchased}
+							class:opacity-50={locked}
+							class:border-green-500={purchased}
+							class:border-gray-300={!purchased && !locked}
+							class:border-red-300={locked}
 							data-upgrade-id={upgrade.id}
 						>
 							<div class="flex justify-between items-start mb-2">
 								<h3 class="font-semibold text-lg">{upgrade.name}</h3>
-								{#if isPurchased(upgrade.id)}
+								{#if purchased}
 									<span class="purchased-badge text-green-600 text-xl" title="Purchased">✓</span>
 								{/if}
 							</div>
@@ -162,18 +158,18 @@
 								Cost: {formatMoney(upgrade.cost)}
 							</div>
 
-							{#if formatEffects(upgrade).length > 0}
+							{#if effects.length > 0}
 								<div class="effects mb-3 text-xs text-gray-700">
 									<div class="font-semibold mb-1">Effects:</div>
 									<ul class="list-disc list-inside">
-										{#each formatEffects(upgrade) as effect}
+										{#each effects as effect}
 											<li>{effect}</li>
 										{/each}
 									</ul>
 								</div>
 							{/if}
 
-							{#if isLocked(upgrade)}
+							{#if locked}
 								<div class="locked-message text-xs text-red-600 mb-2">
 									<div class="font-semibold">Locked - Prerequisites required:</div>
 									<ul class="list-disc list-inside">
@@ -186,34 +182,20 @@
 
 							<button
 								class="purchase-button w-full py-2 px-4 rounded transition-colors"
-								class:bg-blue-500={!isPurchased(upgrade.id) &&
-									!isLocked(upgrade) &&
-									canAffordUpgrade(gameState, upgrade.id)}
-								class:hover:bg-blue-600={!isPurchased(upgrade.id) &&
-									!isLocked(upgrade) &&
-									canAffordUpgrade(gameState, upgrade.id)}
-								class:text-white={!isPurchased(upgrade.id) &&
-									!isLocked(upgrade) &&
-									canAffordUpgrade(gameState, upgrade.id)}
-								class:bg-gray-300={isPurchased(upgrade.id) ||
-									isLocked(upgrade) ||
-									!canAffordUpgrade(gameState, upgrade.id)}
-								class:text-gray-500={isPurchased(upgrade.id) ||
-									isLocked(upgrade) ||
-									!canAffordUpgrade(gameState, upgrade.id)}
-								class:cursor-not-allowed={isPurchased(upgrade.id) ||
-									isLocked(upgrade) ||
-									!canAffordUpgrade(gameState, upgrade.id)}
-								disabled={isPurchased(upgrade.id) ||
-									isLocked(upgrade) ||
-									!canAffordUpgrade(gameState, upgrade.id)}
+								class:bg-blue-500={!purchased && !locked && affordable}
+								class:hover:bg-blue-600={!purchased && !locked && affordable}
+								class:text-white={!purchased && !locked && affordable}
+								class:bg-gray-300={purchased || locked || !affordable}
+								class:text-gray-500={purchased || locked || !affordable}
+								class:cursor-not-allowed={purchased || locked || !affordable}
+								disabled={purchased || locked || !affordable}
 								onclick={() => handlePurchase(upgrade.id)}
 							>
-								{#if isPurchased(upgrade.id)}
+								{#if purchased}
 									Purchased
-								{:else if isLocked(upgrade)}
+								{:else if locked}
 									Locked
-								{:else if !canAffordUpgrade(gameState, upgrade.id)}
+								{:else if !affordable}
 									Cannot Afford
 								{:else}
 									Purchase
@@ -226,21 +208,3 @@
 		{/each}
 	</div>
 </div>
-
-<style>
-	.tech-tree {
-		/* Container styles */
-	}
-
-	.tier-section {
-		/* Individual tier section */
-	}
-
-	.upgrade-card {
-		/* Individual upgrade card */
-	}
-
-	.purchase-button {
-		/* Purchase button styles */
-	}
-</style>

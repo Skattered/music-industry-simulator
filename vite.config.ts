@@ -6,6 +6,17 @@ export default defineConfig({
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		globals: true,
-		environment: 'jsdom'
+		environment: 'jsdom',
+		coverage: {
+			provider: 'v8',
+			reporter: ['text', 'json', 'html', 'lcov'],
+			exclude: [
+				'node_modules/',
+				'src/**/*.test.ts',
+				'src/**/*.spec.ts',
+				'.svelte-kit/',
+				'build/'
+			]
+		}
 	}
 });

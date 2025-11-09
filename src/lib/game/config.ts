@@ -297,11 +297,12 @@ export const UPGRADES: UpgradeDefinition[] = [
 		id: 'tier3_advanced',
 		tier: 3,
 		name: 'Multi-GPU Setup',
-		description: 'Parallel processing across multiple GPUs. Songs take 4s.',
+		description: 'Parallel processing across multiple GPUs. Unlocks tours. Songs take 4s.',
 		cost: 50000,
 		effects: {
 			songSpeed: 4000,
-			incomeMultiplier: 3.0
+			incomeMultiplier: 3.0,
+			unlockTours: true
 		},
 		prerequisites: ['tier3_improved']
 	},
@@ -317,8 +318,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		cost: 100000,
 		effects: {
 			songSpeed: 3000,
-			incomeMultiplier: 4.0,
-			unlockTours: true
+			incomeMultiplier: 4.0
 		},
 		prerequisites: ['tier3_advanced']
 	},

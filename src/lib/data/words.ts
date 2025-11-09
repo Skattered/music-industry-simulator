@@ -50,7 +50,7 @@ export const ADJECTIVES = [
   // Size & Scale
   "Tiny", "Small", "Mini", "Micro", "Nano", "Pico", "Large", "Big",
   "Huge", "Massive", "Giant", "Colossal", "Enormous", "Gigantic", "Titanic", "Mammoth",
-  "Vast", "Infinite", "Endless", "Limitless", "Boundless", "Infinite", "Cosmic", "Microscopic",
+  "Vast", "Infinite", "Endless", "Limitless", "Boundless", "Cosmic", "Microscopic",
   "Miniature", "Compact", "Dense", "Sparse", "Thick", "Thin", "Wide", "Narrow",
 
   // Speed & Motion
@@ -109,7 +109,7 @@ export const ADJECTIVES = [
   // Military & Combat
   "Tactical", "Strategic", "Combat", "Battle", "War", "Peace", "Militant", "Pacifist",
   "Armored", "Armed", "Weaponized", "Defensive", "Offensive", "Aggressive", "Passive", "Neutral",
-  "Militant", "Soldier", "Warrior", "Fighter", "Champion", "Gladiator", "Samurai", "Ninja",
+  "Soldier", "Warrior", "Fighter", "Champion", "Gladiator", "Samurai", "Ninja",
   "Commando", "Ranger", "Sniper", "Scout", "Recon", "Infantry", "Cavalry", "Artillery",
 
   // Ocean & Water
@@ -291,7 +291,7 @@ export const NOUNS = [
   // Money & Commerce
   "Dollar", "Euro", "Pound", "Yen", "Franc", "Mark", "Ruble", "Peso",
   "Cash", "Coin", "Bill", "Note", "Check", "Credit", "Debit", "Charge",
-  "Price", "Cost", "Value", "Worth", "Fee", "Rate", "Charge", "Tax",
+  "Price", "Cost", "Value", "Worth", "Fee", "Rate", "Tax",
   "Market", "Exchange", "Trade", "Deal", "Bargain", "Sale", "Auction", "Bid",
 
   // War & Conflict
@@ -464,7 +464,7 @@ export const VERBS = [
   // Light & Visibility
   "Shining", "Glowing", "Gleaming", "Glittering", "Sparkling", "Shimmering", "Flickering", "Flashing",
   "Fading", "Dimming", "Darkening", "Brightening", "Illuminating", "Lighting", "Blinding", "Dazzling",
-  "Appearing", "Disappearing", "Vanishing", "Emerging", "Materializing", "Fading", "Dissolving", "Evaporating",
+  "Appearing", "Disappearing", "Vanishing", "Emerging", "Materializing", "Dissolving", "Evaporating",
   "Hiding", "Revealing", "Showing", "Concealing", "Exposing", "Uncovering", "Masking", "Unveiling",
 
   // Combat & Conflict

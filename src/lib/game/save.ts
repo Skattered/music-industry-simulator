@@ -38,6 +38,12 @@ function createSaveFile(state: GameState): SaveFile {
  * @returns true if save was successful, false otherwise
  */
 export function saveGame(state: GameState): boolean {
+	// Create save file structure
+	const saveFile = createSaveFile(state);
+
+	// Serialize to JSON
+	const serialized = JSON.stringify(saveFile);
+
 	try {
 		// First, backup the existing save (if it exists)
 		const existingSave = localStorage.getItem(SAVE_KEY);
@@ -49,12 +55,6 @@ export function saveGame(state: GameState): boolean {
 				// Continue with save even if backup fails
 			}
 		}
-
-		// Create save file structure
-		const saveFile = createSaveFile(state);
-
-		// Serialize to JSON
-		const serialized = JSON.stringify(saveFile);
 
 		// Check approximate size (use actual byte size)
 		if (new Blob([serialized]).size > MAX_STORAGE_SIZE) {

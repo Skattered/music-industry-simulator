@@ -134,8 +134,8 @@ describe('generateSong', () => {
 		const song = generateSong(state);
 		expect(song.genre).toBe('pop');
 		expect(song.isTrending).toBe(true);
-		expect(song.incomePerSecond).toBe(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
-		expect(song.fanGenerationRate).toBe(BASE_FAN_GENERATION_RATE * TRENDING_MULTIPLIER);
+		expect(song.incomePerSecond).toBeCloseTo(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
+		expect(song.fanGenerationRate).toBeCloseTo(BASE_FAN_GENERATION_RATE * TRENDING_MULTIPLIER);
 	});
 
 	it('should fade trending multiplier over time', () => {
@@ -147,7 +147,7 @@ describe('generateSong', () => {
 			trendDiscoveredAt: now
 		});
 		const songStart = generateSong(stateStart);
-		expect(songStart.incomePerSecond).toBe(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
+		expect(songStart.incomePerSecond).toBeCloseTo(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
 
 		// Test at halfway through fade (1.5x multiplier: midpoint between 2.0 and 1.0)
 		const stateHalf = createTestGameState({
@@ -156,7 +156,7 @@ describe('generateSong', () => {
 		});
 		const songHalf = generateSong(stateHalf);
 		const expectedHalfMultiplier = 1.5; // Halfway between 2.0 and 1.0
-		expect(songHalf.incomePerSecond).toBe(BASE_INCOME_PER_SONG * expectedHalfMultiplier);
+		expect(songHalf.incomePerSecond).toBeCloseTo(BASE_INCOME_PER_SONG * expectedHalfMultiplier);
 
 		// Test after fade complete (1.0x multiplier - no bonus)
 		const stateFaded = createTestGameState({

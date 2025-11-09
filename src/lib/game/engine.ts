@@ -7,7 +7,7 @@
  */
 
 import type { GameState, QueuedSong, ActiveBoost, Tour } from './types';
-import { TICK_RATE, SAVE_KEY, BACKUP_KEY, TRENDING_MULTIPLIER } from './config';
+import { TICK_RATE, SAVE_KEY, BACKUP_KEY, TRENDING_MULTIPLIER, TOUR_DURATION } from './config';
 
 /**
  * Callback function type for save operations
@@ -136,18 +136,10 @@ export class GameEngine {
 		if (this.detectClockChange(deltaTime)) {
 			console.warn('GameEngine: Clock change detected, capping deltaTime');
 			deltaTime = TICK_RATE; // Use normal tick rate instead
-		}
-
-		// Cap deltaTime to prevent huge jumps (e.g., tab was hidden for a long time)
-		if (deltaTime > this.MAX_DELTA_TIME) {
+		} else if (deltaTime > this.MAX_DELTA_TIME) {
+			// Cap deltaTime to prevent huge jumps (e.g., tab was hidden for a long time)
 			console.warn(`GameEngine: Large deltaTime detected (${deltaTime}ms), capping to ${this.MAX_DELTA_TIME}ms`);
 			deltaTime = this.MAX_DELTA_TIME;
-		}
-
-		// Ensure deltaTime is positive and reasonable
-		if (deltaTime < 0) {
-			console.warn('GameEngine: Negative deltaTime detected, using TICK_RATE');
-			deltaTime = TICK_RATE;
 		}
 
 		// Update last tick time
@@ -316,9 +308,8 @@ export class GameEngine {
 		for (const tour of this.gameState.tours) {
 			if (tour.completedAt === null) {
 				const elapsed = currentTime - tour.startedAt;
-				const tourDuration = 180000; // TOUR_DURATION from config
 
-				if (elapsed >= tourDuration) {
+				if (elapsed >= TOUR_DURATION) {
 					tour.completedAt = currentTime;
 				}
 			}

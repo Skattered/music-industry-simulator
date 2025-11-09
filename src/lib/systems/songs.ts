@@ -137,7 +137,7 @@ function getIncomeMultiplier(state: GameState): number {
 /**
  * Get the current song generation speed in milliseconds
  */
-function getSongGenerationSpeed(state: GameState): number {
+export function getSongGenerationSpeed(state: GameState): number {
 	// Find the minimum songSpeed value among all upgrades (lower is better)
 	let speed = state.songGenerationSpeed;
 
@@ -159,7 +159,7 @@ function getSongGenerationSpeed(state: GameState): number {
 /**
  * Get the current song cost from upgrades
  */
-function getCurrentSongCost(state: GameState): number {
+export function getCurrentSongCost(state: GameState): number {
 	let cost = BASE_SONG_COST;
 
 	const costs: number[] = [];

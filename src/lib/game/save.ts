@@ -198,10 +198,10 @@ export function validateSave(data: any): data is SaveFile {
 	// Validate currentArtist object
 	if (!state.currentArtist || typeof state.currentArtist !== 'object') return false;
 	if (typeof state.currentArtist.name !== 'string') return false;
-	if (typeof state.currentArtist.songs !== 'number') return false;
-	if (typeof state.currentArtist.fans !== 'number') return false;
-	if (typeof state.currentArtist.peakFans !== 'number') return false;
-	if (typeof state.currentArtist.createdAt !== 'number') return false;
+	if (typeof state.currentArtist.songs !== 'number' || !Number.isFinite(state.currentArtist.songs)) return false;
+	if (typeof state.currentArtist.fans !== 'number' || !Number.isFinite(state.currentArtist.fans)) return false;
+	if (typeof state.currentArtist.peakFans !== 'number' || !Number.isFinite(state.currentArtist.peakFans)) return false;
+	if (typeof state.currentArtist.createdAt !== 'number' || !Number.isFinite(state.currentArtist.createdAt)) return false;
 
 	// Validate upgrades object
 	if (!state.upgrades || typeof state.upgrades !== 'object') return false;

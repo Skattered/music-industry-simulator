@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { generateFans, calculateFanGeneration, updatePeakFans } from './fans';
 import type { GameState, Song, ActiveBoost } from '../game/types';
-import { TRENDING_MULTIPLIER } from '../game/config';
 
 // Helper function to create a minimal game state for testing
 function createTestState(overrides: Partial<GameState> = {}): GameState {

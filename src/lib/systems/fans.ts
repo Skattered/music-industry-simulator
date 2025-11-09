@@ -17,6 +17,7 @@
 
 import type { GameState } from '../game/types';
 import { TRENDING_MULTIPLIER } from '../game/config';
+import { calculateBoostMultiplier } from './boosts';
 
 /**
  * Generate fans and add them to the game state
@@ -102,27 +103,9 @@ function applyFanMultipliers(state: GameState, baseFanGeneration: number): numbe
 	fanGeneration *= state.experienceMultiplier;
 
 	// Apply active boost multipliers (multiplicative stacking)
-	const boostMultiplier = calculateBoostMultiplier(state);
+	const boostMultiplier = calculateBoostMultiplier(state, 'fanMultiplier');
 	fanGeneration *= boostMultiplier;
 
 	return fanGeneration;
 }
 
-/**
- * Calculate total fan multiplier from active boosts
- * Stacks multiplicatively (multiply all active boost fan multipliers)
- */
-function calculateBoostMultiplier(state: GameState): number {
-	let multiplier = 1.0;
-	const currentTime = Date.now();
-
-	for (const boost of state.activeBoosts) {
-		// Check if boost is still active
-		const elapsedTime = currentTime - boost.activatedAt;
-		if (elapsedTime < boost.duration) {
-			multiplier *= boost.fanMultiplier;
-		}
-	}
-
-	return multiplier;
-}

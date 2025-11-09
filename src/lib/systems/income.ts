@@ -18,6 +18,7 @@
 
 import type { GameState } from '../game/types';
 import { TRENDING_MULTIPLIER } from '../game/config';
+import { calculateBoostMultiplier } from './boosts';
 
 /**
  * Generate income and add it to the game state
@@ -73,7 +74,7 @@ export function applyIncomeMultipliers(state: GameState, baseIncome: number): nu
 	income *= state.experienceMultiplier;
 
 	// Apply active boost multipliers (multiplicative stacking)
-	const boostMultiplier = calculateBoostMultiplier(state);
+	const boostMultiplier = calculateBoostMultiplier(state, 'incomeMultiplier');
 	income *= boostMultiplier;
 
 	return income;
@@ -132,7 +133,6 @@ function calculatePlatformIncome(state: GameState): number {
  */
 function calculateTourIncome(state: GameState): number {
 	let income = 0;
-	const currentTime = Date.now();
 
 	for (const tour of state.tours) {
 		// Only count active tours (not completed)
@@ -158,21 +158,3 @@ function calculateUpgradeMultiplier(state: GameState): number {
 	return multiplier;
 }
 
-/**
- * Calculate total income multiplier from active boosts
- * Stacks multiplicatively (multiply all active boost multipliers)
- */
-function calculateBoostMultiplier(state: GameState): number {
-	let multiplier = 1.0;
-	const currentTime = Date.now();
-
-	for (const boost of state.activeBoosts) {
-		// Check if boost is still active
-		const elapsedTime = currentTime - boost.activatedAt;
-		if (elapsedTime < boost.duration) {
-			multiplier *= boost.incomeMultiplier;
-		}
-	}
-
-	return multiplier;
-}

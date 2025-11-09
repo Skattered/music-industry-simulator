@@ -34,7 +34,7 @@ const localStorageMock = (() => {
 })();
 
 // Setup localStorage mock
-Object.defineProperty(global, 'localStorage', {
+Object.defineProperty(globalThis, 'localStorage', {
 	value: localStorageMock,
 	writable: true
 });
@@ -59,6 +59,7 @@ function createValidGameState(): GameState {
 		songQueue: [],
 		songGenerationSpeed: 30000,
 		currentTrendingGenre: null,
+		trendDiscoveredAt: null,
 		techTier: 1,
 		techSubTier: 0,
 		upgrades: {},
@@ -378,7 +379,7 @@ describe('Save/Load System', () => {
 
 			// Mock URL.createObjectURL
 			const mockUrl = 'blob:http://localhost/test-blob';
-			global.URL.createObjectURL = vi.fn(() => mockUrl);
+			globalThis.URL.createObjectURL = vi.fn(() => mockUrl);
 
 			const result = exportSave();
 
@@ -484,7 +485,7 @@ describe('Save/Load System', () => {
 			saveGame(state);
 
 			// Mock URL methods
-			global.URL.createObjectURL = vi.fn((blob: Blob) => {
+			globalThis.URL.createObjectURL = vi.fn((blob: Blob) => {
 				// Return a mock URL, actual reading will be handled below
 				return 'blob:mock-url';
 			});
@@ -500,13 +501,13 @@ describe('Save/Load System', () => {
 				// Since exportSave likely creates a Blob and calls createObjectURL,
 				// we can spy on the call to get the blob.
 				let blobArg: Blob | undefined;
-				const origCreateObjectURL = global.URL.createObjectURL;
-				global.URL.createObjectURL = vi.fn((blob: Blob) => {
+				const origCreateObjectURL = globalThis.URL.createObjectURL;
+				globalThis.URL.createObjectURL = vi.fn((blob: Blob) => {
 					blobArg = blob;
 					return origCreateObjectURL(blob);
 				});
 				exportSave();
-				global.URL.createObjectURL = origCreateObjectURL;
+				globalThis.URL.createObjectURL = origCreateObjectURL;
 				if (blobArg) {
 					reader.readAsText(blobArg);
 				}

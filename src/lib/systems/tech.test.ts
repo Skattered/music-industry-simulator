@@ -56,6 +56,7 @@ function createTestGameState(overrides?: Partial<GameState>): GameState {
 		songQueue: [],
 		songGenerationSpeed: BASE_SONG_GENERATION_TIME,
 		currentTrendingGenre: null,
+		trendDiscoveredAt: null,
 		techTier: INITIAL_TECH_TIER,
 		techSubTier: INITIAL_TECH_SUB_TIER,
 		upgrades: {},

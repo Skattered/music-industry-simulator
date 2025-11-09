@@ -98,9 +98,9 @@ export const BASE_FAN_GENERATION_RATE = 10;
 
 /**
  * Trending genre income multiplier
- * Balance: 3x reward for matching trending genre - pure optimization (pay to research trends)
+ * Balance: 2x reward for matching trending genre - pure optimization (pay to research trends)
  */
-export const TRENDING_MULTIPLIER = 3.0;
+export const TRENDING_MULTIPLIER = 2.0;
 
 /**
  * Cost to generate a song at tier 1 (web services)
@@ -153,7 +153,7 @@ export const PHASE_REQUIREMENTS: Record<Phase, PhaseRequirements> = {
 	3: {
 		minFans: 10_000_000, // 10 million fans (100x from 100K)
 		minAlbums: 50, // 50 albums (5x from 10)
-		minTechTier: 4,
+		minTechTier: 3, // Local AI Models (design: "Own Local Models")
 		description: 'Tours & Concerts Phase - Stadium tours and massive payouts'
 	},
 	4: {

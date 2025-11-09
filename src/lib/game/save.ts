@@ -75,8 +75,7 @@ export function saveGame(state: GameState): boolean {
 			// Attempt to clear backup and retry once
 			try {
 				localStorage.removeItem(BACKUP_KEY);
-				const saveFile = createSaveFile(state);
-				localStorage.setItem(SAVE_KEY, JSON.stringify(saveFile));
+				localStorage.setItem(SAVE_KEY, serialized);
 				return true;
 			} catch (retryError) {
 				console.error('Save failed even after clearing backup:', retryError);

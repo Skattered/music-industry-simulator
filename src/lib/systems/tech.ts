@@ -107,13 +107,8 @@ export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): 
 		state.songGenerationSpeed = effects.songSpeed;
 	}
 
-	// Apply income multiplier
-	if (effects.incomeMultiplier !== undefined) {
-		// Multiply each song's current income by the multiplier
-		state.songs.forEach((song) => {
-			song.incomePerSecond = song.incomePerSecond * effects.incomeMultiplier!;
-		});
-	}
+	// Income multiplier is applied by the income calculation system using getTechIncomeMultiplier.
+	// Not applied here to avoid incorrect stacking and ensure new songs get the multiplier.
 
 	// Unlock systems
 	if (effects.unlockGPU) {

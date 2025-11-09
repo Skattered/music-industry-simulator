@@ -143,7 +143,7 @@ Success criteria:
   - BASE_FAN_GENERATION_RATE = 10 fans/second per song
   - BASE_SONG_COST = $1
 - ✅ Phase unlock requirements (5 phases with scaled requirements)
-- ✅ Tech tier upgrades: 21 upgrades (7 tiers × 3 sub-tiers)
+- ✅ Tech tier upgrade definitions: 21 upgrades (7 tiers × 3 sub-tiers)
   - Tier 1: Third-party web services ($10-$200)
   - Tier 2: Lifetime licenses ($500-$5K, unlocks free songs)
   - Tier 3: Local AI models ($10K-$50K, unlocks GPU & prestige)
@@ -151,11 +151,11 @@ Success criteria:
   - Tier 5: Train your own ($1M-$5M)
   - Tier 6: Build your software ($10M-$50M, unlocks platforms)
   - Tier 7: AI agents ($100M-$500M, full automation)
-- ✅ Exploitation boosts: 11 abilities across all phases
-- ✅ Prestige system constants (MAX_LEGACY_ARTISTS=3, multipliers)
-- ✅ Physical album constants (payouts, cooldowns)
-- ✅ Tour/concert constants (costs, income rates, duration)
-- ✅ Platform definitions (6 platforms with costs and control %)
+- ✅ Exploitation boost definitions: 11 ability configs (systems not yet implemented)
+- ✅ Prestige system constants (MAX_LEGACY_ARTISTS=3, multipliers, etc.)
+- ✅ Physical album constants (payouts, cooldowns, etc.)
+- ✅ Tour/concert constants (costs, income rates, duration, etc.)
+- ✅ Platform definitions: 6 platform configs (costs, control %, etc.)
 - ✅ All constants use UPPER_SNAKE_CASE
 - ✅ Comprehensive balance notes and comments
 - ✅ All properly typed with TypeScript interfaces

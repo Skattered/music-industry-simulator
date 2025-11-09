@@ -63,8 +63,12 @@ function isNameInCache(cache: string[], name: string): boolean {
 
 /**
  * Select a random element from an array
+ * @throws {Error} if array is empty
  */
 function randomElement<T>(array: T[]): T {
+	if (array.length === 0) {
+		throw new Error('Cannot select from empty array');
+	}
 	return array[Math.floor(Math.random() * array.length)];
 }
 
@@ -132,7 +136,7 @@ const SONG_PATTERNS: Array<{ weight: number; generate: (genre?: Genre) => string
 	{
 		weight: 4,
 		generate: () => {
-			// Pattern: "[Verb] [Adverb]" (using place as adverb context)
+			// Pattern: "[Verb] [Place]" (e.g., "Dancing Tokyo")
 			const verb = randomElement(VERBS);
 			const place = randomElement(PLACES);
 			return `${verb} ${place}`;
@@ -184,10 +188,10 @@ export function generateSongName(state?: GameState): string {
 	}
 
 	// If we couldn't generate a unique name after max attempts,
-	// append a number to ensure uniqueness
+	// append a timestamp to ensure uniqueness
 	const pattern = selectSongPattern();
 	const baseName = pattern(genre);
-	const name = `${baseName} ${attempts}`;
+	const name = `${baseName} ${Date.now()}`;
 	addToCache(recentNames.songs, name);
 	return name;
 }
@@ -240,7 +244,11 @@ const ARTIST_PATTERNS: Array<{ weight: number; generate: () => string }> = [
 		generate: () => {
 			// Pattern: "[Noun] and the [Noun]s"
 			const noun1 = randomElement(ARTIST_NOUNS);
-			const noun2 = randomElement(ARTIST_NOUNS);
+			let noun2 = randomElement(ARTIST_NOUNS);
+			// Ensure the two nouns are different
+			while (noun2 === noun1) {
+				noun2 = randomElement(ARTIST_NOUNS);
+			}
 			return `${noun1} and the ${noun2}s`;
 		}
 	},
@@ -294,10 +302,10 @@ export function generateArtistName(): string {
 		attempts++;
 	}
 
-	// Fallback with number
+	// Fallback with timestamp
 	const pattern = selectArtistPattern();
 	const baseName = pattern();
-	const name = `${baseName} ${attempts}`;
+	const name = `${baseName} ${Date.now()}`;
 	addToCache(recentNames.artists, name);
 	return name;
 }
@@ -413,10 +421,10 @@ export function generateAlbumName(): string {
 		attempts++;
 	}
 
-	// Fallback with number
+	// Fallback with timestamp
 	const pattern = selectAlbumPattern();
 	const baseName = pattern();
-	const name = `${baseName} ${attempts}`;
+	const name = `${baseName} ${Date.now()}`;
 	addToCache(recentNames.albums, name);
 	return name;
 }

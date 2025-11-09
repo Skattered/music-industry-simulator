@@ -263,7 +263,7 @@ export interface GameState {
   /** Current tech tier (1-7) */
   techTier: TechTier;
   /** Sub-tier progress within current tech tier (0-2) */
-  techSubTier: number;
+  techSubTier: 0 | 1 | 2;
   /** All purchased upgrades, keyed by upgrade ID */
   upgrades: Record<string, Upgrade>;
 

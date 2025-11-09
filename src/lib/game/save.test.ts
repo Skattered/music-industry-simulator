@@ -59,6 +59,7 @@ function createValidGameState(): GameState {
 		songQueue: [],
 		songGenerationSpeed: 30000,
 		currentTrendingGenre: null,
+		trendDiscoveredAt: null,
 		techTier: 1,
 		techSubTier: 0,
 		upgrades: {},

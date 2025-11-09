@@ -22,6 +22,7 @@ function createTestState(overrides: Partial<GameState> = {}): GameState {
 		songQueue: [],
 		songGenerationSpeed: 30000,
 		currentTrendingGenre: null,
+		trendDiscoveredAt: null,
 		techTier: 1,
 		techSubTier: 0,
 		upgrades: {},
@@ -148,6 +149,7 @@ describe('Income System', () => {
 		it('should apply trending multiplier to matching songs', () => {
 			const state = createTestState({
 				currentTrendingGenre: 'pop',
+		trendDiscoveredAt: null,
 				songs: [
 					createTestSong({ incomePerSecond: 10, genre: 'pop', isTrending: true }),
 					createTestSong({ incomePerSecond: 10, genre: 'rock', isTrending: false })

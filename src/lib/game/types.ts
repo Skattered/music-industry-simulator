@@ -388,6 +388,29 @@ export interface Milestone {
 }
 
 /**
+ * Requirements to unlock a game phase
+ * Each phase uses different metrics based on its focus
+ */
+export interface PhaseRequirements {
+  /** Minimum fan count required */
+  minFans: number;
+  /** Minimum songs completed (used in Phase 1-2) */
+  minSongs?: number;
+  /** Minimum money balance (used in Phase 2) */
+  minMoney?: number;
+  /** Minimum physical albums released (used in Phase 3) */
+  minAlbums?: number;
+  /** Minimum tours completed (used in Phase 4) */
+  minTours?: number;
+  /** Minimum platforms owned (used in Phase 5) */
+  minPlatforms?: number;
+  /** Minimum tech tier required */
+  minTechTier: TechTier;
+  /** Phase description */
+  description: string;
+}
+
+/**
  * Save file structure for localStorage
  */
 export interface SaveFile {

@@ -15,7 +15,7 @@
  * - Early game (Tier 1-2): Build to first million fans, manual song creation
  * - Mid game (Tier 3-5): Scale to 100M+ fans, automation begins
  * - Late game (Tier 6-7): Push toward billions, full automation and industry control
- * - Prestige unlocks at 500M fans for massive multiplier bonuses
+ * - Prestige unlocks at tier 3 (Local Models) - can prestige immediately, no fan gate
  */
 
 import type {
@@ -23,7 +23,8 @@ import type {
 	BoostDefinition,
 	Phase,
 	TechTier,
-	UnlockedSystems
+	UnlockedSystems,
+	PhaseRequirements
 } from './types';
 
 // ============================================================================
@@ -97,15 +98,15 @@ export const BASE_FAN_GENERATION_RATE = 10;
 
 /**
  * Trending genre income multiplier
- * Balance: 3x reward encourages strategic genre switching and creates viral hits
+ * Balance: 3x reward for matching trending genre - pure optimization (pay to research trends)
  */
 export const TRENDING_MULTIPLIER = 3.0;
 
 /**
  * Cost to generate a song at tier 1 (web services)
- * Balance: First song is free ($10 starting), second costs $2, creating early tension
+ * Balance: First song is free ($10 starting), second costs $1, creating early tension
  */
-export const BASE_SONG_COST = 2;
+export const BASE_SONG_COST = 1;
 
 /**
  * Offline progress cap in hours
@@ -120,14 +121,22 @@ export const OFFLINE_PROGRESS_CAP_HOURS = 4;
 /**
  * Requirements to unlock each game phase
  * Each phase introduces new mechanics and revenue streams
- * Balance: Scaled to billions of fans - hit songs should reach 1B+ plays
+ *
+ * Balance Philosophy:
+ * - Scaled 100x from original design for billion-fan economy
+ * - Each phase uses metrics from PREVIOUS phase's content (not just songs)
+ * - Phase 2: Songs → Phase 3: Albums → Phase 4: Tours → Phase 5: Platforms
+ * - Consistent 100x fan multiplier: 10K→1M, 100K→10M, 1M→100M, 10M→1B
+ * - End game target: 4B fans (achieved after Phase 5 unlock)
+ *
+ * Original → Scaled:
+ * - Songs: 100 → 1,000 (10x for massive catalogs)
+ * - Money: $5K → $5M (1000x for billion-dollar economy)
+ * - Albums: 10 → 50 (5x, albums take time to produce)
+ * - Tours: 50 → 200 (4x, tours are expensive/complex)
+ * - Platforms: 3 → 3 (no scaling, only 6 platforms exist total)
  */
-export const PHASE_REQUIREMENTS: Record<Phase, {
-	minFans: number;
-	minSongs: number;
-	minTechTier: TechTier;
-	description: string;
-}> = {
+export const PHASE_REQUIREMENTS: Record<Phase, PhaseRequirements> = {
 	1: {
 		minFans: 0,
 		minSongs: 0,
@@ -135,26 +144,27 @@ export const PHASE_REQUIREMENTS: Record<Phase, {
 		description: 'Streaming Phase - Generate songs and earn from streams'
 	},
 	2: {
-		minFans: 1_000_000, // 1 million fans
-		minSongs: 10,
+		minFans: 1_000_000, // 1 million fans (100x from 10K)
+		minSongs: 1_000, // 1K songs (10x from 100)
+		minMoney: 5_000_000, // $5M (1000x from $5K)
 		minTechTier: 2,
 		description: 'Physical Albums Phase - Release albums for million-copy sales'
 	},
 	3: {
-		minFans: 100_000_000, // 100 million fans
-		minSongs: 50,
+		minFans: 10_000_000, // 10 million fans (100x from 100K)
+		minAlbums: 50, // 50 albums (5x from 10)
 		minTechTier: 4,
 		description: 'Tours & Concerts Phase - Stadium tours and massive payouts'
 	},
 	4: {
-		minFans: 1_000_000_000, // 1 billion fans
-		minSongs: 200,
+		minFans: 100_000_000, // 100 million fans (100x from 1M)
+		minTours: 200, // 200 tours (4x from 50)
 		minTechTier: 6,
 		description: 'Platform Ownership Phase - Buy industry infrastructure'
 	},
 	5: {
-		minFans: 4_000_000_000, // 4 billion fans (global domination)
-		minSongs: 1000,
+		minFans: 1_000_000_000, // 1 billion fans (100x from 10M)
+		minPlatforms: 3, // 3 platforms (same as original - only 6 exist)
 		minTechTier: 7,
 		description: 'Total Automation Phase - AI agents control the world'
 	}
@@ -262,11 +272,12 @@ export const UPGRADES: UpgradeDefinition[] = [
 		id: 'tier3_basic',
 		tier: 3,
 		name: 'Download Open Models',
-		description: 'Run AI locally on your hardware. Unlocks GPU resources. Songs take 6s.',
+		description: 'Run AI locally on your hardware. Unlocks GPU resources and prestige. Songs take 6s.',
 		cost: 10000,
 		effects: {
 			songSpeed: 6000,
-			unlockGPU: true
+			unlockGPU: true,
+			unlockPrestige: true
 		},
 		prerequisites: ['tier2_advanced']
 	},
@@ -359,8 +370,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		cost: 2500000,
 		effects: {
 			songSpeed: 1000,
-			incomeMultiplier: 10.0,
-			unlockPrestige: true
+			incomeMultiplier: 10.0
 		},
 		prerequisites: ['tier5_basic']
 	},
@@ -785,7 +795,7 @@ export const INITIAL_UNLOCKED_SYSTEMS: UnlockedSystems = {
 
 /**
  * All available music genres
- * Trending genre rotates randomly
+ * Trending genre changes only when player manually researches (no auto-rotation)
  */
 export const GENRES = ['pop', 'hip-hop', 'rock', 'electronic', 'country', 'jazz', 'classical', 'indie'] as const;
 

@@ -248,9 +248,9 @@ export function deleteSave(): void {
 }
 
 /**
- * Exports the current save as a data URL for download
+ * Exports the current save as a blob URL for download
  *
- * @returns A data URL string containing the save file JSON, or null if export fails
+ * @returns A blob URL string referencing the save file JSON, or null if export fails
  */
 export function exportSave(): string | null {
 	try {

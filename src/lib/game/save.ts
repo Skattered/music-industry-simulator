@@ -46,8 +46,8 @@ export function saveGame(state: GameState): boolean {
 		// Serialize to JSON
 		const serialized = JSON.stringify(saveFile);
 
-		// Check approximate size
-		if (serialized.length > MAX_STORAGE_SIZE) {
+		// Check approximate size (use actual byte size)
+		if (new Blob([serialized]).size > MAX_STORAGE_SIZE) {
 			console.error('Save data exceeds maximum storage size');
 			return false;
 		}

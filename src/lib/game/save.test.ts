@@ -2,7 +2,7 @@
  * Unit tests for the save/load system
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
 	saveGame,
 	loadGame,
@@ -478,38 +478,50 @@ describe('Save/Load System', () => {
 			expect(loaded!.currentArtist.name).toBe('Integration Test Artist');
 		});
 
-		it('should handle export/import cycle', () => {
+		it('should handle export/import cycle', async () => {
 			const state = createValidGameState();
 			state.money = 2000;
 			saveGame(state);
 
 			// Mock URL methods
-			let blobContent = '';
 			global.URL.createObjectURL = vi.fn((blob: Blob) => {
-				// Read blob content
-				const reader = new FileReader();
-				reader.onload = () => {
-					blobContent = reader.result as string;
-				};
-				reader.readAsText(blob);
+				// Return a mock URL, actual reading will be handled below
 				return 'blob:mock-url';
 			});
 
-			// Export
-			exportSave();
+			// Export and read blob content asynchronously
+			const blobContent: string = await new Promise((resolve) => {
+				const reader = new FileReader();
+				reader.onload = () => {
+					resolve(reader.result as string);
+				};
+				// The exportSave function should trigger a download with a Blob.
+				// We need to get the blob that was passed to createObjectURL.
+				// Since exportSave likely creates a Blob and calls createObjectURL,
+				// we can spy on the call to get the blob.
+				let blobArg: Blob | undefined;
+				const origCreateObjectURL = global.URL.createObjectURL;
+				global.URL.createObjectURL = vi.fn((blob: Blob) => {
+					blobArg = blob;
+					return origCreateObjectURL(blob);
+				});
+				exportSave();
+				global.URL.createObjectURL = origCreateObjectURL;
+				if (blobArg) {
+					reader.readAsText(blobArg);
+				}
+			});
 
 			// Clear localStorage
 			deleteSave();
 
 			// Import
-			if (blobContent) {
-				const importResult = importSave(blobContent);
-				expect(importResult).toBe(true);
+			const importResult = importSave(blobContent);
+			expect(importResult).toBe(true);
 
-				const loaded = loadGame();
-				expect(loaded).toBeTruthy();
-				expect(loaded!.money).toBe(2000);
-			}
+			const loaded = loadGame();
+			expect(loaded).toBeTruthy();
+			expect(loaded!.money).toBe(2000);
 		});
 
 		it('should maintain backup integrity across multiple saves', () => {

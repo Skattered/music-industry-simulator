@@ -89,11 +89,15 @@
 	}
 
 	// Get boosts for the selected category
-	let categoryBoosts = $derived(() => {
-		const category = CATEGORIES.find((c) => c.id === selectedCategory);
-		if (!category) return [];
-		return BOOSTS.filter((boost) => category.boostIds.includes(boost.id));
-	});
+	let categoryBoosts = $derived(
+		(() => {
+			const category = CATEGORIES.find((c) => c.id === selectedCategory);
+			if (!category) return [];
+			return BOOSTS.filter((boost) =>
+				category.boostIds.includes(boost.id as (typeof category.boostIds)[number])
+			);
+		})()
+	);
 </script>
 
 <div class="upgrade-panel">

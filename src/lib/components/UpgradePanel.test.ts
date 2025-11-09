@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import UpgradePanel from './UpgradePanel.svelte';
 import type { GameState, UnlockedSystems, Artist } from '$lib/game/types';
-import { BOOSTS } from '$lib/game/config';
 
 /**
  * Helper function to create a minimal GameState for testing

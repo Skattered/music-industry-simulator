@@ -275,7 +275,7 @@ export class GameEngine {
 
 			// Apply trending bonus if applicable
 			if (song.isTrending) {
-				songFans *= 2.0; // TRENDING_MULTIPLIER from config
+				songFans *= TRENDING_MULTIPLIER;
 			}
 
 			totalFans += songFans;

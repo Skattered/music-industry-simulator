@@ -13,6 +13,7 @@ import {
 	calculateTechTier,
 	doesTierUnlockPrestige
 } from '../data/tech-upgrades';
+import { BASE_SONG_COST } from '../game/config';
 
 /**
  * Get all available tech upgrades
@@ -188,7 +189,7 @@ export function getSongGenerationCost(state: GameState): number {
 	}
 
 	// Default to base cost from config
-	return 1; // BASE_SONG_COST
+	return BASE_SONG_COST;
 }
 
 /**

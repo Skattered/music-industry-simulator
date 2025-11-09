@@ -258,6 +258,8 @@ export interface GameState {
   songGenerationSpeed: number;
   /** Current trending genre (null if trend research not unlocked) */
   currentTrendingGenre: Genre | null;
+  /** Timestamp when the current trend was discovered (for calculating fade) */
+  trendDiscoveredAt: number | null;
 
   // Tech Progression
   /** Current tech tier (1-7) */

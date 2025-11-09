@@ -63,6 +63,7 @@ function createTestGameState(overrides?: Partial<GameState>): GameState {
 		songQueue: [],
 		songGenerationSpeed: BASE_SONG_GENERATION_TIME,
 		currentTrendingGenre: null,
+		trendDiscoveredAt: null,
 		techTier: INITIAL_TECH_TIER,
 		techSubTier: INITIAL_TECH_SUB_TIER,
 		upgrades: {},
@@ -133,7 +134,8 @@ describe('generateSong', () => {
 
 	it('should apply trending multiplier to income and fan generation', () => {
 		const state = createTestGameState({
-			currentTrendingGenre: 'pop'
+			currentTrendingGenre: 'pop',
+			trendDiscoveredAt: Date.now() // Set to now for full multiplier strength
 		});
 
 		// Generate songs until we get a pop song
@@ -149,6 +151,35 @@ describe('generateSong', () => {
 		expect(trendingSong).not.toBeNull();
 		expect(trendingSong!.incomePerSecond).toBe(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
 		expect(trendingSong!.fanGenerationRate).toBe(BASE_FAN_GENERATION_RATE * TRENDING_MULTIPLIER);
+	});
+
+	it('should fade trending multiplier over time', () => {
+		const now = Date.now();
+
+		// Test at start of trend (full multiplier)
+		const stateStart = createTestGameState({
+			currentTrendingGenre: 'pop',
+			trendDiscoveredAt: now
+		});
+		const songStart = generateSong(stateStart);
+		expect(songStart.incomePerSecond).toBe(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
+
+		// Test at halfway through fade (1.5x multiplier: midpoint between 2.0 and 1.0)
+		const stateHalf = createTestGameState({
+			currentTrendingGenre: 'pop',
+			trendDiscoveredAt: now - 150000 // 2.5 minutes ago (half of 5 minute fade)
+		});
+		const songHalf = generateSong(stateHalf);
+		const expectedHalfMultiplier = 1.5; // Halfway between 2.0 and 1.0
+		expect(songHalf.incomePerSecond).toBe(BASE_INCOME_PER_SONG * expectedHalfMultiplier);
+
+		// Test after fade complete (1.0x multiplier - no bonus)
+		const stateFaded = createTestGameState({
+			currentTrendingGenre: 'pop',
+			trendDiscoveredAt: now - 300000 // 5 minutes ago (fully faded)
+		});
+		const songFaded = generateSong(stateFaded);
+		expect(songFaded.incomePerSecond).toBe(BASE_INCOME_PER_SONG * 1.0);
 	});
 
 	it('should apply experience multiplier to income', () => {

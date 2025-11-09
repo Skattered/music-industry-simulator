@@ -11,12 +11,41 @@ import {
 	BASE_FAN_GENERATION_RATE,
 	BASE_SONG_COST,
 	TRENDING_MULTIPLIER,
+	TREND_FADE_DURATION,
 	UPGRADES,
 	GENRES
 } from '../game/config';
 
 // Create a Map for O(1) upgrade lookups
 const UPGRADE_MAP = new Map(UPGRADES.map((u) => [u.id, u]));
+
+/**
+ * Calculate the current trending multiplier with fade
+ * Starts at TRENDING_MULTIPLIER and fades linearly to 1.0 over TREND_FADE_DURATION
+ *
+ * @param state - Current game state
+ * @returns Current trending multiplier (1.0 to TRENDING_MULTIPLIER)
+ */
+export function getTrendingMultiplier(state: GameState): number {
+	if (state.currentTrendingGenre === null || state.trendDiscoveredAt === null) {
+		return 1.0;
+	}
+
+	const now = Date.now();
+	const elapsed = now - state.trendDiscoveredAt;
+
+	// If trend has fully faded, return 1.0
+	if (elapsed >= TREND_FADE_DURATION) {
+		return 1.0;
+	}
+
+	// Linear fade from TRENDING_MULTIPLIER to 1.0
+	const fadeProgress = elapsed / TREND_FADE_DURATION; // 0.0 to 1.0
+	const multiplierRange = TRENDING_MULTIPLIER - 1.0; // e.g., 2.0 - 1.0 = 1.0
+	const currentMultiplier = TRENDING_MULTIPLIER - (multiplierRange * fadeProgress);
+
+	return currentMultiplier;
+}
 
 // ============================================================================
 // NAME GENERATION
@@ -160,6 +189,9 @@ export function generateSong(state: GameState): Song {
 	// Generate song properties
 	const id = crypto.randomUUID();
 	const name = generateSongName();
+	// When a trending genre is discovered, intentionally create all songs in that genre
+	// to capitalize on the trend bonus before it fades. This is the core mechanic:
+	// research trend -> make songs in that genre -> bonus fades -> research new trend
 	const genre = state.currentTrendingGenre || selectRandomGenre();
 	const createdAt = Date.now();
 
@@ -170,17 +202,19 @@ export function generateSong(state: GameState): Song {
 	const upgradeMultiplier = getIncomeMultiplier(state);
 	let incomePerSecond = BASE_INCOME_PER_SONG * upgradeMultiplier * state.experienceMultiplier;
 
-	// Apply trending multiplier if applicable
+	// Apply fading trending multiplier if applicable (starts at 2.0x, fades to 1.0x over 5 minutes)
 	if (isTrending) {
-		incomePerSecond *= TRENDING_MULTIPLIER;
+		const trendingMultiplier = getTrendingMultiplier(state);
+		incomePerSecond *= trendingMultiplier;
 	}
 
 	// Calculate fan generation rate
 	let fanGenerationRate = BASE_FAN_GENERATION_RATE;
 
-	// Apply trending multiplier to fan generation as well
+	// Apply fading trending multiplier to fan generation as well
 	if (isTrending) {
-		fanGenerationRate *= TRENDING_MULTIPLIER;
+		const trendingMultiplier = getTrendingMultiplier(state);
+		fanGenerationRate *= trendingMultiplier;
 	}
 
 	return {

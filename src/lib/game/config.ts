@@ -629,10 +629,13 @@ export const PRESTIGE_MULTIPLIER_PER_LEVEL = 0.1;
 export const MAX_LEGACY_ARTISTS = 3;
 
 /**
- * Minimum fans required to unlock prestige option
- * Balance: 500M fans represents major commercial success
+ * Recommended fan milestone for prestige (for UI display/guidance only)
+ * IMPORTANT: Prestige is unlocked by tech tiers (tier 3, 5, 6, 7), NOT by fan count
+ * This value is just for showing "you might want to prestige around here" - not a hard gate
+ * Players can prestige immediately after tech unlock if they want (linear progression, no strategy)
+ * Balance: 500M fans gives decent prestige multiplier bonus
  */
-export const PRESTIGE_MIN_FANS = 500_000_000;
+export const PRESTIGE_RECOMMENDED_FANS = 500_000_000;
 
 /**
  * Percentage of peak fans that converts to legacy artist income rate
@@ -789,11 +792,6 @@ export const GENRES = ['pop', 'hip-hop', 'rock', 'electronic', 'country', 'jazz'
 /**
  * Cost to research and switch trending genre
  * Balance: Expensive enough to matter but affordable mid-game
+ * IMPORTANT: Trends ONLY change when manually researched (no auto-rotation)
  */
 export const TREND_RESEARCH_COST = 1_000_000;
-
-/**
- * How often trending genre changes automatically (milliseconds)
- * Balance: 5 minutes gives time to capitalize on trends
- */
-export const TREND_ROTATION_INTERVAL = 300000;

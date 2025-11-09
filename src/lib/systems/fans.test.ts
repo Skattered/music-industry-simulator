@@ -192,7 +192,7 @@ describe('Fan System', () => {
 		it('should apply trending multiplier to matching songs', () => {
 			const state = createTestState({
 				currentTrendingGenre: 'pop',
-		trendDiscoveredAt: null,
+				trendDiscoveredAt: null,
 				songs: [
 					createTestSong({ fanGenerationRate: 10, genre: 'pop', isTrending: true }),
 					createTestSong({ fanGenerationRate: 10, genre: 'rock', isTrending: false })
@@ -205,7 +205,7 @@ describe('Fan System', () => {
 		it('should only apply trending to songs marked as trending', () => {
 			const state = createTestState({
 				currentTrendingGenre: 'pop',
-		trendDiscoveredAt: null,
+				trendDiscoveredAt: null,
 				songs: [
 					createTestSong({ fanGenerationRate: 10, genre: 'pop', isTrending: false })
 				]

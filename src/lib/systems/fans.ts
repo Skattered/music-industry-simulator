@@ -77,8 +77,8 @@ function calculateSongFanGeneration(state: GameState): number {
 	for (const song of state.songs) {
 		let songFanGen = song.fanGenerationRate;
 
-		// Apply trending multiplier if song matches current trend
-		if (song.isTrending && state.currentTrendingGenre === song.genre) {
+		// Apply trending multiplier if song matches current trending genre
+		if (state.currentTrendingGenre === song.genre) {
 			songFanGen *= TRENDING_MULTIPLIER;
 		}
 

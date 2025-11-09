@@ -90,8 +90,8 @@ function calculateSongIncome(state: GameState): number {
 	for (const song of state.songs) {
 		let songIncome = song.incomePerSecond;
 
-		// Apply trending multiplier if song matches current trend
-		if (song.isTrending && state.currentTrendingGenre === song.genre) {
+		// Apply trending multiplier if song matches current trending genre
+		if (state.currentTrendingGenre === song.genre) {
 			songIncome *= TRENDING_MULTIPLIER;
 		}
 

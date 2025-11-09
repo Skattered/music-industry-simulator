@@ -7,6 +7,7 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		globals: true,
 		environment: 'jsdom',
+		setupFiles: ['./vitest-setup.ts'],
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'json', 'html', 'lcov'],
@@ -18,5 +19,8 @@ export default defineConfig({
 				'build/'
 			]
 		}
+	},
+	resolve: {
+		conditions: ['browser']
 	}
 });

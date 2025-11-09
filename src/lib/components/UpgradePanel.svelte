@@ -93,9 +93,10 @@
 		(() => {
 			const category = CATEGORIES.find((c) => c.id === selectedCategory);
 			if (!category) return [];
-			return BOOSTS.filter((boost) =>
-				category.boostIds.includes(boost.id as (typeof category.boostIds)[number])
-			);
+			return BOOSTS.filter((boost) => {
+				const boostIds = category.boostIds as readonly string[];
+				return boostIds.includes(boost.id);
+			});
 		})()
 	);
 </script>
@@ -158,7 +159,7 @@
 	<div class="available-boosts-section">
 		<h3 class="section-title">Available Boosts</h3>
 		<div class="boosts-grid">
-			{#each categoryBoosts() as boost}
+			{#each categoryBoosts as boost}
 				{@const cost = calculateBoostCost(boost)}
 				{@const active = isBoostActive(boost.id)}
 				{@const affordable = canAfford(boost)}

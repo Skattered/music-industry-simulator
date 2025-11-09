@@ -12,6 +12,7 @@
  *
  * Multipliers applied:
  * - Upgrade income multipliers (stacked additively)
+ * - Prestige experience multiplier
  * - Active boost multipliers (stacked multiplicatively)
  * - Trending genre bonuses (2x for matching songs)
  */
@@ -90,8 +91,8 @@ function calculateSongIncome(state: GameState): number {
 	for (const song of state.songs) {
 		let songIncome = song.incomePerSecond;
 
-		// Apply trending multiplier if song matches current trending genre
-		if (state.currentTrendingGenre === song.genre) {
+		// Apply trending multiplier if song matches current trending genre and is marked as trending
+		if (state.currentTrendingGenre === song.genre && song.isTrending) {
 			songIncome *= TRENDING_MULTIPLIER;
 		}
 

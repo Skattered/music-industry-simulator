@@ -11,6 +11,7 @@
  * Features:
  * - Passive fan accumulation from all songs
  * - Boost multipliers for temporary fan growth
+ * - Prestige experience multiplier for enhanced growth
  * - Peak fan tracking for prestige bonuses
  * - Current artist fan tracking separate from total fans
  */
@@ -49,7 +50,7 @@ export function calculateFanGeneration(state: GameState): number {
 	// Calculate base fan generation from songs
 	const baseFanGeneration = calculateSongFanGeneration(state);
 
-	// Apply active boost multipliers
+	// Apply fan generation multipliers (prestige and boosts)
 	const totalFanGeneration = applyFanMultipliers(state, baseFanGeneration);
 
 	return totalFanGeneration;
@@ -77,8 +78,8 @@ function calculateSongFanGeneration(state: GameState): number {
 	for (const song of state.songs) {
 		let songFanGen = song.fanGenerationRate;
 
-		// Apply trending multiplier if song matches current trending genre
-		if (state.currentTrendingGenre === song.genre) {
+		// Apply trending multiplier if song matches current trending genre and is marked as trending
+		if (state.currentTrendingGenre === song.genre && song.isTrending) {
 			songFanGen *= TRENDING_MULTIPLIER;
 		}
 
@@ -90,7 +91,7 @@ function calculateSongFanGeneration(state: GameState): number {
 
 /**
  * Apply all fan generation multipliers
- * Currently only applies active boost multipliers
+ * Applies prestige experience multiplier and active boost multipliers
  *
  * @param state - The current game state
  * @param baseFanGeneration - Base fan generation before multipliers

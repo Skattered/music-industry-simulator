@@ -18,6 +18,20 @@ import { SAVE_KEY, BACKUP_KEY, GAME_VERSION } from './config';
 const MAX_STORAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
 /**
+ * Creates a SaveFile object from the current game state
+ *
+ * @param state - The current game state
+ * @returns A SaveFile object with timestamp and version
+ */
+function createSaveFile(state: GameState): SaveFile {
+	return {
+		state,
+		savedAt: Date.now(),
+		version: GAME_VERSION
+	};
+}
+
+/**
  * Saves the game state to localStorage with automatic backup
  *
  * @param state - The current game state to save
@@ -37,11 +51,7 @@ export function saveGame(state: GameState): boolean {
 		}
 
 		// Create save file structure
-		const saveFile: SaveFile = {
-			state,
-			savedAt: Date.now(),
-			version: GAME_VERSION
-		};
+		const saveFile = createSaveFile(state);
 
 		// Serialize to JSON
 		const serialized = JSON.stringify(saveFile);
@@ -65,11 +75,7 @@ export function saveGame(state: GameState): boolean {
 			// Attempt to clear backup and retry once
 			try {
 				localStorage.removeItem(BACKUP_KEY);
-				const saveFile: SaveFile = {
-					state,
-					savedAt: Date.now(),
-					version: GAME_VERSION
-				};
+				const saveFile = createSaveFile(state);
 				localStorage.setItem(SAVE_KEY, JSON.stringify(saveFile));
 				return true;
 			} catch (retryError) {

@@ -22,6 +22,7 @@
 		"@sveltejs/kit": "^2.47.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@testing-library/svelte": "^5.2.8",
+		"@vitest/coverage-v8": "^4.0.8",
 		"@vitest/ui": "^4.0.8",
 		"autoprefixer": "^10.4.21",
 		"jsdom": "^27.1.0",

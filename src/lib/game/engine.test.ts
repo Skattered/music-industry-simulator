@@ -43,6 +43,7 @@ function createTestGameState(): GameState {
 		techSubTier: 0,
 		upgrades: {},
 		activeBoosts: [],
+		boostUsageCounts: {},
 		physicalAlbums: [],
 		tours: [],
 		ownedPlatforms: [],

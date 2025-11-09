@@ -27,6 +27,7 @@ function createTestState(overrides: Partial<GameState> = {}): GameState {
 		techSubTier: 0,
 		upgrades: {},
 		activeBoosts: [],
+		boostUsageCounts: {},
 		physicalAlbums: [],
 		tours: [],
 		ownedPlatforms: [],

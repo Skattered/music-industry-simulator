@@ -20,6 +20,7 @@
 import type { GameState } from '../game/types';
 import { TRENDING_MULTIPLIER } from '../game/config';
 import { calculateBoostMultiplier } from './boosts';
+import { calculateTourIncome as calculateTourIncomeFromTours } from './tours';
 
 /**
  * Generate income and add it to the game state
@@ -133,16 +134,8 @@ function calculatePlatformIncome(state: GameState): number {
  * Only counts tours that are still running
  */
 function calculateTourIncome(state: GameState): number {
-	let income = 0;
-
-	for (const tour of state.tours) {
-		// Only count active tours (not completed)
-		if (tour.completedAt === null) {
-			income += tour.incomePerSecond;
-		}
-	}
-
-	return income;
+	// Use the dedicated tours system for income calculation
+	return calculateTourIncomeFromTours(state);
 }
 
 /**

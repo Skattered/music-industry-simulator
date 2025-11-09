@@ -8,6 +8,7 @@
 
 import type { GameState, QueuedSong, ActiveBoost, Tour } from './types';
 import { TICK_RATE, SAVE_KEY, BACKUP_KEY, TRENDING_MULTIPLIER, TOUR_DURATION } from './config';
+import { processTours as processToursSystem, calculateTourIncome } from '../systems/tours';
 
 /**
  * Callback function type for save operations
@@ -236,11 +237,8 @@ export class GameEngine {
 		}
 
 		// Income from active tours
-		for (const tour of this.gameState.tours) {
-			if (tour.completedAt === null) {
-				totalIncome += tour.incomePerSecond * deltaSeconds;
-			}
-		}
+		const tourIncomePerSecond = calculateTourIncome(this.gameState);
+		totalIncome += tourIncomePerSecond * deltaSeconds;
 
 		// Income from owned platforms
 		for (const platform of this.gameState.ownedPlatforms) {
@@ -303,17 +301,8 @@ export class GameEngine {
 	 * Process active tours and mark completed ones
 	 */
 	private processTours(): void {
-		const currentTime = Date.now();
-
-		for (const tour of this.gameState.tours) {
-			if (tour.completedAt === null) {
-				const elapsed = currentTime - tour.startedAt;
-
-				if (elapsed >= TOUR_DURATION) {
-					tour.completedAt = currentTime;
-				}
-			}
-		}
+		// Use the dedicated tours system for processing
+		processToursSystem(this.gameState, TICK_RATE);
 	}
 
 	/**

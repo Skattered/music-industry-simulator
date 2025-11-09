@@ -5,10 +5,17 @@
  * All constants use UPPER_SNAKE_CASE naming convention.
  *
  * Balance Philosophy:
- * - Early game (Tier 1-2): Focus on manual song creation and discovery
- * - Mid game (Tier 3-5): Automation and scaling begin
- * - Late game (Tier 6-7): Full automation and industry control
- * - Prestige is encouraged around 30-60 minutes of gameplay
+ * - MASSIVE SCALE: End game targets 4 BILLION fans (global domination)
+ * - Hit songs should generate BILLIONS of plays/streams
+ * - Albums can sell MILLIONS of copies (or 500K+ for limited releases)
+ * - Tours generate MILLIONS in revenue
+ * - Platform ownership costs HUNDREDS OF MILLIONS but generates massive passive income
+ *
+ * Progression:
+ * - Early game (Tier 1-2): Build to first million fans, manual song creation
+ * - Mid game (Tier 3-5): Scale to 100M+ fans, automation begins
+ * - Late game (Tier 6-7): Push toward billions, full automation and industry control
+ * - Prestige unlocks at 500M fans for massive multiplier bonuses
  */
 
 import type {
@@ -78,21 +85,21 @@ export const BASE_SONG_GENERATION_TIME = 30000;
 
 /**
  * Base income per song per second in dollars
- * Balance: At $0.001/sec, one song earns $3.60/hour - realistic streaming rates
+ * Balance: At $1/sec, one song earns $3,600/hour - scales to billions with multipliers
  */
-export const BASE_INCOME_PER_SONG = 0.001;
+export const BASE_INCOME_PER_SONG = 1.0;
 
 /**
  * Base fan generation rate per song per second
- * Balance: Slow organic growth, needs multiple songs to scale
+ * Balance: Need high rates to reach billions of fans - 10 fans/sec = 36K fans/hour per song
  */
-export const BASE_FAN_GENERATION_RATE = 0.1;
+export const BASE_FAN_GENERATION_RATE = 10;
 
 /**
  * Trending genre income multiplier
- * Balance: 2x reward encourages strategic genre switching
+ * Balance: 3x reward encourages strategic genre switching and creates viral hits
  */
-export const TRENDING_MULTIPLIER = 2.0;
+export const TRENDING_MULTIPLIER = 3.0;
 
 /**
  * Cost to generate a song at tier 1 (web services)
@@ -113,6 +120,7 @@ export const OFFLINE_PROGRESS_CAP_HOURS = 4;
 /**
  * Requirements to unlock each game phase
  * Each phase introduces new mechanics and revenue streams
+ * Balance: Scaled to billions of fans - hit songs should reach 1B+ plays
  */
 export const PHASE_REQUIREMENTS: Record<Phase, {
 	minFans: number;
@@ -127,28 +135,28 @@ export const PHASE_REQUIREMENTS: Record<Phase, {
 		description: 'Streaming Phase - Generate songs and earn from streams'
 	},
 	2: {
-		minFans: 1000,
+		minFans: 1_000_000, // 1 million fans
 		minSongs: 10,
 		minTechTier: 2,
-		description: 'Physical Albums Phase - Release albums for one-time payouts'
+		description: 'Physical Albums Phase - Release albums for million-copy sales'
 	},
 	3: {
-		minFans: 10000,
+		minFans: 100_000_000, // 100 million fans
 		minSongs: 50,
 		minTechTier: 4,
-		description: 'Tours & Concerts Phase - Organize tours for massive income'
+		description: 'Tours & Concerts Phase - Stadium tours and massive payouts'
 	},
 	4: {
-		minFans: 100000,
+		minFans: 1_000_000_000, // 1 billion fans
 		minSongs: 200,
 		minTechTier: 6,
 		description: 'Platform Ownership Phase - Buy industry infrastructure'
 	},
 	5: {
-		minFans: 1000000,
+		minFans: 4_000_000_000, // 4 billion fans (global domination)
 		minSongs: 1000,
 		minTechTier: 7,
-		description: 'Total Automation Phase - AI agents run everything'
+		description: 'Total Automation Phase - AI agents control the world'
 	}
 };
 
@@ -474,7 +482,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'bot_streams',
 		name: 'Bot Streams',
 		description: 'Deploy streaming bots to inflate play counts. Ethically dubious but effective.',
-		baseCost: 100,
+		baseCost: 100_000,
 		duration: 30000, // 30 seconds
 		incomeMultiplier: 3.0,
 		fanMultiplier: 1.5,
@@ -485,7 +493,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'playlist_placement',
 		name: 'Playlist Payola',
 		description: 'Pay playlist curators for placement. Modern payola.',
-		baseCost: 500,
+		baseCost: 500_000,
 		duration: 60000, // 60 seconds
 		incomeMultiplier: 2.5,
 		fanMultiplier: 3.0,
@@ -496,7 +504,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'social_media_campaign',
 		name: 'Viral Marketing Campaign',
 		description: 'Astroturfing and fake engagement for artificial virality.',
-		baseCost: 1000,
+		baseCost: 1_000_000,
 		duration: 45000, // 45 seconds
 		incomeMultiplier: 2.0,
 		fanMultiplier: 5.0,
@@ -511,7 +519,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'limited_edition_variants',
 		name: 'Limited Edition Variants',
 		description: 'Release 47 different vinyl colors. Collectors must buy them all.',
-		baseCost: 5000,
+		baseCost: 5_000_000,
 		duration: 60000,
 		incomeMultiplier: 4.0,
 		fanMultiplier: 1.2,
@@ -522,7 +530,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'shut_down_competitors',
 		name: 'Shut Down Competitors',
 		description: 'DMCA takedowns and frivolous lawsuits against other artists.',
-		baseCost: 10000,
+		baseCost: 10_000_000,
 		duration: 90000, // 90 seconds
 		incomeMultiplier: 3.5,
 		fanMultiplier: 0.8, // Fans don\'t like this
@@ -533,7 +541,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'exclusive_retailer_deals',
 		name: 'Exclusive Retailer Deals',
 		description: 'Force fans to shop at specific stores for different bonus tracks.',
-		baseCost: 7500,
+		baseCost: 7_500_000,
 		duration: 60000,
 		incomeMultiplier: 3.0,
 		fanMultiplier: 1.5,
@@ -548,7 +556,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'scalp_records',
 		name: 'Scalp Your Own Records',
 		description: 'Buy your own limited releases and resell at markup. Peak capitalism.',
-		baseCost: 25000,
+		baseCost: 25_000_000,
 		duration: 120000, // 2 minutes
 		incomeMultiplier: 5.0,
 		fanMultiplier: 0.5, // Fans really don\'t like this
@@ -559,7 +567,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'limit_tickets',
 		name: 'Artificial Ticket Scarcity',
 		description: 'Hold back tickets to create false demand and urgency.',
-		baseCost: 50000,
+		baseCost: 50_000_000,
 		duration: 90000,
 		incomeMultiplier: 4.5,
 		fanMultiplier: 1.1,
@@ -570,7 +578,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'scalp_tickets',
 		name: 'Scalp Your Own Tickets',
 		description: 'Partner with scalpers to resell your own tickets at 10x markup.',
-		baseCost: 100000,
+		baseCost: 100_000_000,
 		duration: 120000,
 		incomeMultiplier: 6.0,
 		fanMultiplier: 0.3, // Fans hate this but keep buying
@@ -581,7 +589,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'fomo_marketing',
 		name: 'FOMO Marketing',
 		description: '"Last chance ever" claims and countdown timers. Repeat monthly.',
-		baseCost: 75000,
+		baseCost: 75_000_000,
 		duration: 60000,
 		incomeMultiplier: 3.5,
 		fanMultiplier: 2.5,
@@ -596,7 +604,7 @@ export const BOOSTS: BoostDefinition[] = [
 		type: 'dynamic_pricing',
 		name: 'Dynamic Pricing',
 		description: 'Surge pricing for your own shows on your own platform. Beautiful synergy.',
-		baseCost: 250000,
+		baseCost: 250_000_000,
 		duration: 180000, // 3 minutes
 		incomeMultiplier: 8.0,
 		fanMultiplier: 0.2, // Maximum exploitation
@@ -622,15 +630,15 @@ export const MAX_LEGACY_ARTISTS = 3;
 
 /**
  * Minimum fans required to unlock prestige option
- * Balance: Should take 30-60 minutes on first run
+ * Balance: 500M fans represents major commercial success
  */
-export const PRESTIGE_MIN_FANS = 50000;
+export const PRESTIGE_MIN_FANS = 500_000_000;
 
 /**
  * Percentage of peak fans that converts to legacy artist income rate
- * Balance: 1% means 100k fans = $1/sec passive income
+ * Balance: 100M fans = $10K/sec passive income, 1B fans = $100K/sec
  */
-export const LEGACY_ARTIST_INCOME_RATIO = 0.00001;
+export const LEGACY_ARTIST_INCOME_RATIO = 0.0001;
 
 // ============================================================================
 // PHYSICAL ALBUMS
@@ -638,15 +646,16 @@ export const LEGACY_ARTIST_INCOME_RATIO = 0.00001;
 
 /**
  * Base payout per song in an album
- * Balance: 10 song album = $1000 base, scales with fans
+ * Balance: 10 song album = $500K base, scales with fans to reach millions
  */
-export const ALBUM_PAYOUT_PER_SONG = 100;
+export const ALBUM_PAYOUT_PER_SONG = 50_000;
 
 /**
  * Fan count multiplier for album payouts
  * More fans = larger audience = bigger payout
+ * Balance: $0.50 per fan - 1M fans = $500K, 10M fans = $5M in album sales
  */
-export const ALBUM_FAN_MULTIPLIER = 0.01;
+export const ALBUM_FAN_MULTIPLIER = 0.5;
 
 /**
  * Minimum songs required to release an album
@@ -665,8 +674,9 @@ export const ALBUM_RELEASE_COOLDOWN = 120000;
 
 /**
  * Base cost to start a tour
+ * Balance: Expensive to organize but massive returns
  */
-export const TOUR_BASE_COST = 50000;
+export const TOUR_BASE_COST = 5_000_000;
 
 /**
  * Tour duration in milliseconds
@@ -676,14 +686,15 @@ export const TOUR_DURATION = 180000;
 
 /**
  * Base income per second during tour
- * Scales with fans and songs
+ * Scales with fans and songs for stadium-level earnings
  */
-export const TOUR_BASE_INCOME_PER_SECOND = 10;
+export const TOUR_BASE_INCOME_PER_SECOND = 10_000;
 
 /**
  * Fan count multiplier for tour income
+ * Balance: $0.01 per fan per second - 100M fans = $1M/sec = $180M per tour
  */
-export const TOUR_FAN_MULTIPLIER = 0.001;
+export const TOUR_FAN_MULTIPLIER = 0.01;
 
 /**
  * Maximum active tours at once
@@ -696,48 +707,49 @@ export const MAX_ACTIVE_TOURS = 3;
 
 /**
  * Available platforms for purchase in Phase 4+
+ * Balance: Expensive investments with massive passive income for late game
  */
 export const PLATFORM_DEFINITIONS = [
 	{
 		type: 'streaming' as const,
 		name: 'Streaming Service',
-		baseCost: 10000000,
-		incomePerSecond: 1000,
+		baseCost: 10_000_000,
+		incomePerSecond: 10_000,
 		controlContribution: 15
 	},
 	{
 		type: 'ticketing' as const,
 		name: 'Ticketing Platform',
-		baseCost: 25000000,
-		incomePerSecond: 2500,
+		baseCost: 25_000_000,
+		incomePerSecond: 25_000,
 		controlContribution: 20
 	},
 	{
 		type: 'venue' as const,
 		name: 'Concert Venue Chain',
-		baseCost: 50000000,
-		incomePerSecond: 5000,
+		baseCost: 50_000_000,
+		incomePerSecond: 50_000,
 		controlContribution: 15
 	},
 	{
 		type: 'billboard' as const,
 		name: 'Billboard Charts',
-		baseCost: 100000000,
-		incomePerSecond: 10000,
+		baseCost: 100_000_000,
+		incomePerSecond: 100_000,
 		controlContribution: 25
 	},
 	{
 		type: 'grammys' as const,
 		name: 'The Grammys',
-		baseCost: 250000000,
-		incomePerSecond: 25000,
+		baseCost: 250_000_000,
+		incomePerSecond: 250_000,
 		controlContribution: 20
 	},
 	{
 		type: 'training_data' as const,
 		name: 'AI Training Data Monopoly',
-		baseCost: 500000000,
-		incomePerSecond: 50000,
+		baseCost: 500_000_000,
+		incomePerSecond: 500_000,
 		controlContribution: 30
 	}
 ] as const;
@@ -778,7 +790,7 @@ export const GENRES = ['pop', 'hip-hop', 'rock', 'electronic', 'country', 'jazz'
  * Cost to research and switch trending genre
  * Balance: Expensive enough to matter but affordable mid-game
  */
-export const TREND_RESEARCH_COST = 10000;
+export const TREND_RESEARCH_COST = 1_000_000;
 
 /**
  * How often trending genre changes automatically (milliseconds)

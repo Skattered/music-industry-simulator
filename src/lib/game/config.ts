@@ -97,10 +97,16 @@ export const BASE_INCOME_PER_SONG = 1.0;
 export const BASE_FAN_GENERATION_RATE = 10;
 
 /**
- * Trending genre income multiplier
+ * Trending genre income multiplier (at start of trend)
  * Balance: 2x reward for matching trending genre - pure optimization (pay to research trends)
  */
 export const TRENDING_MULTIPLIER = 2.0;
+
+/**
+ * Time in milliseconds for trend bonus to fade from max to 1.0x
+ * Balance: 5 minutes gives players time to capitalize before needing to research again
+ */
+export const TREND_FADE_DURATION = 300000; // 5 minutes
 
 /**
  * Cost to generate a song at tier 1 (web services)

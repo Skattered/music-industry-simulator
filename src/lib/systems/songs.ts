@@ -15,6 +15,9 @@ import {
 	GENRES
 } from '../game/config';
 
+// Create a Map for O(1) upgrade lookups
+const UPGRADE_MAP = new Map(UPGRADES.map((u) => [u.id, u]));
+
 // ============================================================================
 // NAME GENERATION
 // ============================================================================
@@ -93,7 +96,7 @@ function getIncomeMultiplier(state: GameState): number {
 
 	// Apply upgrade income multipliers
 	for (const upgradeId in state.upgrades) {
-		const upgrade = UPGRADES.find((u) => u.id === upgradeId);
+		const upgrade = UPGRADE_MAP.get(upgradeId);
 		if (upgrade?.effects.incomeMultiplier) {
 			multiplier *= upgrade.effects.incomeMultiplier;
 		}
@@ -106,14 +109,19 @@ function getIncomeMultiplier(state: GameState): number {
  * Get the current song generation speed in milliseconds
  */
 function getSongGenerationSpeed(state: GameState): number {
-	// Check upgrades for the most recent speed setting
+	// Find the minimum songSpeed value among all upgrades (lower is better)
 	let speed = state.songGenerationSpeed;
 
+	const speeds: number[] = [];
 	for (const upgradeId in state.upgrades) {
-		const upgrade = UPGRADES.find((u) => u.id === upgradeId);
+		const upgrade = UPGRADE_MAP.get(upgradeId);
 		if (upgrade?.effects.songSpeed !== undefined) {
-			speed = upgrade.effects.songSpeed;
+			speeds.push(upgrade.effects.songSpeed);
 		}
+	}
+
+	if (speeds.length > 0) {
+		speed = Math.min(speed, ...speeds);
 	}
 
 	return speed;
@@ -125,12 +133,18 @@ function getSongGenerationSpeed(state: GameState): number {
 function getCurrentSongCost(state: GameState): number {
 	let cost = BASE_SONG_COST;
 
-	// Check upgrades for cost modifications
+	const costs: number[] = [];
+
+	// Collect all songCost values from upgrades
 	for (const upgradeId in state.upgrades) {
-		const upgrade = UPGRADES.find((u) => u.id === upgradeId);
+		const upgrade = UPGRADE_MAP.get(upgradeId);
 		if (upgrade?.effects.songCost !== undefined) {
-			cost = upgrade.effects.songCost;
+			costs.push(upgrade.effects.songCost);
 		}
+	}
+
+	if (costs.length > 0) {
+		cost = Math.min(...costs);
 	}
 
 	return cost;

@@ -114,22 +114,14 @@ describe('generateSong', () => {
 
 	it('should mark song as trending when it matches currentTrendingGenre', () => {
 		const state = createTestGameState({
-			currentTrendingGenre: 'pop'
+			currentTrendingGenre: 'pop',
+			trendDiscoveredAt: Date.now()
 		});
 
-		// Generate multiple songs to eventually get a pop song
-		let foundTrending = false;
-		for (let i = 0; i < 100; i++) {
-			const song = generateSong(state);
-			if (song.genre === 'pop') {
-				expect(song.isTrending).toBe(true);
-				foundTrending = true;
-				break;
-			}
-		}
-
-		// Should eventually find a trending song with random generation
-		expect(foundTrending).toBe(true);
+		// When currentTrendingGenre is set, all songs are generated in that genre
+		const song = generateSong(state);
+		expect(song.genre).toBe('pop');
+		expect(song.isTrending).toBe(true);
 	});
 
 	it('should apply trending multiplier to income and fan generation', () => {
@@ -138,19 +130,12 @@ describe('generateSong', () => {
 			trendDiscoveredAt: Date.now() // Set to now for full multiplier strength
 		});
 
-		// Generate songs until we get a pop song
-		let trendingSong = null;
-		for (let i = 0; i < 100; i++) {
-			const song = generateSong(state);
-			if (song.genre === 'pop') {
-				trendingSong = song;
-				break;
-			}
-		}
-
-		expect(trendingSong).not.toBeNull();
-		expect(trendingSong!.incomePerSecond).toBe(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
-		expect(trendingSong!.fanGenerationRate).toBe(BASE_FAN_GENERATION_RATE * TRENDING_MULTIPLIER);
+		// When currentTrendingGenre is set, all songs are generated in that genre
+		const song = generateSong(state);
+		expect(song.genre).toBe('pop');
+		expect(song.isTrending).toBe(true);
+		expect(song.incomePerSecond).toBe(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
+		expect(song.fanGenerationRate).toBe(BASE_FAN_GENERATION_RATE * TRENDING_MULTIPLIER);
 	});
 
 	it('should fade trending multiplier over time', () => {

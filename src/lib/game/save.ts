@@ -172,18 +172,18 @@ export function validateSave(data: any): data is SaveFile {
 	const state = data.state;
 
 	// Validate required primitive fields
-	if (typeof state.money !== 'number') return false;
-	if (typeof state.fans !== 'number') return false;
-	if (typeof state.gpu !== 'number') return false;
-	if (typeof state.phase !== 'number') return false;
-	if (typeof state.industryControl !== 'number') return false;
-	if (typeof state.songGenerationSpeed !== 'number') return false;
-	if (typeof state.techTier !== 'number') return false;
-	if (typeof state.techSubTier !== 'number') return false;
-	if (typeof state.prestigeCount !== 'number') return false;
-	if (typeof state.experienceMultiplier !== 'number') return false;
-	if (typeof state.lastUpdate !== 'number') return false;
-	if (typeof state.createdAt !== 'number') return false;
+	if (typeof state.money !== 'number' || !Number.isFinite(state.money)) return false;
+	if (typeof state.fans !== 'number' || !Number.isFinite(state.fans)) return false;
+	if (typeof state.gpu !== 'number' || !Number.isFinite(state.gpu)) return false;
+	if (typeof state.phase !== 'number' || !Number.isFinite(state.phase)) return false;
+	if (typeof state.industryControl !== 'number' || !Number.isFinite(state.industryControl)) return false;
+	if (typeof state.songGenerationSpeed !== 'number' || !Number.isFinite(state.songGenerationSpeed)) return false;
+	if (typeof state.techTier !== 'number' || !Number.isFinite(state.techTier)) return false;
+	if (typeof state.techSubTier !== 'number' || !Number.isFinite(state.techSubTier)) return false;
+	if (typeof state.prestigeCount !== 'number' || !Number.isFinite(state.prestigeCount)) return false;
+	if (typeof state.experienceMultiplier !== 'number' || !Number.isFinite(state.experienceMultiplier)) return false;
+	if (typeof state.lastUpdate !== 'number' || !Number.isFinite(state.lastUpdate)) return false;
+	if (typeof state.createdAt !== 'number' || !Number.isFinite(state.createdAt)) return false;
 	if (typeof state.version !== 'string') return false;
 
 	// Validate arrays

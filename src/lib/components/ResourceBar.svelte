@@ -5,7 +5,7 @@
 	let { gameState = $bindable() }: { gameState: GameState } = $props();
 
 	// Calculate total income per second from all sources
-	const incomePerSecond = $derived(() => {
+	const incomePerSecond = $derived.by(() => {
 		// Sum income from all songs
 		const songIncome = gameState.songs.reduce((total, song) => total + song.incomePerSecond, 0);
 
@@ -30,7 +30,7 @@
 			<div class="resource-value text-white text-lg font-semibold">
 				<span class="icon">💰</span>
 				{formatMoney(gameState.money)}
-				<span class="text-sm text-gray-400">({formatMoney(incomePerSecond())}/s)</span>
+				<span class="text-sm text-gray-400">({formatMoney(incomePerSecond)}/s)</span>
 			</div>
 		</div>
 

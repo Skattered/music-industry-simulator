@@ -272,6 +272,8 @@ export interface GameState {
   // Exploitation & Boosts
   /** Currently active temporary boosts */
   activeBoosts: ActiveBoost[];
+  /** Usage count for each ability type (for cost scaling) */
+  abilityUsageCount?: Record<BoostType, number>;
 
   // Physical & Concerts
   /** All released physical albums */

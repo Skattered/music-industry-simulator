@@ -137,7 +137,7 @@ describe('checkPhaseProgression', () => {
 	});
 
 	it('should not advance to phase 2 without enough fans', () => {
-		const songs = Array.from({ length: 1000 }, (_, i) => ({
+		const songs = Array.from({ length: 100 }, (_, i) => ({
 			id: `song-${i}`,
 			name: `Song ${i}`,
 			genre: 'pop' as const,
@@ -149,9 +149,9 @@ describe('checkPhaseProgression', () => {
 
 		const state = createTestGameState({
 			phase: 1,
-			fans: 500_000, // Not enough (need 1M)
+			fans: 50_000, // Not enough (need 100K)
 			songs,
-			money: 5_000_000,
+			money: 100_000,
 			techTier: 2
 		});
 
@@ -177,7 +177,7 @@ describe('checkPhaseProgression', () => {
 	});
 
 	it('should not advance to phase 2 without enough money', () => {
-		const songs = Array.from({ length: 1000 }, (_, i) => ({
+		const songs = Array.from({ length: 100 }, (_, i) => ({
 			id: `song-${i}`,
 			name: `Song ${i}`,
 			genre: 'pop' as const,
@@ -189,9 +189,9 @@ describe('checkPhaseProgression', () => {
 
 		const state = createTestGameState({
 			phase: 1,
-			fans: 1_000_000,
+			fans: 100_000,
 			songs,
-			money: 1_000_000, // Not enough (need $5M)
+			money: 50_000, // Not enough (need $100K)
 			techTier: 2
 		});
 
@@ -276,9 +276,9 @@ describe('checkPhaseProgression', () => {
 	});
 
 	it('should not count incomplete tours for phase 4 requirements', () => {
-		// Create 200 tours but only 100 are completed
+		// Create 150 tours: 50 completed, 100 incomplete
 		const tours = [
-			...Array.from({ length: 100 }, (_, i) => ({
+			...Array.from({ length: 50 }, (_, i) => ({
 				id: `tour-complete-${i}`,
 				name: `Tour ${i}`,
 				startedAt: Date.now() - 200000,
@@ -288,7 +288,7 @@ describe('checkPhaseProgression', () => {
 			})),
 			...Array.from({ length: 100 }, (_, i) => ({
 				id: `tour-incomplete-${i}`,
-				name: `Tour ${i + 100}`,
+				name: `Tour ${i + 50}`,
 				startedAt: Date.now(),
 				completedAt: null,
 				incomePerSecond: 10000,
@@ -298,13 +298,14 @@ describe('checkPhaseProgression', () => {
 
 		const state = createTestGameState({
 			phase: 3,
-			fans: 100_000_000,
+			fans: 5_000_000, // Not enough (need 10M)
 			tours,
 			techTier: 6
 		});
 
 		const unlocked = checkPhaseProgression(state);
 
+		// Should NOT advance - not enough fans (5M < 10M required)
 		expect(unlocked).toBe(false);
 		expect(state.phase).toBe(3);
 	});

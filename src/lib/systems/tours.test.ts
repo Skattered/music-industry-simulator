@@ -198,7 +198,7 @@ describe('canStartTour', () => {
 
 	it('should return false when not enough money', () => {
 		const state = createTestGameState({
-			money: 1_000_000, // Less than TOUR_BASE_COST (5M)
+			money: 100_000, // Less than TOUR_BASE_COST (250K)
 			unlockedSystems: { ...INITIAL_UNLOCKED_SYSTEMS, tours: true },
 			fans: 100_000,
 			physicalAlbums: Array.from({ length: 10 }, (_, i) => createTestAlbum(i))
@@ -452,7 +452,7 @@ describe('startTour', () => {
 
 	it('should return null when tour cannot be started', () => {
 		const state = createTestGameState({
-			money: 1_000_000, // Not enough
+			money: 100_000, // Not enough (need 250K)
 			unlockedSystems: { ...INITIAL_UNLOCKED_SYSTEMS, tours: true },
 			fans: 100_000,
 			physicalAlbums: Array.from({ length: 10 }, (_, i) => createTestAlbum(i))

@@ -200,7 +200,7 @@ describe('SongGenerator - Button States', () => {
 	});
 
 	it('should enable 5x button when can afford 5 songs', () => {
-		const gameState = createTestGameState({ money: 5 });
+		const gameState = createTestGameState({ money: 10 }); // 5 songs * $2 = $10
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
 		const button = getByTestId('queue-5x') as HTMLButtonElement;
@@ -216,7 +216,7 @@ describe('SongGenerator - Button States', () => {
 	});
 
 	it('should enable 10x button when can afford 10 songs', () => {
-		const gameState = createTestGameState({ money: 10 });
+		const gameState = createTestGameState({ money: 20 }); // 10 songs * $2 = $20
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
 		const button = getByTestId('queue-10x') as HTMLButtonElement;
@@ -224,12 +224,12 @@ describe('SongGenerator - Button States', () => {
 	});
 
 	it('should enable Max button and show correct count', () => {
-		const gameState = createTestGameState({ money: 7 });
+		const gameState = createTestGameState({ money: 7 }); // 7 / 2 = 3.5 → 3 songs
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
 		const button = getByTestId('queue-max') as HTMLButtonElement;
 		expect(button.disabled).toBe(false);
-		expect(button.textContent).toContain('Max (7)');
+		expect(button.textContent).toContain('Max (3)');
 	});
 
 	it('should disable Max button when count would be 0', () => {
@@ -294,9 +294,9 @@ describe('SongGenerator - Cost Display', () => {
 		const gameState = createTestGameState({ money: 100 });
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
-		expect(getByTestId('queue-1x').textContent).toContain('($1)');
-		expect(getByTestId('queue-5x').textContent).toContain('($5)');
-		expect(getByTestId('queue-10x').textContent).toContain('($10)');
+		expect(getByTestId('queue-1x').textContent).toContain('($2)');
+		expect(getByTestId('queue-5x').textContent).toContain('($10)');
+		expect(getByTestId('queue-10x').textContent).toContain('($20)');
 	});
 
 	it('should show FREE on buttons when songs are free', () => {
@@ -319,10 +319,10 @@ describe('SongGenerator - Cost Display', () => {
 	it('should calculate Max button correctly with various money amounts', () => {
 		const testCases = [
 			{ money: 0, expected: 0 },
-			{ money: 1, expected: 1 },
-			{ money: 7, expected: 7 },
-			{ money: 15, expected: 15 },
-			{ money: 100, expected: 100 }
+			{ money: 1, expected: 0 }, // Can't afford $2 song
+			{ money: 7, expected: 3 }, // 7 / 2 = 3.5 → 3
+			{ money: 15, expected: 7 }, // 15 / 2 = 7.5 → 7
+			{ money: 100, expected: 50 } // 100 / 2 = 50
 		];
 
 		testCases.forEach(({ money, expected }) => {
@@ -423,7 +423,7 @@ describe('SongGenerator - User Interactions', () => {
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();
 
-		expect(container.textContent).toContain('$9.00'); // 10 - 1
+		expect(container.textContent).toContain('$8.00'); // 10 - 2
 		expect(container.textContent).toContain('1 songs queued');
 	});
 
@@ -437,7 +437,7 @@ describe('SongGenerator - User Interactions', () => {
 		await fireEvent.click(getByTestId('queue-5x'));
 		await tick();
 
-		expect(container.textContent).toContain('$15.00'); // 20 - 5
+		expect(container.textContent).toContain('$10.00'); // 20 - 10 (5 songs * $2)
 		expect(container.textContent).toContain('5 songs queued');
 	});
 
@@ -451,7 +451,7 @@ describe('SongGenerator - User Interactions', () => {
 		await fireEvent.click(getByTestId('queue-10x'));
 		await tick();
 
-		expect(container.textContent).toContain('$40.00'); // 50 - 10
+		expect(container.textContent).toContain('$30.00'); // 50 - 20 (10 songs * $2)
 		expect(container.textContent).toContain('10 songs queued');
 	});
 
@@ -465,8 +465,8 @@ describe('SongGenerator - User Interactions', () => {
 		await fireEvent.click(getByTestId('queue-max'));
 		await tick();
 
-		expect(container.textContent).toContain('$0.00'); // 7 - 7
-		expect(container.textContent).toContain('7 songs queued');
+		expect(container.textContent).toContain('$1.00'); // 7 - 6 (3 songs * $2)
+		expect(container.textContent).toContain('3 songs queued');
 	});
 
 	it('should not queue songs when disabled button is clicked', async () => {
@@ -550,19 +550,19 @@ describe('SongGenerator - User Interactions', () => {
 		// First queue
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();
-		expect(container.textContent).toContain('$19.00');
+		expect(container.textContent).toContain('$18.00'); // 20 - 2
 		expect(container.textContent).toContain('1 songs queued');
 
 		// Second queue
 		await fireEvent.click(getByTestId('queue-5x'));
 		await tick();
-		expect(container.textContent).toContain('$14.00');
+		expect(container.textContent).toContain('$8.00'); // 18 - 10
 		expect(container.textContent).toContain('6 songs queued');
 
 		// Third queue
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();
-		expect(container.textContent).toContain('$13.00');
+		expect(container.textContent).toContain('$6.00'); // 8 - 2
 		expect(container.textContent).toContain('7 songs queued');
 	});
 
@@ -595,8 +595,8 @@ describe('SongGenerator - User Interactions', () => {
 		});
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		// tier1_improved sets songSpeed to 20000 (20 seconds)
-		expect(container.textContent).toContain('20s per song');
+		// tier1_improved sets songSpeed to 12000 (12 seconds)
+		expect(container.textContent).toContain('12s per song');
 
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();

@@ -129,15 +129,15 @@ describe('UpgradePanel', () => {
 			}
 		});
 
-		// Bot Streams base cost is $100,000
-		expect(container.textContent).toContain('$100K');
+		// Bot Streams base cost is $50,000
+		expect(container.textContent).toContain('$50K');
 	});
 
 	it('shows scaled cost for previously used boosts', () => {
 		const gameState = createTestGameState({
 			money: 10_000_000,
 			boostUsageCounts: {
-				bot_streams: 2 // Used twice, so cost = 100000 * 1.5^2 = 225000
+				bot_streams: 2 // Used twice, so cost = 50000 * 1.5^2 = 112500
 			}
 		});
 		const mockCallback = vi.fn();
@@ -149,8 +149,8 @@ describe('UpgradePanel', () => {
 			}
 		});
 
-		// Should show scaled cost: $100K * 1.5^2 = $225K
-		expect(container.textContent).toContain('$225K');
+		// Should show scaled cost: $50K * 1.5^2 = $112.5K
+		expect(container.textContent).toContain('$112.5K');
 	});
 
 	it('displays usage count badge when boost has been used', () => {
@@ -209,7 +209,7 @@ describe('UpgradePanel', () => {
 		// Find and click the activate button for bot_streams
 		const activateButtons = container.querySelectorAll('.activate-button');
 		const botStreamsButton = Array.from(activateButtons).find((btn) =>
-			btn.textContent?.includes('$100K')
+			btn.textContent?.includes('$50K')
 		);
 
 		expect(botStreamsButton).toBeTruthy();
@@ -487,9 +487,9 @@ describe('UpgradePanel', () => {
 		const gameState = createTestGameState({
 			money: 10_000_000,
 			boostUsageCounts: {
-				bot_streams: 0, // Base cost: 100,000
-				playlist_placement: 1, // 500,000 * 1.5^1 = 750,000
-				social_media: 2 // 1,000,000 * 1.5^2 = 2,250,000
+				bot_streams: 0, // Base cost: 50,000
+				playlist_placement: 1, // 250,000 * 1.5^1 = 375,000
+				social_media: 2 // 500,000 * 1.5^2 = 1,125,000
 			}
 		});
 		const mockCallback = vi.fn();
@@ -502,13 +502,13 @@ describe('UpgradePanel', () => {
 		});
 
 		// Bot Streams: base cost
-		expect(container.textContent).toContain('$100K');
+		expect(container.textContent).toContain('$50K');
 
-		// Playlist Payola: 750K
-		expect(container.textContent).toContain('$750K');
+		// Playlist Payola: 375K
+		expect(container.textContent).toContain('$375K');
 
-		// Social Media: 2.25M
-		expect(container.textContent).toContain('$2.25M');
+		// Social Media: 1.125M rounded to 1.13M by formatMoney
+		expect(container.textContent).toContain('$1.13M');
 	});
 
 	it('shows all boosts in concerts category', async () => {

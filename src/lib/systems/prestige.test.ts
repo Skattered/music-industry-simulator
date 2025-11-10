@@ -354,8 +354,8 @@ describe('performPrestige', () => {
 
 		performPrestige(state);
 
-		// After 1st prestige: 1.0 + (1 * 0.1) = 1.1
-		expect(state.experienceMultiplier).toBe(1.1);
+		// After 1st prestige: 1.0 + (1 * 0.15) = 1.15
+		expect(state.experienceMultiplier).toBe(1.15);
 	});
 
 	it('should create a new artist', () => {
@@ -508,31 +508,31 @@ describe('calculateExperienceBonus', () => {
 		expect(bonus).toBe(1.0);
 	});
 
-	it('should return 1.1 for 1 prestige', () => {
+	it('should return 1.15 for 1 prestige', () => {
 		const state = createTestGameState({
 			prestigeCount: 1
 		});
 
 		const bonus = calculateExperienceBonus(state);
-		expect(bonus).toBe(1.1);
+		expect(bonus).toBe(1.15);
 	});
 
-	it('should return 1.2 for 2 prestiges', () => {
+	it('should return 1.3 for 2 prestiges', () => {
 		const state = createTestGameState({
 			prestigeCount: 2
 		});
 
 		const bonus = calculateExperienceBonus(state);
-		expect(bonus).toBe(1.2);
+		expect(bonus).toBe(1.3);
 	});
 
-	it('should return 1.5 for 5 prestiges', () => {
+	it('should return 1.75 for 5 prestiges', () => {
 		const state = createTestGameState({
 			prestigeCount: 5
 		});
 
 		const bonus = calculateExperienceBonus(state);
-		expect(bonus).toBe(1.5);
+		expect(bonus).toBe(1.75);
 	});
 
 	it('should use PRESTIGE_MULTIPLIER_PER_LEVEL correctly', () => {

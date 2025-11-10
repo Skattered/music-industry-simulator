@@ -323,18 +323,18 @@ describe('TechTree Component', () => {
 			const tier1BasicCard = container.querySelector('[data-upgrade-id="tier1_basic"]');
 			const costText = tier1BasicCard?.querySelector('.cost')?.textContent;
 
-			expect(costText).toContain('$10');
+			expect(costText).toContain('$15');
 		});
 
 		it('should format large costs correctly', () => {
 			const gameState = createTestGameState({ money: 10000000000 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			// tier7_basic costs $100M
+			// tier7_basic costs $125M
 			const tier7BasicCard = container.querySelector('[data-upgrade-id="tier7_basic"]');
 			const costText = tier7BasicCard?.querySelector('.cost')?.textContent;
 
-			expect(costText).toContain('$100.00M');
+			expect(costText).toContain('$125.00M');
 		});
 	});
 
@@ -354,7 +354,7 @@ describe('TechTree Component', () => {
 			render(TechTree, { props: { gameState } });
 
 			expect(
-				screen.getByText(/Basic web-based AI music generation. Songs take 30s to generate./)
+				screen.getByText(/Basic web-based AI music generation. Songs take 15s/)
 			).toBeTruthy();
 		});
 
@@ -365,8 +365,8 @@ describe('TechTree Component', () => {
 			const tier1BasicCard = container.querySelector('[data-upgrade-id="tier1_basic"]');
 			const effectsText = tier1BasicCard?.textContent;
 
-			expect(effectsText).toContain('Song speed: 30s');
-			expect(effectsText).toContain('Song cost: $2');
+			expect(effectsText).toContain('Song speed: 15s');
+			expect(effectsText).toContain('Song cost: $1.50');
 		});
 
 		it('should show unlock effects', () => {

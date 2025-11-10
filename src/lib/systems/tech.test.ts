@@ -210,7 +210,7 @@ describe('Tech Upgrade System', () => {
 
 			applyTechEffects(state, upgrade!);
 
-			expect(state.songGenerationSpeed).toBe(30000);
+			expect(state.songGenerationSpeed).toBe(15000);
 		});
 
 		it('should unlock GPU system when specified', () => {
@@ -433,13 +433,13 @@ describe('Tech Upgrade System', () => {
 			const state = createTestGameState({ money: 1000000 });
 
 			purchaseTechUpgrade(state, 'tier1_basic');
-			expect(getSongGenerationCost(state)).toBe(2);
-
-			purchaseTechUpgrade(state, 'tier1_improved');
 			expect(getSongGenerationCost(state)).toBe(1.5);
 
+			purchaseTechUpgrade(state, 'tier1_improved');
+			expect(getSongGenerationCost(state)).toBe(1.0);
+
 			purchaseTechUpgrade(state, 'tier1_advanced');
-			expect(getSongGenerationCost(state)).toBe(1);
+			expect(getSongGenerationCost(state)).toBe(0.5);
 
 			purchaseTechUpgrade(state, 'tier2_basic');
 			expect(getSongGenerationCost(state)).toBe(0); // Free!
@@ -482,23 +482,23 @@ describe('Tech Upgrade System', () => {
 			const state = createTestGameState({ money: 100000000 });
 
 			purchaseTechUpgrade(state, 'tier1_basic');
-			expect(state.songGenerationSpeed).toBe(30000);
-
-			purchaseTechUpgrade(state, 'tier1_improved');
-			expect(state.songGenerationSpeed).toBe(20000);
-
-			purchaseTechUpgrade(state, 'tier1_advanced');
 			expect(state.songGenerationSpeed).toBe(15000);
 
-			purchaseTechUpgrade(state, 'tier2_basic');
+			purchaseTechUpgrade(state, 'tier1_improved');
 			expect(state.songGenerationSpeed).toBe(12000);
+
+			purchaseTechUpgrade(state, 'tier1_advanced');
+			expect(state.songGenerationSpeed).toBe(10000);
+
+			purchaseTechUpgrade(state, 'tier2_basic');
+			expect(state.songGenerationSpeed).toBe(10000);
 
 			// Continue through higher tiers
 			purchaseTechUpgrade(state, 'tier2_improved');
-			expect(state.songGenerationSpeed).toBe(10000);
+			expect(state.songGenerationSpeed).toBe(8000);
 
 			purchaseTechUpgrade(state, 'tier2_advanced');
-			expect(state.songGenerationSpeed).toBe(8000);
+			expect(state.songGenerationSpeed).toBe(6000);
 		});
 
 		it('should unlock all major systems through tier progression', () => {

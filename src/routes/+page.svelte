@@ -19,16 +19,19 @@
 
 	// Import components
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import VictoryModal from '$lib/components/VictoryModal.svelte';
 
 	// Local reactive state using Svelte 5 $state rune
 	let gameState = $state<GameState>(createNewGameState());
 	let gameEngine: GameEngine | null = null;
 	let isLoading = $state(true);
+	let showVictoryModal = $state(false);
 
 	// Derived state for UI
 	const artistName = $derived(gameState.currentArtist.name);
 	const toursUnlocked = $derived(gameState.unlockedSystems.tours);
 	const prestigeUnlocked = $derived(gameState.unlockedSystems.prestige);
+	const hasWon = $derived(gameState.industryControl >= 100);
 
 	onMount(() => {
 		// Try to load saved game
@@ -63,11 +66,43 @@
 		}
 	});
 
+	// Watch for victory condition
+	$effect(() => {
+		if (hasWon && !showVictoryModal) {
+			showVictoryModal = true;
+			console.log('Victory achieved! Industry control at 100%');
+		}
+	});
+
 	// Manual save function for settings button (future)
 	function handleSave() {
 		if (gameEngine) {
 			gameEngine.forceSave();
 		}
+	}
+
+	// Handle starting a new game after victory
+	function handleNewGame() {
+		if (gameEngine) {
+			gameEngine.stop();
+		}
+
+		// Clear saved game
+		localStorage.removeItem('music_empire_save');
+		localStorage.removeItem('music_empire_backup');
+
+		// Create new game state
+		gameState = createNewGameState();
+		showVictoryModal = false;
+
+		// Restart engine with new state
+		gameEngine = new GameEngine(gameState);
+		gameEngine.onSave((state: GameState) => {
+			saveGame(state);
+		});
+		gameEngine.start();
+
+		console.log('New game started');
 	}
 </script>
 
@@ -81,6 +116,11 @@
 {:else}
 	<!-- Toast Notifications (always visible) -->
 	<ToastContainer />
+
+	<!-- Victory Modal (shown when player reaches 100% control) -->
+	{#if showVictoryModal}
+		<VictoryModal gameState={gameState} onNewGame={handleNewGame} />
+	{/if}
 
 	<div class="min-h-screen bg-gray-900 text-white">
 		<!-- Header -->

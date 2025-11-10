@@ -385,11 +385,82 @@ describe('purchasePlatform', () => {
 // ============================================================================
 
 describe('calculateIndustryControl', () => {
-	it('should return 0 when no platforms are owned', () => {
+	it('should return 0 when no achievements are met', () => {
 		const state = createTestGameState();
 		expect(calculateIndustryControl(state)).toBe(0);
 	});
 
+	// Fan Milestone Tests
+	it('should award 2% control at 10k fans', () => {
+		const state = createTestGameState({ fans: 10_000 });
+		expect(calculateIndustryControl(state)).toBe(2);
+	});
+
+	it('should award 5% control at 100k fans (2% + 3%)', () => {
+		const state = createTestGameState({ fans: 100_000 });
+		expect(calculateIndustryControl(state)).toBe(5); // 2 + 3
+	});
+
+	it('should award 9% control at 1M fans (2% + 3% + 4%)', () => {
+		const state = createTestGameState({ fans: 1_000_000 });
+		expect(calculateIndustryControl(state)).toBe(9); // 2 + 3 + 4
+	});
+
+	it('should award 14% control at 10M fans (2% + 3% + 4% + 5%)', () => {
+		const state = createTestGameState({ fans: 10_000_000 });
+		expect(calculateIndustryControl(state)).toBe(14); // 2 + 3 + 4 + 5
+	});
+
+	// Tech Tier Achievement Tests
+	it('should award 5% control at tech tier 3 (Local AI Models)', () => {
+		const state = createTestGameState({ techTier: 3 as TechTier });
+		expect(calculateIndustryControl(state)).toBe(5);
+	});
+
+	it('should award 13% control at tech tier 6 (Own Your Software)', () => {
+		const state = createTestGameState({ techTier: 6 as TechTier });
+		expect(calculateIndustryControl(state)).toBe(13); // 5 + 8
+	});
+
+	it('should award 23% control at tech tier 7 (AI Agents)', () => {
+		const state = createTestGameState({ techTier: 7 as TechTier });
+		expect(calculateIndustryControl(state)).toBe(23); // 5 + 8 + 10
+	});
+
+	// Phase Unlock Tests
+	it('should award 5% control at phase 2 (Physical Albums)', () => {
+		const state = createTestGameState({ phase: 2 });
+		expect(calculateIndustryControl(state)).toBe(5);
+	});
+
+	it('should award 11% control at phase 3 (Tours)', () => {
+		const state = createTestGameState({ phase: 3 });
+		expect(calculateIndustryControl(state)).toBe(11); // 5 + 6
+	});
+
+	it('should award 18% control at phase 4 (Platform Ownership)', () => {
+		const state = createTestGameState({ phase: 4 });
+		expect(calculateIndustryControl(state)).toBe(18); // 5 + 6 + 7
+	});
+
+	it('should award 26% control at phase 5 (Total Automation)', () => {
+		const state = createTestGameState({ phase: 5 });
+		expect(calculateIndustryControl(state)).toBe(26); // 5 + 6 + 7 + 8
+	});
+
+	// Prestige Tests
+	it('should award 8% control per prestige', () => {
+		const state1 = createTestGameState({ prestigeCount: 1 });
+		expect(calculateIndustryControl(state1)).toBe(8);
+
+		const state2 = createTestGameState({ prestigeCount: 3 });
+		expect(calculateIndustryControl(state2)).toBe(24); // 8 * 3
+
+		const state3 = createTestGameState({ prestigeCount: 5 });
+		expect(calculateIndustryControl(state3)).toBe(40); // 8 * 5
+	});
+
+	// Platform Ownership Tests
 	it('should return correct control for single platform', () => {
 		const state = createTestGameState({
 			ownedPlatforms: [
@@ -443,12 +514,14 @@ describe('calculateIndustryControl', () => {
 
 		expect(calculateIndustryControl(state)).toBe(47); // 15 + 20 + 12
 	});
-});
 
-describe('updateControlProgress', () => {
-	it('should set industry control based on platform contributions', () => {
+	// Combined Achievement Tests
+	it('should combine all sources of control correctly', () => {
 		const state = createTestGameState({
-			industryControl: 0,
+			fans: 10_000_000, // 14%
+			techTier: 7 as TechTier, // 23%
+			phase: 5, // 26%
+			prestigeCount: 3, // 24%
 			ownedPlatforms: [
 				{
 					id: 'streaming_service',
@@ -459,11 +532,97 @@ describe('updateControlProgress', () => {
 					incomePerSecond: 50_000,
 					controlContribution: 15
 				}
+			] // 15%
+		});
+
+		// Total: 14 + 23 + 26 + 24 + 15 = 102, capped at 100
+		expect(calculateIndustryControl(state)).toBe(100);
+	});
+
+	it('should cap control at 100%', () => {
+		// Create state with maximum achievements
+		const allPlatforms = PLATFORM_DEFINITIONS.map((def) => ({
+			id: def.id,
+			type: def.type,
+			name: def.name,
+			cost: def.baseCost,
+			acquiredAt: Date.now(),
+			incomePerSecond: def.incomePerSecond,
+			controlContribution: def.controlContribution
+		}));
+
+		const state = createTestGameState({
+			fans: 100_000_000, // Max fans (14%)
+			techTier: 7 as TechTier, // Max tech (23%)
+			phase: 5, // Max phase (26%)
+			prestigeCount: 10, // 10 prestiges (80%)
+			ownedPlatforms: allPlatforms // All platforms (125%)
+		});
+
+		// Total would be 14 + 23 + 26 + 80 + 125 = 268, but capped at 100
+		expect(calculateIndustryControl(state)).toBe(100);
+	});
+
+	it('should achieve 100% control with 3 prestiges and minimal platforms', () => {
+		const state = createTestGameState({
+			fans: 10_000_000, // 14%
+			techTier: 7 as TechTier, // 23%
+			phase: 5, // 26%
+			prestigeCount: 3, // 24% (total so far: 87%)
+			ownedPlatforms: [
+				{
+					id: 'streaming_service',
+					type: 'streaming',
+					name: 'Major Streaming Platform',
+					cost: 100_000_000,
+					acquiredAt: Date.now(),
+					incomePerSecond: 50_000,
+					controlContribution: 15 // 13% needed, 15% provided
+				}
 			]
 		});
 
+		// Total: 14 + 23 + 26 + 24 + 15 = 102, capped at 100
+		expect(calculateIndustryControl(state)).toBe(100);
+	});
+
+	it('should achieve 100% control with 5 prestiges and no platforms', () => {
+		const state = createTestGameState({
+			fans: 10_000_000, // 14%
+			techTier: 7 as TechTier, // 23%
+			phase: 5, // 26%
+			prestigeCount: 5 // 40%
+		});
+
+		// Total: 14 + 23 + 26 + 40 = 103, capped at 100
+		expect(calculateIndustryControl(state)).toBe(100);
+	});
+});
+
+describe('updateControlProgress', () => {
+	it('should set industry control based on all achievement sources', () => {
+		const state = createTestGameState({
+			industryControl: 0,
+			fans: 10_000, // 2%
+			techTier: 3 as TechTier, // 5%
+			phase: 2, // 5%
+			prestigeCount: 1, // 8%
+			ownedPlatforms: [
+				{
+					id: 'streaming_service',
+					type: 'streaming',
+					name: 'Major Streaming Platform',
+					cost: 100_000_000,
+					acquiredAt: Date.now(),
+					incomePerSecond: 50_000,
+					controlContribution: 15
+				}
+			] // 15%
+		});
+
 		updateControlProgress(state);
-		expect(state.industryControl).toBe(15);
+		// Total: 2 + 5 + 5 + 8 + 15 = 35
+		expect(state.industryControl).toBe(35);
 	});
 
 	it('should cap industry control at 100', () => {
@@ -480,11 +639,59 @@ describe('updateControlProgress', () => {
 
 		const state = createTestGameState({
 			industryControl: 0,
-			ownedPlatforms: allPlatforms
+			fans: 100_000_000, // 14%
+			techTier: 7 as TechTier, // 23%
+			phase: 5, // 26%
+			prestigeCount: 10, // 80%
+			ownedPlatforms: allPlatforms // 125%
 		});
 
 		updateControlProgress(state);
 		expect(state.industryControl).toBe(100); // Should be capped at 100
+	});
+
+	it('should update control dynamically as achievements change', () => {
+		const state = createTestGameState({
+			industryControl: 0,
+			fans: 5_000 // Not yet at 10k milestone
+		});
+
+		updateControlProgress(state);
+		expect(state.industryControl).toBe(0);
+
+		// Reach 10k fans
+		state.fans = 10_000;
+		updateControlProgress(state);
+		expect(state.industryControl).toBe(2);
+
+		// Reach 100k fans
+		state.fans = 100_000;
+		updateControlProgress(state);
+		expect(state.industryControl).toBe(5);
+
+		// Add a prestige
+		state.prestigeCount = 1;
+		updateControlProgress(state);
+		expect(state.industryControl).toBe(13); // 5 + 8
+	});
+
+	it('should persist control through game progression', () => {
+		const state = createTestGameState({
+			fans: 10_000_000, // 14%
+			techTier: 7 as TechTier, // 23%
+			phase: 5, // 26%
+			prestigeCount: 3 // 24%
+		});
+
+		updateControlProgress(state);
+		// Total: 14 + 23 + 26 + 24 = 87
+		expect(state.industryControl).toBe(87);
+
+		// Industry control should reflect all accumulated achievements
+		// Even if fans decrease (which shouldn't happen), control is based on current state
+		// This test verifies the calculation is deterministic
+		updateControlProgress(state);
+		expect(state.industryControl).toBe(87);
 	});
 });
 

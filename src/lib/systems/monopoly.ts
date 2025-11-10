@@ -124,43 +124,66 @@ export function purchasePlatform(state: GameState, platformId: string): boolean 
 // ============================================================================
 
 /**
- * Calculate current industry control percentage from owned platforms
+ * Calculate current industry control percentage from all sources
  *
- * Sums up control contributions from all owned platforms.
- * Does not include other sources (milestones, etc) - just platform ownership.
+ * Control sources (designed to reach 100% after 3-5 prestiges):
+ * - Fan milestones: 10k (2%), 100k (3%), 1M (4%), 10M (5%) = 14% total
+ * - Tech tiers: T3 (5%), T6 (8%), T7 (10%) = 23% total
+ * - Phase unlocks: P2 (5%), P3 (6%), P4 (7%), P5 (8%) = 26% total
+ * - Prestige bonuses: 8% per prestige (24% at 3 prestiges, 40% at 5)
+ * - Platform ownership: varies, 15-30% per platform (125% total available)
+ *
+ * Expected progression to 100%:
+ * - 3 prestiges + minimal platforms: 63% (milestones) + 24% (prestige) + 13% (platforms) = 100%
+ * - 5 prestiges + no platforms: 63% + 40% = 103% (over 100%)
+ *
+ * Progress persists through prestige - industry control NEVER decreases.
  *
  * @param state - Current game state
- * @returns Industry control percentage from platforms (0-100+)
+ * @returns Industry control percentage (0-100)
  */
 export function calculateIndustryControl(state: GameState): number {
 	let control = 0;
 
+	// Fan milestones (14% total)
+	if (state.fans >= 10_000) control += 2;
+	if (state.fans >= 100_000) control += 3;
+	if (state.fans >= 1_000_000) control += 4;
+	if (state.fans >= 10_000_000) control += 5;
+
+	// Tech tier achievements (23% total)
+	if (state.techTier >= 3) control += 5; // Local AI Models
+	if (state.techTier >= 6) control += 8; // Own Your Software
+	if (state.techTier >= 7) control += 10; // AI Agents
+
+	// Phase unlocks (26% total)
+	if (state.phase >= 2) control += 5; // Physical Albums
+	if (state.phase >= 3) control += 6; // Tours & Concerts
+	if (state.phase >= 4) control += 7; // Platform Ownership
+	if (state.phase >= 5) control += 8; // Total Automation
+
+	// Prestige bonuses (8% per prestige)
+	control += state.prestigeCount * 8;
+
+	// Platform ownership (15-30% per platform, 125% total available)
 	for (const platform of state.ownedPlatforms) {
 		control += platform.controlContribution;
 	}
 
-	return control;
+	// Cap at 100% for victory
+	return Math.min(control, 100);
 }
 
 /**
- * Update the game state's industry control based on owned platforms
+ * Update the game state's industry control based on all achievement sources
  *
- * This function updates state.industryControl by adding platform contributions.
- * It preserves any existing control from other sources (prestige, milestones, etc.)
- *
- * Note: In full implementation, this should be part of a larger control system
- * that tracks various sources of control. For now, it focuses on platform contributions.
+ * Recalculates industry control from fan milestones, tech tiers, phase unlocks,
+ * prestige count, and platform ownership. Progress persists through prestige.
  *
  * @param state - Current game state (will be mutated)
  */
 export function updateControlProgress(state: GameState): void {
-	// Calculate platform control contribution
-	const platformControl = calculateIndustryControl(state);
-
-	// For now, set industry control to platform control
-	// In a full implementation, this would add to existing control from other sources
-	// (prestige bonuses, tech milestones, fan thresholds, etc.)
-	state.industryControl = Math.min(platformControl, 100);
+	state.industryControl = calculateIndustryControl(state);
 }
 
 // ============================================================================

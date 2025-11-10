@@ -131,7 +131,7 @@ export function purchasePlatform(state: GameState, platformId: string): boolean 
  * - Tech tiers: T3 (5%), T6 (8%), T7 (10%) = 23% total
  * - Phase unlocks: P2 (5%), P3 (6%), P4 (7%), P5 (8%) = 26% total
  * - Prestige bonuses: 8% per prestige (24% at 3 prestiges, 40% at 5)
- * - Platform ownership: varies, 15-30% per platform (125% total available)
+ * - Platform ownership: varies, 15-30% per platform (115% total available)
  *
  * Expected progression to 100%:
  * - 3 prestiges + minimal platforms: 63% (milestones) + 24% (prestige) + 13% (platforms) = 100%

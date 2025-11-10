@@ -38,14 +38,14 @@ console.log('\n\nExample 2: Comparing no prestige vs 2 prestiges');
 console.log('-'.repeat(80));
 
 // Without prestige
-const noPrestieSimulator = new TimingSimulator();
-noPrestieSimulator
+const noPrestigeSimulator = new TimingSimulator();
+noPrestigeSimulator
 	.setFans(1_000_000)
 	.setSongs(200)
 	.addUpgrades(['tier1_basic', 'tier1_improved', 'tier1_advanced', 'tier2_basic', 'tier2_improved'])
 	.setPrestigeCount(0);
 
-const noPrestigeReport = noPrestieSimulator.analyze();
+const noPrestigeReport = noPrestigeSimulator.analyze();
 console.log('WITHOUT PRESTIGE:');
 console.log(`  Income/sec: $${noPrestigeReport.incomePerSecond.toFixed(2)}`);
 

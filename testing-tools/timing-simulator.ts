@@ -19,12 +19,9 @@ import {
 	INITIAL_MONEY,
 	INITIAL_FANS,
 	INITIAL_GPU,
-	INITIAL_TECH_TIER,
-	INITIAL_TECH_SUB_TIER,
 	INITIAL_PHASE,
 	INITIAL_INDUSTRY_CONTROL,
 	INITIAL_PRESTIGE_COUNT,
-	INITIAL_EXPERIENCE_MULTIPLIER,
 	BASE_SONG_GENERATION_TIME,
 	INITIAL_UNLOCKED_SYSTEMS,
 	UPGRADES,
@@ -33,17 +30,14 @@ import {
 	PRESTIGE_MULTIPLIER_PER_LEVEL,
 	BASE_INCOME_PER_SONG,
 	BASE_FAN_GENERATION_RATE,
-	TRENDING_MULTIPLIER,
-	TOUR_BASE_COST,
 	TOUR_DURATION,
 	TOUR_BASE_INCOME_PER_SECOND,
 	TOUR_FAN_MULTIPLIER,
 	TREND_RESEARCH_COST
 } from '../src/lib/game/config';
 import { calculateTotalIncome } from '../src/lib/systems/income';
-import { getCurrentSongCost, calculateSongCost } from '../src/lib/systems/songs';
-import { getTechIncomeMultiplier } from '../src/lib/systems/tech';
-import { calculateTourIncomePerSecond, getTourCost } from '../src/lib/systems/tours';
+import { getCurrentSongCost } from '../src/lib/systems/songs';
+import { getTourCost } from '../src/lib/systems/tours';
 
 // ============================================================================
 // SIMULATOR CONFIGURATION
@@ -374,26 +368,22 @@ export class TimingSimulator {
 
 	/**
 	 * Build songs array based on configuration
+	 * 
+	 * Note: Songs store BASE_INCOME_PER_SONG only. Multipliers (tech, prestige, trending)
+	 * are applied at income calculation time by calculateTotalIncome -> applyIncomeMultipliers.
 	 */
 	private buildSongs() {
 		const songs = [];
-		const incomeMultiplier = getTechIncomeMultiplier(this.gameState || this.buildMockState());
-		const experienceMultiplier = 1.0 + (this.config.prestigeCount * PRESTIGE_MULTIPLIER_PER_LEVEL);
 
 		for (let i = 0; i < this.config.songCount; i++) {
 			const isTrending = this.config.trendingGenre !== null;
-			let incomePerSecond = BASE_INCOME_PER_SONG * incomeMultiplier * experienceMultiplier;
-
-			if (isTrending) {
-				incomePerSecond *= TRENDING_MULTIPLIER;
-			}
 
 			songs.push({
 				id: `song-${i}`,
 				name: `Test Song ${i + 1}`,
 				genre: this.config.trendingGenre || 'pop' as Genre,
 				createdAt: Date.now(),
-				incomePerSecond,
+				incomePerSecond: BASE_INCOME_PER_SONG,  // Store base income only
 				fanGenerationRate: BASE_FAN_GENERATION_RATE,
 				isTrending
 			});
@@ -618,37 +608,20 @@ export class TimingSimulator {
 
 	/**
 	 * Calculate breakdown of income by source
+	 * 
+	 * Note: This uses calculateTotalIncome from the main game, which already applies
+	 * all multipliers (tech, prestige, boosts, trending). We just extract the breakdown
+	 * by temporarily zeroing out different income sources.
 	 */
 	private calculateIncomeBreakdown() {
-		// Song income
-		let songIncome = 0;
-		for (const song of this.gameState.songs) {
-			songIncome += song.incomePerSecond;
-		}
-
-		// Apply multipliers to song income
-		const upgradeMultiplier = getTechIncomeMultiplier(this.gameState);
-		songIncome *= upgradeMultiplier * this.gameState.experienceMultiplier;
-
-		// Tour income
-		let tourIncome = 0;
-		for (const tour of this.gameState.tours) {
-			if (tour.completedAt === null) {
-				tourIncome += tour.incomePerSecond;
-			}
-		}
-
-		// Platform income
-		let platformIncome = 0;
-		for (const platform of this.gameState.ownedPlatforms) {
-			platformIncome += platform.incomePerSecond;
-		}
-
-		// Legacy artist income
-		let legacyIncome = 0;
-		for (const artist of this.gameState.legacyArtists) {
-			legacyIncome += artist.incomeRate;
-		}
+		// Calculate total income using the actual game function
+		const totalIncome = calculateTotalIncome(this.gameState);
+		
+		// To get accurate breakdown, we calculate income with/without each source
+		const songIncome = this.calculateSourceIncome('songs');
+		const tourIncome = this.calculateSourceIncome('tours');
+		const platformIncome = this.calculateSourceIncome('platforms');
+		const legacyIncome = this.calculateSourceIncome('legacy');
 
 		return {
 			songs: songIncome,
@@ -656,6 +629,38 @@ export class TimingSimulator {
 			platforms: platformIncome,
 			legacyArtists: legacyIncome
 		};
+	}
+
+	/**
+	 * Helper to calculate income from a specific source
+	 */
+	private calculateSourceIncome(source: 'songs' | 'tours' | 'platforms' | 'legacy'): number {
+		const originalState = { ...this.gameState };
+		const tempState = { ...this.gameState };
+		
+		// Calculate total with all sources
+		const withSource = calculateTotalIncome(this.gameState);
+		
+		// Calculate total without this source
+		switch (source) {
+			case 'songs':
+				tempState.songs = [];
+				break;
+			case 'tours':
+				tempState.tours = [];
+				break;
+			case 'platforms':
+				tempState.ownedPlatforms = [];
+				break;
+			case 'legacy':
+				tempState.legacyArtists = [];
+				break;
+		}
+		
+		const withoutSource = calculateTotalIncome(tempState);
+		
+		// The difference is the income from this source (with all multipliers applied)
+		return withSource - withoutSource;
 	}
 
 	/**

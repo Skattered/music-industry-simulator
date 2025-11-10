@@ -272,6 +272,7 @@ describe('GameEngine', () => {
 		});
 
 		it('should apply trending multiplier to income', () => {
+			gameState.currentTrendingGenre = 'pop';
 			gameState.songs = [
 				{
 					id: 'song1',
@@ -717,6 +718,438 @@ describe('GameEngine', () => {
 
 			expect(receivedState).toBe(gameState);
 			expect(receivedDeltaTime).toBeGreaterThan(0);
+		});
+	});
+
+	describe('Physical Album Processing', () => {
+		it('should not auto-release albums if system is locked', () => {
+			gameState.unlockedSystems.physicalAlbums = false;
+			gameState.songs = new Array(20).fill(null).map((_, i) => ({
+				id: `song${i}`,
+				name: `Song ${i}`,
+				genre: 'pop' as const,
+				createdAt: Date.now(),
+				incomePerSecond: 100,
+				fanGenerationRate: 10,
+				isTrending: false
+			}));
+
+			engine.start();
+			vi.advanceTimersByTime(5000);
+			engine.stop();
+
+			// No albums should have been released
+			expect(gameState.physicalAlbums.length).toBe(0);
+		});
+
+		it('should auto-release albums when unlocked and milestones reached', () => {
+			gameState.unlockedSystems.physicalAlbums = true;
+			gameState.songs = new Array(15).fill(null).map((_, i) => ({
+				id: `song${i}`,
+				name: `Song ${i}`,
+				genre: 'pop' as const,
+				createdAt: Date.now(),
+				incomePerSecond: 100,
+				fanGenerationRate: 10,
+				isTrending: false
+			}));
+			gameState.fans = 10000;
+
+			const initialAlbums = gameState.physicalAlbums.length;
+
+			engine.start();
+			// Advance past cooldown
+			vi.advanceTimersByTime(130000); // 130 seconds
+			engine.stop();
+
+			// Should have released at least one album
+			expect(gameState.physicalAlbums.length).toBeGreaterThan(initialAlbums);
+		});
+	});
+
+	describe('Legacy Artist Processing', () => {
+		it('should generate cross-promotion fans from legacy artists', () => {
+			gameState.legacyArtists = [
+				{
+					name: 'Legacy Artist',
+					peakFans: 1000000,
+					songs: 100,
+					incomeRate: 50,
+					createdAt: Date.now() - 100000,
+					prestigedAt: Date.now() - 50000
+				}
+			];
+
+			const initialFans = gameState.fans;
+			const initialArtistFans = gameState.currentArtist.fans;
+
+			engine.start();
+			vi.advanceTimersByTime(1000); // 1 second
+			engine.stop();
+
+			// Should have gained fans from cross-promotion
+			expect(gameState.fans).toBeGreaterThan(initialFans);
+			expect(gameState.currentArtist.fans).toBeGreaterThan(initialArtistFans);
+		});
+
+		it('should update peak fans from cross-promotion', () => {
+			gameState.legacyArtists = [
+				{
+					name: 'Legacy Artist',
+					peakFans: 10000000,
+					songs: 100,
+					incomeRate: 50,
+					createdAt: Date.now() - 100000,
+					prestigedAt: Date.now() - 50000
+				}
+			];
+
+			engine.start();
+			vi.advanceTimersByTime(1000); // 1 second
+			engine.stop();
+
+			// Peak fans should be updated
+			expect(gameState.currentArtist.peakFans).toBeGreaterThan(0);
+		});
+	});
+
+	describe('Platform Ownership', () => {
+		it('should update industry control when platforms are owned', () => {
+			gameState.ownedPlatforms = [
+				{
+					id: 'streaming',
+					type: 'streaming',
+					name: 'Streaming Service',
+					cost: 10000000,
+					acquiredAt: Date.now(),
+					incomePerSecond: 10000,
+					controlContribution: 15
+				}
+			];
+
+			engine.start();
+			vi.advanceTimersByTime(100); // Single tick
+			engine.stop();
+
+			// Industry control should reflect platform ownership
+			expect(gameState.industryControl).toBeGreaterThan(0);
+		});
+
+		it('should process multiple platforms correctly', () => {
+			gameState.ownedPlatforms = [
+				{
+					id: 'streaming',
+					type: 'streaming',
+					name: 'Streaming Service',
+					cost: 10000000,
+					acquiredAt: Date.now(),
+					incomePerSecond: 10000,
+					controlContribution: 15
+				},
+				{
+					id: 'ticketing',
+					type: 'ticketing',
+					name: 'Ticketing Platform',
+					cost: 25000000,
+					acquiredAt: Date.now(),
+					incomePerSecond: 25000,
+					controlContribution: 20
+				}
+			];
+
+			const initialMoney = gameState.money;
+
+			engine.start();
+			vi.advanceTimersByTime(1000); // 1 second
+			engine.stop();
+
+			// Should have earned from both platforms (35000/sec total)
+			expect(gameState.money).toBeCloseTo(initialMoney + 35000, 0);
+
+			// Industry control should be sum of both platforms
+			expect(gameState.industryControl).toBe(35);
+		});
+	});
+
+	describe('System Unlocks', () => {
+		it('should check for physical album unlock', () => {
+			gameState.unlockedSystems.physicalAlbums = false;
+			gameState.upgrades = { tier2_improved: { purchasedAt: Date.now(), tier: 2 } };
+
+			engine.start();
+			vi.advanceTimersByTime(100); // Single tick
+			engine.stop();
+
+			// Physical albums should now be unlocked
+			expect(gameState.unlockedSystems.physicalAlbums).toBe(true);
+		});
+
+		it('should check for tour unlock', () => {
+			gameState.unlockedSystems.tours = false;
+			gameState.unlockedSystems.physicalAlbums = true;
+			gameState.upgrades = { tier3_advanced: { purchasedAt: Date.now(), tier: 3 } };
+			gameState.physicalAlbums = new Array(15).fill(null).map((_, i) => ({
+				id: `album${i}`,
+				name: `Album ${i}`,
+				songCount: 10,
+				releasedAt: Date.now(),
+				payout: 100000,
+				variantCount: 2,
+				isRerelease: false
+			}));
+			gameState.fans = 150000;
+
+			engine.start();
+			vi.advanceTimersByTime(100); // Single tick
+			engine.stop();
+
+			// Tours should now be unlocked
+			expect(gameState.unlockedSystems.tours).toBe(true);
+		});
+
+		it('should check for prestige unlock', () => {
+			gameState.unlockedSystems.prestige = false;
+			gameState.upgrades = { tier3_basic: { purchasedAt: Date.now(), tier: 3 } };
+
+			engine.start();
+			vi.advanceTimersByTime(100); // Single tick
+			engine.stop();
+
+			// Prestige should now be unlocked
+			expect(gameState.unlockedSystems.prestige).toBe(true);
+		});
+
+		it('should check for platform ownership unlock', () => {
+			gameState.unlockedSystems.platformOwnership = false;
+			gameState.upgrades = { tier6_basic: { purchasedAt: Date.now(), tier: 6 } };
+			gameState.tours = new Array(60).fill(null).map((_, i) => ({
+				id: `tour${i}`,
+				name: `Tour ${i}`,
+				startedAt: Date.now() - 200000,
+				completedAt: Date.now() - 10000, // Completed
+				incomePerSecond: 1000,
+				usesScarcity: false
+			}));
+			gameState.fans = 2000000;
+
+			engine.start();
+			vi.advanceTimersByTime(100); // Single tick
+			engine.stop();
+
+			// Platform ownership should now be unlocked
+			expect(gameState.unlockedSystems.platformOwnership).toBe(true);
+		});
+	});
+
+	describe('Full Integration Test', () => {
+		it('should process all systems together correctly', () => {
+			// Set up a complex game state with all systems active
+			gameState.unlockedSystems = {
+				trendResearch: true,
+				physicalAlbums: true,
+				tours: true,
+				platformOwnership: true,
+				monopoly: true,
+				prestige: true,
+				gpu: true
+			};
+
+			gameState.songs = [
+				{
+					id: 'song1',
+					name: 'Hit Song',
+					genre: 'pop',
+					createdAt: Date.now(),
+					incomePerSecond: 100,
+					fanGenerationRate: 10,
+					isTrending: false
+				}
+			];
+
+			gameState.legacyArtists = [
+				{
+					name: 'Legacy Artist',
+					peakFans: 1000000,
+					songs: 50,
+					incomeRate: 25,
+					createdAt: Date.now() - 100000,
+					prestigedAt: Date.now() - 50000
+				}
+			];
+
+			const now = Date.now();
+			gameState.tours = [
+				{
+					id: 'tour1',
+					name: 'Active Tour',
+					startedAt: now,
+					completedAt: null,
+					incomePerSecond: 500,
+					usesScarcity: false
+				}
+			];
+
+			gameState.ownedPlatforms = [
+				{
+					id: 'streaming',
+					type: 'streaming',
+					name: 'Streaming Service',
+					cost: 10000000,
+					acquiredAt: now,
+					incomePerSecond: 1000,
+					controlContribution: 15
+				}
+			];
+
+			gameState.activeBoosts = [
+				{
+					id: 'boost1',
+					type: 'bot_streams',
+					name: 'Bot Streams',
+					activatedAt: now,
+					duration: 30000,
+					incomeMultiplier: 2.0,
+					fanMultiplier: 1.5
+				}
+			];
+
+			const initialMoney = gameState.money;
+			const initialFans = gameState.fans;
+
+			engine.start();
+			vi.advanceTimersByTime(1000); // 1 second
+			engine.stop();
+
+			// Verify all systems contributed:
+			// - Songs: 100/sec * 2.0 boost * 1.0 experience = 200
+			// - Legacy: 25/sec * 2.0 boost * 1.0 experience = 50
+			// - Tours: 500/sec * 2.0 boost * 1.0 experience = 1000
+			// - Platforms: 1000/sec * 2.0 boost * 1.0 experience = 2000
+			// Total: 3250/sec (all income gets boost multipliers)
+			expect(gameState.money).toBeGreaterThan(initialMoney);
+			expect(gameState.money).toBeCloseTo(initialMoney + 3250, 50);
+
+			// Fans: 10/sec * 1.5 boost + cross-promotion
+			expect(gameState.fans).toBeGreaterThan(initialFans);
+
+			// Industry control should be set
+			expect(gameState.industryControl).toBe(15);
+		});
+
+		it('should handle performance at 10 TPS with all systems active', () => {
+			// Set up maximum complexity
+			gameState.unlockedSystems = {
+				trendResearch: true,
+				physicalAlbums: true,
+				tours: true,
+				platformOwnership: true,
+				monopoly: true,
+				prestige: true,
+				gpu: true
+			};
+
+			// Add many songs
+			gameState.songs = new Array(100).fill(null).map((_, i) => ({
+				id: `song${i}`,
+				name: `Song ${i}`,
+				genre: 'pop' as const,
+				createdAt: Date.now(),
+				incomePerSecond: 10,
+				fanGenerationRate: 1,
+				isTrending: false
+			}));
+
+			// Add legacy artists
+			gameState.legacyArtists = new Array(3).fill(null).map((_, i) => ({
+				name: `Legacy ${i}`,
+				peakFans: 1000000,
+				songs: 50,
+				incomeRate: 25,
+				createdAt: Date.now() - 100000,
+				prestigedAt: Date.now() - 50000
+			}));
+
+			// Add tours
+			const now = Date.now();
+			gameState.tours = new Array(3).fill(null).map((_, i) => ({
+				id: `tour${i}`,
+				name: `Tour ${i}`,
+				startedAt: now,
+				completedAt: null,
+				incomePerSecond: 100,
+				usesScarcity: false
+			}));
+
+			// Add platforms
+			gameState.ownedPlatforms = new Array(3).fill(null).map((_, i) => ({
+				id: `platform${i}`,
+				type: 'streaming' as const,
+				name: `Platform ${i}`,
+				cost: 10000000,
+				acquiredAt: now,
+				incomePerSecond: 100,
+				controlContribution: 10
+			}));
+
+			const tickCallback = vi.fn();
+			engine.onTick(tickCallback);
+
+			engine.start();
+
+			// Run for 10 seconds (100 ticks)
+			vi.advanceTimersByTime(10000);
+
+			engine.stop();
+
+			// Should have executed 100 ticks
+			expect(tickCallback).toHaveBeenCalledTimes(100);
+
+			// All systems should have processed correctly
+			expect(gameState.money).toBeGreaterThan(1000);
+			expect(gameState.fans).toBeGreaterThan(0);
+
+			// Verify it completed without crashing
+			// (Performance timing is not reliable with fake timers)
+			expect(engine.running).toBe(false);
+		});
+
+		it('should maintain game state consistency across all systems', () => {
+			gameState.unlockedSystems.physicalAlbums = true;
+			gameState.unlockedSystems.tours = true;
+			gameState.unlockedSystems.platformOwnership = true;
+
+			gameState.songs = new Array(20).fill(null).map((_, i) => ({
+				id: `song${i}`,
+				name: `Song ${i}`,
+				genre: 'pop' as const,
+				createdAt: Date.now(),
+				incomePerSecond: 50,
+				fanGenerationRate: 5,
+				isTrending: false
+			}));
+
+			gameState.fans = 100000;
+			const initialMoney = gameState.money;
+
+			engine.start();
+			vi.advanceTimersByTime(5000); // 5 seconds
+			engine.stop();
+
+			// Verify state consistency
+			expect(gameState.money).toBeGreaterThan(initialMoney);
+			expect(gameState.fans).toBeGreaterThan(100000);
+			// Current artist fans should have increased (but may not equal total fans due to initial state)
+			expect(gameState.currentArtist.fans).toBeGreaterThan(0);
+			expect(gameState.lastUpdate).toBeGreaterThan(Date.now() - 1000);
+
+			// Verify no arrays have invalid states
+			expect(Array.isArray(gameState.songs)).toBe(true);
+			expect(Array.isArray(gameState.songQueue)).toBe(true);
+			expect(Array.isArray(gameState.physicalAlbums)).toBe(true);
+			expect(Array.isArray(gameState.tours)).toBe(true);
+			expect(Array.isArray(gameState.ownedPlatforms)).toBe(true);
+			expect(Array.isArray(gameState.legacyArtists)).toBe(true);
+			expect(Array.isArray(gameState.activeBoosts)).toBe(true);
 		});
 	});
 });

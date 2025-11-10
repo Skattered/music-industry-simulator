@@ -303,12 +303,11 @@ export const UPGRADES: UpgradeDefinition[] = [
 		id: 'tier3_advanced',
 		tier: 3,
 		name: 'Multi-GPU Setup',
-		description: 'Parallel processing across multiple GPUs. Unlocks tours. Songs take 4s.',
+		description: 'Parallel processing across multiple GPUs. Enables tours (requires 10 albums + 100K fans). Songs take 4s.',
 		cost: 50000,
 		effects: {
 			songSpeed: 4000,
-			incomeMultiplier: 3.0,
-			unlockTours: true
+			incomeMultiplier: 3.0
 		},
 		prerequisites: ['tier3_improved']
 	},
@@ -400,12 +399,11 @@ export const UPGRADES: UpgradeDefinition[] = [
 		id: 'tier6_basic',
 		tier: 6,
 		name: 'Custom Inference Engine',
-		description: 'Write optimized code from scratch. Songs take 0.6s.',
+		description: 'Write optimized code from scratch. Enables platform ownership (requires 50 tours + 1M fans). Songs take 0.6s.',
 		cost: 10000000,
 		effects: {
 			songSpeed: 600,
-			incomeMultiplier: 15.0,
-			unlockPlatformOwnership: true
+			incomeMultiplier: 15.0
 		},
 		prerequisites: ['tier5_advanced']
 	},

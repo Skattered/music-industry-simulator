@@ -240,23 +240,6 @@ describe('Tech Upgrade System', () => {
 			expect(state.unlockedSystems.physicalAlbums).toBe(true);
 		});
 
-		it('should unlock tours when specified', () => {
-			const state = createTestGameState();
-			const upgrade = getUpgradeById('tier3_advanced');
-
-			applyTechEffects(state, upgrade!);
-
-			expect(state.unlockedSystems.tours).toBe(true);
-		});
-
-		it('should unlock platform ownership when specified', () => {
-			const state = createTestGameState();
-			const upgrade = getUpgradeById('tier6_basic');
-
-			applyTechEffects(state, upgrade!);
-
-			expect(state.unlockedSystems.platformOwnership).toBe(true);
-		});
 
 		it('should unlock monopoly mechanics when specified', () => {
 			const state = createTestGameState();
@@ -549,13 +532,17 @@ describe('Tech Upgrade System', () => {
 				purchaseTechUpgrade(state, upgradeId);
 			}
 
+			// These systems unlock via upgrade effects
 			expect(state.unlockedSystems.trendResearch).toBe(true);
 			expect(state.unlockedSystems.physicalAlbums).toBe(true);
 			expect(state.unlockedSystems.gpu).toBe(true);
 			expect(state.unlockedSystems.prestige).toBe(true);
-			expect(state.unlockedSystems.tours).toBe(true);
-			expect(state.unlockedSystems.platformOwnership).toBe(true);
 			expect(state.unlockedSystems.monopoly).toBe(true);
+
+			// Tours and platform ownership require additional milestone checks in unlocks.ts
+			// They won't be unlocked just by purchasing upgrades
+			expect(state.unlockedSystems.tours).toBe(false);
+			expect(state.unlockedSystems.platformOwnership).toBe(false);
 		});
 	});
 });

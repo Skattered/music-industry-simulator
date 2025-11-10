@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GameEngine } from '../game/engine';
 import type { GameState, Phase } from '../game/types';
 import { GAME_VERSION, INITIAL_UNLOCKED_SYSTEMS, PHASE_REQUIREMENTS } from '../game/config';
-import { checkPhaseUnlock } from '../systems/unlocks';
+import { checkPhaseUnlocks } from '../systems/unlocks';
 import { purchaseTechUpgrade } from '../systems/tech';
 import { performPrestige } from '../systems/prestige';
 

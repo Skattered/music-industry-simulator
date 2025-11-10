@@ -31,7 +31,7 @@
 		<!-- Money -->
 		<div class="resource-item">
 			<div class="resource-label text-gray-400 text-sm mb-1">Money</div>
-			<div class="resource-value text-white text-lg font-semibold">
+			<div class="resource-value text-white text-lg font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
 				<span class="icon">💰</span>
 				{formatMoney(gameState.money)}
 				<span class="text-sm text-gray-400">({formatMoney(incomePerSecond)}/s)</span>

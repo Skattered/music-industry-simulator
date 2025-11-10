@@ -21,7 +21,7 @@
  */
 
 import type { GameState, Phase } from '../game/types';
-import { PHASE_REQUIREMENTS } from '../game/config';
+import { PHASE_REQUIREMENTS, PHASE_NAMES } from '../game/config';
 import { toastStore } from '../stores/toasts.svelte';
 
 /**
@@ -296,14 +296,7 @@ export function checkPhaseProgression(state: GameState): boolean {
 		state.phase = nextPhase;
 
 		// Log phase unlock
-		const phaseNames = {
-			2: 'Physical Albums',
-			3: 'Tours & Concerts',
-			4: 'Platform Ownership',
-			5: 'Total Automation'
-		};
-
-		console.log(`🎉 Phase ${nextPhase} Unlocked: ${phaseNames[nextPhase as 2 | 3 | 4 | 5]}!`);
+		console.log(`🎉 Phase ${nextPhase} Unlocked: ${PHASE_NAMES[nextPhase]}!`);
 		console.log(`   ${PHASE_REQUIREMENTS[nextPhase].description}`);
 
 		// Show toast notification

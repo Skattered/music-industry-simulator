@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { GameState } from '../game/types';
 	import { formatMoney, formatNumber } from '../game/utils';
+	import { PHASE_NAMES } from '../game/config';
 
 	let { gameState = $bindable() }: { gameState: GameState } = $props();
 
@@ -21,16 +22,8 @@
 	// Calculate progress bar width
 	const progressWidth = $derived(`${Math.min(gameState.industryControl, 100)}%`);
 
-	// Phase names for display
-	const phaseNames: Record<number, string> = {
-		1: 'Streaming',
-		2: 'Physical Albums',
-		3: 'Tours & Concerts',
-		4: 'Platform Ownership',
-		5: 'Total Automation'
-	};
-
-	const phaseName = $derived(phaseNames[gameState.phase] || 'Unknown');
+	// Get phase name from shared constant
+	const phaseName = $derived(PHASE_NAMES[gameState.phase] || 'Unknown');
 </script>
 
 <div class="resource-bar bg-game-panel rounded-lg p-4 shadow-lg">

@@ -26,6 +26,8 @@ export interface Toast {
  */
 function createToastStore() {
 	let toasts = $state<Toast[]>([]);
+	// Track timeout IDs to clear them when toasts are dismissed early
+	const timeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
 	return {
 		// Expose toasts array as getter for reactive subscriptions
@@ -52,9 +54,11 @@ function createToastStore() {
 
 			// Auto-dismiss after duration
 			if (newToast.duration > 0) {
-				setTimeout(() => {
+				const timeoutId = setTimeout(() => {
 					this.dismiss(id);
+					timeouts.delete(id);
 				}, newToast.duration);
+				timeouts.set(id, timeoutId);
 			}
 		},
 
@@ -127,6 +131,12 @@ function createToastStore() {
 		 * Dismiss a toast by ID
 		 */
 		dismiss(id: string): void {
+			// Clear the timeout if it exists
+			const timeoutId = timeouts.get(id);
+			if (timeoutId !== undefined) {
+				clearTimeout(timeoutId);
+				timeouts.delete(id);
+			}
 			toasts = toasts.filter((toast) => toast.id !== id);
 		},
 
@@ -134,6 +144,9 @@ function createToastStore() {
 		 * Clear all toasts
 		 */
 		clear(): void {
+			// Clear all pending timeouts
+			timeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+			timeouts.clear();
 			toasts = [];
 		}
 	};

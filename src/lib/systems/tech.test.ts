@@ -210,7 +210,7 @@ describe('Tech Upgrade System', () => {
 
 			applyTechEffects(state, upgrade!);
 
-			expect(state.songGenerationSpeed).toBe(25000);
+			expect(state.songGenerationSpeed).toBe(15000);
 		});
 
 		it('should unlock GPU system when specified', () => {
@@ -482,10 +482,10 @@ describe('Tech Upgrade System', () => {
 			const state = createTestGameState({ money: 100000000 });
 
 			purchaseTechUpgrade(state, 'tier1_basic');
-			expect(state.songGenerationSpeed).toBe(25000);
+			expect(state.songGenerationSpeed).toBe(15000);
 
 			purchaseTechUpgrade(state, 'tier1_improved');
-			expect(state.songGenerationSpeed).toBe(15000);
+			expect(state.songGenerationSpeed).toBe(12000);
 
 			purchaseTechUpgrade(state, 'tier1_advanced');
 			expect(state.songGenerationSpeed).toBe(10000);

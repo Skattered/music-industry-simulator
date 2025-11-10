@@ -354,7 +354,7 @@ describe('TechTree Component', () => {
 			render(TechTree, { props: { gameState } });
 
 			expect(
-				screen.getByText(/Basic web-based AI music generation. Songs take 25s/)
+				screen.getByText(/Basic web-based AI music generation. Songs take 15s/)
 			).toBeTruthy();
 		});
 
@@ -365,7 +365,7 @@ describe('TechTree Component', () => {
 			const tier1BasicCard = container.querySelector('[data-upgrade-id="tier1_basic"]');
 			const effectsText = tier1BasicCard?.textContent;
 
-			expect(effectsText).toContain('Song speed: 25s');
+			expect(effectsText).toContain('Song speed: 15s');
 			expect(effectsText).toContain('Song cost: $1.50');
 		});
 

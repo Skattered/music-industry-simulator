@@ -595,8 +595,8 @@ describe('SongGenerator - User Interactions', () => {
 		});
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		// tier1_improved sets songSpeed to 15000 (15 seconds)
-		expect(container.textContent).toContain('15s per song');
+		// tier1_improved sets songSpeed to 12000 (12 seconds)
+		expect(container.textContent).toContain('12s per song');
 
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();

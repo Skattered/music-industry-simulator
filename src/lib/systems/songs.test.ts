@@ -338,8 +338,8 @@ describe('queueSongs', () => {
 
 		queueSongs(state, 1);
 
-		// tier1_improved sets songSpeed to 15000
-		expect(state.songQueue[0].totalTime).toBe(15000);
+		// tier1_improved sets songSpeed to 12000
+		expect(state.songQueue[0].totalTime).toBe(12000);
 	});
 });
 

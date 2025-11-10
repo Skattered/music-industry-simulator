@@ -9,6 +9,8 @@
  * - Tours: Tech tier 3 (Multi-GPU Setup upgrade) + 10 albums + 100K fans
  * - Prestige: Tech tier 3 (Download Open Models upgrade)
  * - Platform Ownership: Tech tier 6 (Custom Inference Engine upgrade) + 50 tours + 1M fans
+ * - GPU: Tech tier 3 (Download Open Models upgrade)
+ * - Trend Research: Tech tier 1 (Multi-Account Management upgrade)
  */
 
 import type { GameState } from '../game/types';

@@ -14,6 +14,7 @@
 		"test:watch": "vitest",
 		"test:ui": "vitest --ui",
 		"test:coverage": "vitest run --coverage",
+		"test:timing": "tsx testing-tools/run-timing-test.ts",
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
 	},
@@ -33,6 +34,7 @@
 		"svelte": "^5.41.0",
 		"svelte-check": "^4.3.3",
 		"tailwindcss": "^3.4.18",
+		"tsx": "^4.20.6",
 		"typescript": "^5.9.3",
 		"vite": "^7.1.10",
 		"vitest": "^4.0.8"

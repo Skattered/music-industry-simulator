@@ -454,6 +454,11 @@ export const GENRE_WORDS: Record<Genre, { adjectives: string[]; nouns: string[];
     nouns: ["Circuit", "Signal", "Pulse", "Wave", "Code", "Data", "System", "Grid"],
     verbs: ["Pulsing", "Transmitting", "Computing", "Processing", "Streaming", "Syncing", "Encoding", "Morphing"]
   },
+  country: {
+    adjectives: ["Country", "Southern", "Rustic", "Heartland", "Homegrown", "Down-home", "Backroad", "Outlaw"],
+    nouns: ["Highway", "Prairie", "Sunset", "Whiskey", "Truck", "Honky-tonk", "Ranch", "River"],
+    verbs: ["Riding", "Driving", "Wandering", "Rambling", "Singing", "Picking", "Strumming", "Roaming"]
+  },
   indie: {
     adjectives: ["Indie", "Alternative", "Underground", "Authentic", "Real", "True", "Pure", "Honest"],
     nouns: ["Scene", "Vibe", "Sound", "Voice", "Soul", "Spirit", "Heart", "Truth"],

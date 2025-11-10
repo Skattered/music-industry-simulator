@@ -874,7 +874,7 @@ describe('GameEngine', () => {
 	describe('System Unlocks', () => {
 		it('should check for physical album unlock', () => {
 			gameState.unlockedSystems.physicalAlbums = false;
-			gameState.upgrades = { tier2_improved: Date.now() };
+			gameState.upgrades = { tier2_improved: { purchasedAt: Date.now(), tier: 2 } };
 
 			engine.start();
 			vi.advanceTimersByTime(100); // Single tick
@@ -887,7 +887,7 @@ describe('GameEngine', () => {
 		it('should check for tour unlock', () => {
 			gameState.unlockedSystems.tours = false;
 			gameState.unlockedSystems.physicalAlbums = true;
-			gameState.upgrades = { tier3_advanced: Date.now() };
+			gameState.upgrades = { tier3_advanced: { purchasedAt: Date.now(), tier: 3 } };
 			gameState.physicalAlbums = new Array(15).fill(null).map((_, i) => ({
 				id: `album${i}`,
 				name: `Album ${i}`,
@@ -909,7 +909,7 @@ describe('GameEngine', () => {
 
 		it('should check for prestige unlock', () => {
 			gameState.unlockedSystems.prestige = false;
-			gameState.upgrades = { tier3_basic: Date.now() };
+			gameState.upgrades = { tier3_basic: { purchasedAt: Date.now(), tier: 3 } };
 
 			engine.start();
 			vi.advanceTimersByTime(100); // Single tick
@@ -921,7 +921,7 @@ describe('GameEngine', () => {
 
 		it('should check for platform ownership unlock', () => {
 			gameState.unlockedSystems.platformOwnership = false;
-			gameState.upgrades = { tier6_basic: Date.now() };
+			gameState.upgrades = { tier6_basic: { purchasedAt: Date.now(), tier: 6 } };
 			gameState.tours = new Array(60).fill(null).map((_, i) => ({
 				id: `tour${i}`,
 				name: `Tour ${i}`,

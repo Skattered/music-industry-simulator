@@ -6,8 +6,17 @@
  * and clock changes.
  */
 
-import type { GameState, QueuedSong, ActiveBoost, Tour } from './types';
-import { TICK_RATE, SAVE_KEY, BACKUP_KEY, TRENDING_MULTIPLIER, TOUR_DURATION } from './config';
+import type { GameState } from './types';
+import { TICK_RATE, SAVE_KEY, BACKUP_KEY } from './config';
+import { processSongQueue } from '../systems/songs';
+import { generateIncome } from '../systems/income';
+import { generateFans } from '../systems/fans';
+import { processActiveBoosts } from '../systems/exploitation';
+import { processPhysicalAlbums } from '../systems/physical';
+import { processTours } from '../systems/tours';
+import { processLegacyArtists } from '../systems/prestige';
+import { processPlatformIncome, updateControlProgress } from '../systems/monopoly';
+import { checkPhaseUnlocks } from '../systems/unlocks';
 
 /**
  * Callback function type for save operations
@@ -169,184 +178,40 @@ export class GameEngine {
 	 * @param deltaTime - Time elapsed since last tick in milliseconds
 	 */
 	private processSystems(deltaTime: number): void {
-		const deltaSeconds = deltaTime / 1000; // Convert to seconds for easier calculations
-
-		// Process song generation queue
-		this.processSongGeneration(deltaTime);
+		// Process song generation queue (must be first to add completed songs)
+		processSongQueue(this.gameState, deltaTime);
 
 		// Process income from all sources
-		this.processIncome(deltaSeconds);
+		generateIncome(this.gameState, deltaTime);
 
 		// Process fan generation
-		this.processFans(deltaSeconds);
+		generateFans(this.gameState, deltaTime);
 
 		// Process active boosts (check for expiration)
-		this.processBoosts();
+		processActiveBoosts(this.gameState, deltaTime);
+
+		// Process physical album auto-releases
+		processPhysicalAlbums(this.gameState, deltaTime);
 
 		// Process active tours (check for completion)
-		this.processTours();
+		processTours(this.gameState, deltaTime);
+
+		// Process legacy artists (cross-promotion fan generation)
+		processLegacyArtists(this.gameState, deltaTime);
+
+		// Process platform income (passive income from owned platforms)
+		// Note: This is also calculated in generateIncome, but calling it here
+		// ensures income is applied even if the income system changes
+		// Comment out to avoid double-counting - income system already handles this
+		// processPlatformIncome(this.gameState, deltaTime);
+
+		// Update industry control based on owned platforms
+		updateControlProgress(this.gameState);
 
 		// Check and unlock systems based on milestones
-		this.checkSystemUnlocks();
+		checkPhaseUnlocks(this.gameState);
 	}
 
-	/**
-	 * Process song generation queue
-	 * Updates progress on queued songs and completes them when ready
-	 */
-	private processSongGeneration(deltaTime: number): void {
-		if (this.gameState.songQueue.length === 0) {
-			return;
-		}
-
-		// Process the first song in queue
-		const queuedSong = this.gameState.songQueue[0];
-		queuedSong.progress += deltaTime;
-
-		// Check if song is complete
-		if (queuedSong.progress >= queuedSong.totalTime) {
-			// Remove from queue - the actual song creation should be handled
-			// by the game logic layer, not the engine
-			this.gameState.songQueue.shift();
-		}
-	}
-
-	/**
-	 * Process income generation from all sources
-	 * Applies frame-independent income using deltaSeconds
-	 */
-	private processIncome(deltaSeconds: number): void {
-		let totalIncome = 0;
-
-		// Calculate multipliers from active boosts
-		const incomeMultiplier = this.calculateIncomeMultiplier();
-
-		// Income from songs
-		for (const song of this.gameState.songs) {
-			let songIncome = song.incomePerSecond * deltaSeconds;
-
-			// Apply trending bonus if applicable
-			if (song.isTrending) {
-				songIncome *= TRENDING_MULTIPLIER;
-			}
-
-			totalIncome += songIncome;
-		}
-
-		// Income from legacy artists
-		for (const artist of this.gameState.legacyArtists) {
-			totalIncome += artist.incomeRate * deltaSeconds;
-		}
-
-		// Income from active tours
-		for (const tour of this.gameState.tours) {
-			if (tour.completedAt === null) {
-				totalIncome += tour.incomePerSecond * deltaSeconds;
-			}
-		}
-
-		// Income from owned platforms
-		for (const platform of this.gameState.ownedPlatforms) {
-			totalIncome += platform.incomePerSecond * deltaSeconds;
-		}
-
-		// Apply boost multipliers and add to balance
-		totalIncome *= incomeMultiplier;
-		this.gameState.money += totalIncome;
-	}
-
-	/**
-	 * Process fan generation from songs
-	 */
-	private processFans(deltaSeconds: number): void {
-		let totalFans = 0;
-
-		// Calculate multipliers from active boosts
-		const fanMultiplier = this.calculateFanMultiplier();
-
-		// Fans from songs
-		for (const song of this.gameState.songs) {
-			let songFans = song.fanGenerationRate * deltaSeconds;
-
-			// Apply trending bonus if applicable
-			if (song.isTrending) {
-				songFans *= TRENDING_MULTIPLIER;
-			}
-
-			totalFans += songFans;
-		}
-
-		// Apply boost multipliers
-		totalFans *= fanMultiplier;
-
-		// Update fan counts
-		this.gameState.fans += totalFans;
-		this.gameState.currentArtist.fans += totalFans;
-
-		// Update peak fans if necessary
-		if (this.gameState.currentArtist.fans > this.gameState.currentArtist.peakFans) {
-			this.gameState.currentArtist.peakFans = this.gameState.currentArtist.fans;
-		}
-	}
-
-	/**
-	 * Process active boosts and remove expired ones
-	 */
-	private processBoosts(): void {
-		const currentTime = Date.now();
-
-		// Filter out expired boosts
-		this.gameState.activeBoosts = this.gameState.activeBoosts.filter((boost: ActiveBoost) => {
-			const elapsed = currentTime - boost.activatedAt;
-			return elapsed < boost.duration;
-		});
-	}
-
-	/**
-	 * Process active tours and mark completed ones
-	 */
-	private processTours(): void {
-		const currentTime = Date.now();
-
-		for (const tour of this.gameState.tours) {
-			if (tour.completedAt === null) {
-				const elapsed = currentTime - tour.startedAt;
-
-				if (elapsed >= TOUR_DURATION) {
-					tour.completedAt = currentTime;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Calculate total income multiplier from all active boosts
-	 */
-	private calculateIncomeMultiplier(): number {
-		let multiplier = 1.0;
-
-		for (const boost of this.gameState.activeBoosts) {
-			multiplier *= boost.incomeMultiplier;
-		}
-
-		// Apply experience multiplier from prestige
-		multiplier *= this.gameState.experienceMultiplier;
-
-		return multiplier;
-	}
-
-	/**
-	 * Calculate total fan generation multiplier from all active boosts
-	 */
-	private calculateFanMultiplier(): number {
-		let multiplier = 1.0;
-
-		for (const boost of this.gameState.activeBoosts) {
-			multiplier *= boost.fanMultiplier;
-		}
-
-		return multiplier;
-	}
 
 	/**
 	 * Detect if the system clock has changed dramatically
@@ -446,23 +311,6 @@ export class GameEngine {
 		return this.isRunning;
 	}
 
-	/**
-	 * Check and automatically unlock systems based on milestones
-	 */
-	private checkSystemUnlocks(): void {
-		// Check platform ownership unlock
-		if (!this.gameState.unlockedSystems.platformOwnership) {
-			const completedTours = this.gameState.tours.filter((tour) => tour.completedAt !== null).length;
-			const hasEnoughTours = completedTours >= 50; // MIN_TOURS_FOR_PLATFORMS
-			const hasEnoughFans = this.gameState.fans >= 1_000_000; // MIN_FANS_FOR_PLATFORMS
-			const hasRequiredTech = this.gameState.techTier >= 6; // MIN_TECH_TIER_FOR_PLATFORMS
-
-			if (hasEnoughTours && hasEnoughFans && hasRequiredTech) {
-				this.gameState.unlockedSystems.platformOwnership = true;
-				console.log('GameEngine: Platform ownership unlocked!');
-			}
-		}
-	}
 
 	/**
 	 * Force an immediate save

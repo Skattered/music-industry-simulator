@@ -150,6 +150,7 @@ describe('Income System', () => {
 		it('should apply trending multiplier to matching songs', () => {
 			const state = createTestState({
 				currentTrendingGenre: 'pop',
+				trendDiscoveredAt: null,
 				songs: [
 					createTestSong({ incomePerSecond: 10, genre: 'pop', isTrending: true }),
 					createTestSong({ incomePerSecond: 10, genre: 'rock', isTrending: false })

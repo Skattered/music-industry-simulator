@@ -186,8 +186,6 @@ describe('TechTree Component', () => {
 			const gameState = createTestGameState({ money: 100 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			const upgrade = getUpgradeById('tier1_basic')!;
-
 			const tier1BasicCard = container.querySelector('[data-upgrade-id="tier1_basic"]');
 			const button = tier1BasicCard?.querySelector('.purchase-button') as HTMLButtonElement;
 

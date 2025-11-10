@@ -12,8 +12,6 @@
 	// Purchase upgrade handler
 	function handlePurchase(upgradeId: string) {
 		purchaseTechUpgrade(gameState, upgradeId);
-		// Trigger reactivity by reassigning
-		gameState = gameState;
 	}
 
 	// Check if upgrade is purchased

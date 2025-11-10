@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 
-	// Import game components (will be created in Phase 3)
-	// Commenting out for now since components don't exist yet
-	// import ResourceBar from '$lib/components/ResourceBar.svelte';
-	// import SongGenerator from '$lib/components/SongGenerator.svelte';
-	// import PhysicalAlbums from '$lib/components/PhysicalAlbums.svelte';
-	// import Tours from '$lib/components/Tours.svelte';
-	// import TechTree from '$lib/components/TechTree.svelte';
-	// import UpgradePanel from '$lib/components/UpgradePanel.svelte';
-	// import PrestigePanel from '$lib/components/PrestigePanel.svelte';
+	// Import game components
+	import ResourceBar from '$lib/components/ResourceBar.svelte';
+	import SongGenerator from '$lib/components/SongGenerator.svelte';
+	import PhysicalAlbums from '$lib/components/PhysicalAlbums.svelte';
+	import Tours from '$lib/components/Tours.svelte';
+	import TechTree from '$lib/components/TechTree.svelte';
+	import UpgradePanel from '$lib/components/UpgradePanel.svelte';
+	import PrestigePanel from '$lib/components/PrestigePanel.svelte';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import VictoryModal from '$lib/components/VictoryModal.svelte';
 
 	// Import game engine and state management
 	import { GameEngine } from '$lib/game/engine';
@@ -17,9 +18,8 @@
 	import { saveGame, loadGame } from '$lib/game/save';
 	import type { GameState } from '$lib/game/types';
 
-	// Import components
-	import ToastContainer from '$lib/components/ToastContainer.svelte';
-	import VictoryModal from '$lib/components/VictoryModal.svelte';
+	// Import exploitation system for boost activation
+	import { activateAbility } from '$lib/systems/exploitation';
 
 	// Local reactive state using Svelte 5 $state rune
 	let gameState = $state<GameState>(createNewGameState());
@@ -104,6 +104,11 @@
 
 		console.log('New game started');
 	}
+
+	// Handle boost activation for UpgradePanel
+	function handleActivateBoost(boostId: string) {
+		activateAbility(gameState, boostId);
+	}
 </script>
 
 {#if isLoading}
@@ -141,28 +146,7 @@
 
 		<!-- Resource Bar (full width) -->
 		<div class="max-w-7xl mx-auto px-4 py-4">
-			<!-- Placeholder for ResourceBar component -->
-			<div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-					<div>
-						<div class="text-gray-400 text-sm">Money</div>
-						<div class="text-xl font-bold text-green-400">${gameState.money.toFixed(2)}</div>
-					</div>
-					<div>
-						<div class="text-gray-400 text-sm">Songs</div>
-						<div class="text-xl font-bold text-blue-400">{gameState.songs.length}</div>
-					</div>
-					<div>
-						<div class="text-gray-400 text-sm">Fans</div>
-						<div class="text-xl font-bold text-purple-400">{Math.floor(gameState.fans)}</div>
-					</div>
-					<div>
-						<div class="text-gray-400 text-sm">Industry Control</div>
-						<div class="text-xl font-bold text-yellow-400">{gameState.industryControl.toFixed(1)}%</div>
-					</div>
-				</div>
-			</div>
-			<!-- Will be replaced with: <ResourceBar bind:gameState={gameState} /> -->
+			<ResourceBar bind:gameState />
 		</div>
 
 		<!-- Main Content Grid -->
@@ -170,62 +154,39 @@
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 				<!-- Left Column -->
 				<div class="space-y-4">
-					<!-- Song Generator Component Placeholder -->
+					<!-- Song Generator Component -->
 					<div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
 						<h2 class="text-xl font-bold mb-4">Song Generator</h2>
-						<p class="text-gray-400">SongGenerator component will be placed here</p>
-						<p class="text-sm text-gray-500 mt-2">Queue: {gameState.songQueue.length} songs</p>
+						<SongGenerator bind:gameState />
 					</div>
-					<!-- Will be replaced with: <SongGenerator bind:gameState={gameState} /> -->
 
-					<!-- Physical Albums Component Placeholder -->
-					<div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-						<h2 class="text-xl font-bold mb-4">Physical Albums</h2>
-						<p class="text-gray-400">PhysicalAlbums component will be placed here</p>
-						<p class="text-sm text-gray-500 mt-2">Albums: {gameState.physicalAlbums.length}</p>
-					</div>
-					<!-- Will be replaced with: <PhysicalAlbums bind:gameState={gameState} /> -->
+					<!-- Physical Albums Component -->
+					{#if gameState.unlockedSystems.physicalAlbums}
+						<PhysicalAlbums bind:gameState />
+					{/if}
 
 					<!-- Tours Component (conditionally rendered) -->
 					{#if toursUnlocked}
-						<div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-							<h2 class="text-xl font-bold mb-4">Tours</h2>
-							<p class="text-gray-400">Tours component will be placed here</p>
-							<p class="text-sm text-gray-500 mt-2">Active Tours: {gameState.tours.filter(t => !t.completedAt).length}</p>
-						</div>
-						<!-- Will be replaced with: <Tours bind:gameState={gameState} /> -->
+						<Tours bind:gameState />
 					{/if}
 				</div>
 
 				<!-- Right Column -->
 				<div class="space-y-4">
-					<!-- Tech Tree Component Placeholder -->
-					<div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-						<h2 class="text-xl font-bold mb-4">Tech Tree</h2>
-						<p class="text-gray-400">TechTree component will be placed here</p>
-						<p class="text-sm text-gray-500 mt-2">Current Tier: {gameState.techTier}</p>
-					</div>
-					<!-- Will be replaced with: <TechTree bind:gameState={gameState} /> -->
+					<!-- Tech Tree Component -->
+					<TechTree bind:gameState />
 
-					<!-- Upgrade Panel Component Placeholder -->
+					<!-- Upgrade Panel Component -->
 					<div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-						<h2 class="text-xl font-bold mb-4">Upgrades</h2>
-						<p class="text-gray-400">UpgradePanel component will be placed here</p>
-						<p class="text-sm text-gray-500 mt-2">Active Boosts: {gameState.activeBoosts.length}</p>
+						<UpgradePanel {gameState} onActivateBoost={handleActivateBoost} />
 					</div>
-					<!-- Will be replaced with: <UpgradePanel bind:gameState={gameState} /> -->
 				</div>
 			</div>
 
 			<!-- Prestige Panel (full width at bottom, conditionally rendered) -->
 			{#if prestigeUnlocked}
 				<div class="mt-4">
-					<div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
-						<h2 class="text-xl font-bold mb-4">Prestige</h2>
-						<p class="text-gray-400">PrestigePanel component will be placed here</p>
-						<p class="text-sm text-gray-500 mt-2">Prestige Count: {gameState.prestigeCount}</p>
-					</div>
-					<!-- Will be replaced with: <PrestigePanel bind:gameState={gameState} /> -->
+					<PrestigePanel bind:gameState />
 				</div>
 			{/if}
 		</main>

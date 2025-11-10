@@ -185,6 +185,9 @@ export class GameEngine {
 
 		// Process active tours (check for completion)
 		this.processTours();
+
+		// Check and unlock systems based on milestones
+		this.checkSystemUnlocks();
 	}
 
 	/**
@@ -441,6 +444,24 @@ export class GameEngine {
 	 */
 	public get running(): boolean {
 		return this.isRunning;
+	}
+
+	/**
+	 * Check and automatically unlock systems based on milestones
+	 */
+	private checkSystemUnlocks(): void {
+		// Check platform ownership unlock
+		if (!this.gameState.unlockedSystems.platformOwnership) {
+			const completedTours = this.gameState.tours.filter((tour) => tour.completedAt !== null).length;
+			const hasEnoughTours = completedTours >= 50; // MIN_TOURS_FOR_PLATFORMS
+			const hasEnoughFans = this.gameState.fans >= 1_000_000; // MIN_FANS_FOR_PLATFORMS
+			const hasRequiredTech = this.gameState.techTier >= 6; // MIN_TECH_TIER_FOR_PLATFORMS
+
+			if (hasEnoughTours && hasEnoughFans && hasRequiredTech) {
+				this.gameState.unlockedSystems.platformOwnership = true;
+				console.log('GameEngine: Platform ownership unlocked!');
+			}
+		}
 	}
 
 	/**

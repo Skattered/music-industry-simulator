@@ -56,9 +56,9 @@ Comprehensive balance testing revealed **critical game-breaking issues** that wo
 
 **AFTER:**
 - Cost: $15
-- Effect: songCost $2 → $1.5 (improvement!)
-- Effect: songSpeed 20s → 25s (slight improvement)
-- **Result:** Now a legitimate first upgrade
+- Effect: songCost $2 → $1.5 (25% improvement!)
+- Effect: songSpeed 20s → 15s (25% faster!)
+- **Result:** Now a legitimate first upgrade with clear benefits
 
 ### Issue #2: Tours Lost Money ❌ → ✅
 

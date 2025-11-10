@@ -70,11 +70,11 @@
 
 | Upgrade | Current Cost | Proposed Cost | Speed | Cost/Song | Income Mult | Notes |
 |---------|--------------|---------------|-------|-----------|-------------|-------|
-| Basic | $10 | **$15** | **25s** (was 30s) | **$1.5** (was $2) | - | **FIXED**: Actually useful now! |
-| Improved | $50 | **$50** | **15s** (was 20s) | **$1** (was $1.5) | - | Faster unlock of $1 cost |
+| Basic | $10 | **$15** | **15s** (was 30s, base now 20s) | **$1.5** (was $2) | - | **FIXED**: 25% faster than base, 25% cheaper! |
+| Improved | $50 | **$50** | **12s** (was 20s) | **$1** (was $1.5) | - | Faster unlock of $1 cost |
 | Advanced | $200 | **$150** | **10s** (was 15s) | **$0.50** | - | Cheaper songs! |
 
-**Fix**: tier1_basic was a trap (made songs MORE expensive). Now it actually improves speed and cost.
+**Fix**: tier1_basic was a trap (made songs MORE expensive and no speed improvement). Now it improves both speed (20s→15s) and cost ($2→$1.5).
 
 #### Tier 2: Lifetime Licenses
 

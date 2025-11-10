@@ -208,10 +208,10 @@ export const UPGRADES: UpgradeDefinition[] = [
 		id: 'tier1_basic',
 		tier: 1,
 		name: 'Suno/Udio Account',
-		description: 'Basic web-based AI music generation. Songs take 25s, cost $1.50.',
+		description: 'Basic web-based AI music generation. Songs take 15s, cost $1.50.',
 		cost: 15,
 		effects: {
-			songSpeed: 25000,
+			songSpeed: 15000,
 			songCost: 1.5
 		}
 	},
@@ -219,10 +219,10 @@ export const UPGRADES: UpgradeDefinition[] = [
 		id: 'tier1_improved',
 		tier: 1,
 		name: 'Premium Subscription',
-		description: 'Faster generation queue and better quality. Songs take 15s, cost $1.',
+		description: 'Faster generation queue and better quality. Songs take 12s, cost $1.',
 		cost: 50,
 		effects: {
-			songSpeed: 15000,
+			songSpeed: 12000,
 			songCost: 1.0
 		},
 		prerequisites: ['tier1_basic']

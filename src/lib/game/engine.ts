@@ -199,11 +199,6 @@ export class GameEngine {
 		// Process legacy artists (cross-promotion fan generation)
 		processLegacyArtists(this.gameState, deltaTime);
 
-		// Process platform income (passive income from owned platforms)
-		// Note: This is also calculated in generateIncome, but calling it here
-		// ensures income is applied even if the income system changes
-		// Comment out to avoid double-counting - income system already handles this
-		// processPlatformIncome(this.gameState, deltaTime);
 
 		// Update industry control based on owned platforms
 		updateControlProgress(this.gameState);

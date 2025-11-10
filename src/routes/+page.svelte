@@ -17,6 +17,9 @@
 	import { saveGame, loadGame } from '$lib/game/save';
 	import type { GameState } from '$lib/game/types';
 
+	// Import components
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
+
 	// Local reactive state using Svelte 5 $state rune
 	let gameState = $state<GameState>(createNewGameState());
 	let gameEngine: GameEngine | null = null;
@@ -76,6 +79,9 @@
 		</div>
 	</div>
 {:else}
+	<!-- Toast Notifications (always visible) -->
+	<ToastContainer />
+
 	<div class="min-h-screen bg-gray-900 text-white">
 		<!-- Header -->
 		<header class="bg-gray-800 border-b border-gray-700 p-4">

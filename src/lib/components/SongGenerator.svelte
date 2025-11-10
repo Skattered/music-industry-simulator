@@ -26,18 +26,22 @@
 	const canAfford10 = $derived(gameState.money >= cost10x);
 
 	// Calculate max affordable
-	const maxAffordable = $derived(() => {
-		const cost = getCurrentSongCost(gameState);
-		if (cost === 0) return 10; // Default to 10 for free songs
-		return Math.floor(gameState.money / cost);
-	});
+	const maxAffordable = $derived(
+		(() => {
+			const cost = getCurrentSongCost(gameState);
+			if (cost === 0) return 10; // Default to 10 for free songs
+			return Math.floor(gameState.money / cost);
+		})()
+	);
 
 	// Progress bar for first song
 	const currentSong = $derived(gameState.songQueue[0] || null);
-	const progressPercent = $derived(() => {
-		if (!currentSong) return 0;
-		return (currentSong.progress / currentSong.totalTime) * 100;
-	});
+	const progressPercent = $derived(
+		(() => {
+			if (!currentSong) return 0;
+			return (currentSong.progress / currentSong.totalTime) * 100;
+		})()
+	);
 
 	// Button handlers
 	function handleQueue(count: number) {
@@ -74,9 +78,9 @@
 	{#if currentSong}
 		<div class="progress-container">
 			<div class="progress-label">
-				Generating song... {progressPercent().toFixed(0)}%
+				Generating song... {progressPercent.toFixed(0)}%
 			</div>
-			<progress class="progress-bar" value={progressPercent()} max="100"></progress>
+			<progress class="progress-bar" value={progressPercent} max="100"></progress>
 		</div>
 	{/if}
 

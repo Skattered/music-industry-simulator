@@ -157,23 +157,6 @@ export function getSongGenerationSpeed(state: GameState): number {
 }
 
 /**
- * Get the current batch size (how many songs to process simultaneously)
- */
-export function getBatchSize(state: GameState): number {
-	// Find the maximum batchSize value among all upgrades (higher is better)
-	let batchSize = 1;
-
-	for (const upgradeId in state.upgrades) {
-		const upgrade = UPGRADE_MAP.get(upgradeId);
-		if (upgrade?.effects.batchSize !== undefined) {
-			batchSize = Math.max(batchSize, upgrade.effects.batchSize);
-		}
-	}
-
-	return batchSize;
-}
-
-/**
  * Get the current song cost from upgrades
  */
 export function getCurrentSongCost(state: GameState): number {
@@ -298,8 +281,7 @@ export function queueSongs(state: GameState, count: number): boolean {
 /**
  * Process the song generation queue
  *
- * Processes the first song in the queue. When it completes, generates
- * batchSize number of songs (1 by default, 2+ with batch processing upgrades).
+ * Processes the first song in the queue. When it completes, generates one song.
  *
  * @param state - Current game state (will be modified)
  * @param deltaTime - Time elapsed since last update in milliseconds
@@ -315,14 +297,9 @@ export function processSongQueue(state: GameState, deltaTime: number): void {
 
 	// Check if song is complete
 	if (currentSong.progress >= currentSong.totalTime) {
-		// Get batch size to determine how many songs to generate
-		const batchSize = getBatchSize(state);
-		
-		// Generate batchSize number of completed songs
-		for (let i = 0; i < batchSize; i++) {
-			const completedSong = generateSong(state);
-			state.songs.push(completedSong);
-		}
+		// Generate completed song
+		const completedSong = generateSong(state);
+		state.songs.push(completedSong);
 
 		// Calculate remaining time
 		const remainingTime = currentSong.progress - currentSong.totalTime;

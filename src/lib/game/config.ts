@@ -272,12 +272,11 @@ export const UPGRADES: UpgradeDefinition[] = [
 	{
 		id: 'tier2_advanced',
 		tier: 2,
-		name: 'Batch Processing',
-		description: 'Generate songs in batches. Songs take 6s. 2x income.',
+		name: 'Optimized Generation',
+		description: 'Faster song generation. Songs take 6s. 2x income.',
 		cost: 2500,
 		effects: {
 			songSpeed: 6000,
-			batchSize: 2,
 			incomeMultiplier: 2.0
 		},
 		prerequisites: ['tier2_improved']

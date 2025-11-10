@@ -382,43 +382,6 @@ describe('processSongQueue', () => {
 		expect(state.songQueue.length).toBe(3);
 	});
 
-	it('should generate multiple songs with batch processing upgrade', () => {
-		const state = createTestGameState({
-			money: 100,
-			songGenerationSpeed: 10000,
-			upgrades: {
-				tier2_advanced: {
-					purchasedAt: Date.now(),
-					tier: 2
-				}
-			}
-		});
-
-		queueSongs(state, 3);
-		
-		// tier2_advanced sets songSpeed to 6000ms and batchSize to 2
-		// So when one queued song completes, it generates 2 actual songs
-		processSongQueue(state, 6000);
-
-		// One queued song completed, but generated 2 songs (batch size)
-		expect(state.songs.length).toBe(2);
-		expect(state.songQueue.length).toBe(2);
-
-		// Complete another queued song
-		processSongQueue(state, 6000);
-
-		// Another queued song completed, generating 2 more songs
-		expect(state.songs.length).toBe(4);
-		expect(state.songQueue.length).toBe(1);
-
-		// Complete the last queued song
-		processSongQueue(state, 6000);
-
-		// Last queued song completed, generating 2 more songs
-		expect(state.songs.length).toBe(6);
-		expect(state.songQueue.length).toBe(0);
-	});
-
 	it('should complete a song when progress reaches totalTime', () => {
 		const state = createTestGameState({
 			money: 100,

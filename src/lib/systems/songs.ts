@@ -298,9 +298,8 @@ export function queueSongs(state: GameState, count: number): boolean {
 /**
  * Process the song generation queue
  *
- * Songs are processed in batches based on the batch size upgrade.
- * When batch processing is enabled, multiple songs progress simultaneously.
- * When a song completes, it's added to the completed songs list and removed from queue.
+ * Processes the first song in the queue. When it completes, generates
+ * batchSize number of songs (1 by default, 2+ with batch processing upgrades).
  *
  * @param state - Current game state (will be modified)
  * @param deltaTime - Time elapsed since last update in milliseconds
@@ -310,38 +309,30 @@ export function processSongQueue(state: GameState, deltaTime: number): void {
 		return;
 	}
 
-	// Get current batch size (how many songs to process simultaneously)
-	const batchSize = getBatchSize(state);
+	// Process only the first song in the queue
+	const currentSong = state.songQueue[0];
+	currentSong.progress += deltaTime;
 
-	// Process up to batchSize songs from the front of the queue
-	const songsToProcess = Math.min(batchSize, state.songQueue.length);
-	let remainingTime = deltaTime;
-
-	for (let i = 0; i < songsToProcess; i++) {
-		const currentSong = state.songQueue[i];
-		if (!currentSong) break;
-
-		currentSong.progress += deltaTime;
-	}
-
-	// Check for completed songs and remove them
-	while (state.songQueue.length > 0 && state.songQueue[0].progress >= state.songQueue[0].totalTime) {
-		const completedSong = state.songQueue[0];
+	// Check if song is complete
+	if (currentSong.progress >= currentSong.totalTime) {
+		// Get batch size to determine how many songs to generate
+		const batchSize = getBatchSize(state);
 		
-		// Generate completed song
-		const newSong = generateSong(state);
-		state.songs.push(newSong);
+		// Generate batchSize number of completed songs
+		for (let i = 0; i < batchSize; i++) {
+			const completedSong = generateSong(state);
+			state.songs.push(completedSong);
+		}
 
-		// Calculate remaining time from this song
-		remainingTime = completedSong.progress - completedSong.totalTime;
+		// Calculate remaining time
+		const remainingTime = currentSong.progress - currentSong.totalTime;
 
 		// Remove from queue
 		state.songQueue.shift();
 
-		// If there's remaining time and more songs in queue, process them recursively
+		// Process any remaining time on the next song if available
 		if (remainingTime > 0 && state.songQueue.length > 0) {
 			processSongQueue(state, remainingTime);
-			return; // Exit after recursive call
 		}
 	}
 }

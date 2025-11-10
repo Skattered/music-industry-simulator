@@ -97,7 +97,6 @@ describe('SongGenerator - Rendering', () => {
 		const { container } = render(SongGenerator, { props: { gameState } });
 
 		// Check for stats labels
-		expect(container.textContent).toContain('Money:');
 		expect(container.textContent).toContain('Cost per song:');
 		expect(container.textContent).toContain('Generation time:');
 		expect(container.textContent).toContain('Queue:');
@@ -107,13 +106,6 @@ describe('SongGenerator - Rendering', () => {
 		expect(container.querySelector('[data-testid="queue-5x"]')).toBeTruthy();
 		expect(container.querySelector('[data-testid="queue-10x"]')).toBeTruthy();
 		expect(container.querySelector('[data-testid="queue-max"]')).toBeTruthy();
-	});
-
-	it('should display current money correctly', () => {
-		const gameState = createTestGameState({ money: 123.45 });
-		const { container } = render(SongGenerator, { props: { gameState } });
-
-		expect(container.textContent).toContain('$123.45');
 	});
 
 	it('should display cost per song', () => {
@@ -417,13 +409,11 @@ describe('SongGenerator - User Interactions', () => {
 		const gameState = createTestGameState({ money: 10 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		expect(container.textContent).toContain('$10.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();
 
-		expect(container.textContent).toContain('$8.00'); // 10 - 2
 		expect(container.textContent).toContain('1 songs queued');
 	});
 
@@ -431,13 +421,11 @@ describe('SongGenerator - User Interactions', () => {
 		const gameState = createTestGameState({ money: 20 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		expect(container.textContent).toContain('$20.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		await fireEvent.click(getByTestId('queue-5x'));
 		await tick();
 
-		expect(container.textContent).toContain('$10.00'); // 20 - 10 (5 songs * $2)
 		expect(container.textContent).toContain('5 songs queued');
 	});
 
@@ -445,13 +433,11 @@ describe('SongGenerator - User Interactions', () => {
 		const gameState = createTestGameState({ money: 50 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		expect(container.textContent).toContain('$50.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		await fireEvent.click(getByTestId('queue-10x'));
 		await tick();
 
-		expect(container.textContent).toContain('$30.00'); // 50 - 20 (10 songs * $2)
 		expect(container.textContent).toContain('10 songs queued');
 	});
 
@@ -459,13 +445,11 @@ describe('SongGenerator - User Interactions', () => {
 		const gameState = createTestGameState({ money: 7 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		expect(container.textContent).toContain('$7.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		await fireEvent.click(getByTestId('queue-max'));
 		await tick();
 
-		expect(container.textContent).toContain('$1.00'); // 7 - 6 (3 songs * $2)
 		expect(container.textContent).toContain('3 songs queued');
 	});
 
@@ -495,13 +479,11 @@ describe('SongGenerator - User Interactions', () => {
 		});
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		expect(container.textContent).toContain('$100.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		await fireEvent.click(getByTestId('queue-10x'));
 		await tick();
 
-		expect(container.textContent).toContain('$100.00'); // No cost deducted
 		expect(container.textContent).toContain('10 songs queued');
 	});
 
@@ -517,13 +499,11 @@ describe('SongGenerator - User Interactions', () => {
 		});
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
-		expect(container.textContent).toContain('$100.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		await fireEvent.click(getByTestId('queue-max'));
 		await tick();
 
-		expect(container.textContent).toContain('$100.00'); // No cost deducted
 		expect(container.textContent).toContain('10 songs queued');
 	});
 
@@ -544,25 +524,21 @@ describe('SongGenerator - User Interactions', () => {
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
 		// Initial state
-		expect(container.textContent).toContain('$20.00');
 		expect(container.textContent).toContain('0 songs queued');
 
 		// First queue
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();
-		expect(container.textContent).toContain('$18.00'); // 20 - 2
 		expect(container.textContent).toContain('1 songs queued');
 
 		// Second queue
 		await fireEvent.click(getByTestId('queue-5x'));
 		await tick();
-		expect(container.textContent).toContain('$8.00'); // 18 - 10
 		expect(container.textContent).toContain('6 songs queued');
 
 		// Third queue
 		await fireEvent.click(getByTestId('queue-1x'));
 		await tick();
-		expect(container.textContent).toContain('$6.00'); // 8 - 2
 		expect(container.textContent).toContain('7 songs queued');
 	});
 

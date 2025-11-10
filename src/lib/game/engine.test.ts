@@ -1098,7 +1098,6 @@ describe('GameEngine', () => {
 
 			// Run for 10 seconds (100 ticks)
 			vi.advanceTimersByTime(10000);
-			const endTime = performance.now();
 
 			engine.stop();
 

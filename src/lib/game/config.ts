@@ -277,6 +277,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		cost: 2500,
 		effects: {
 			songSpeed: 6000,
+			batchSize: 2,
 			incomeMultiplier: 2.0
 		},
 		prerequisites: ['tier2_improved']

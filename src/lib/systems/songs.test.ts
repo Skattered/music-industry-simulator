@@ -382,6 +382,55 @@ describe('processSongQueue', () => {
 		expect(state.songQueue.length).toBe(3);
 	});
 
+	it('should process multiple songs simultaneously with batch processing', () => {
+		const state = createTestGameState({
+			money: 100,
+			songGenerationSpeed: 10000,
+			upgrades: {
+				tier2_advanced: {
+					purchasedAt: Date.now(),
+					tier: 2
+				}
+			}
+		});
+
+		queueSongs(state, 4);
+		
+		// tier2_advanced sets songSpeed to 6000ms, so songs complete at 6000ms
+		processSongQueue(state, 3000);
+
+		// With batchSize: 2, first two songs should have progressed
+		expect(state.songQueue[0].progress).toBe(3000);
+		expect(state.songQueue[1].progress).toBe(3000);
+
+		// Third and fourth songs should not have progressed yet
+		expect(state.songQueue[2].progress).toBe(0);
+		expect(state.songQueue[3].progress).toBe(0);
+
+		// No songs completed yet
+		expect(state.songs.length).toBe(0);
+		expect(state.songQueue.length).toBe(4);
+
+		// Complete the first batch (3000 + 3000 = 6000ms)
+		processSongQueue(state, 3000);
+
+		// First two songs should be complete
+		expect(state.songs.length).toBe(2);
+		expect(state.songQueue.length).toBe(2);
+
+		// The remaining two songs should now be at the front of the queue
+		// and have no progress yet (they just moved to the front)
+		expect(state.songQueue[0].progress).toBe(0);
+		expect(state.songQueue[1].progress).toBe(0);
+
+		// Process the second batch (6000ms to complete both)
+		processSongQueue(state, 6000);
+
+		// All songs should now be complete
+		expect(state.songs.length).toBe(4);
+		expect(state.songQueue.length).toBe(0);
+	});
+
 	it('should complete a song when progress reaches totalTime', () => {
 		const state = createTestGameState({
 			money: 100,

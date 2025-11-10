@@ -333,6 +333,8 @@ export interface UpgradeEffects {
   songCost?: number;
   /** Set song generation speed (ms) */
   songSpeed?: number;
+  /** Number of songs to process simultaneously (default: 1) */
+  batchSize?: number;
   /** Multiply income by this amount */
   incomeMultiplier?: number;
   /** Unlock GPU resource system */

@@ -14,7 +14,6 @@ import type { GameState } from '../game/types';
 import { GAME_VERSION, INITIAL_UNLOCKED_SYSTEMS } from '../game/config';
 import { queueSongs } from '../systems/songs';
 import { purchaseTechUpgrade } from '../systems/tech';
-import { performPrestige } from '../systems/prestige';
 
 /**
  * Create a minimal game state for testing

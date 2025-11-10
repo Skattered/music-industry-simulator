@@ -191,7 +191,7 @@ export interface Platform {
   /** Unique identifier */
   id: string;
   /** Platform type */
-  type: 'streaming' | 'ticketing' | 'venue' | 'billboard' | 'grammys' | 'training_data';
+  type: 'streaming' | 'algorithm' | 'ticketing' | 'venue' | 'billboard' | 'grammys' | 'training_data';
   /** Platform name */
   name: string;
   /** Purchase price (in dollars) */

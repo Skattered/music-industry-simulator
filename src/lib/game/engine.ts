@@ -15,7 +15,7 @@ import { processActiveBoosts } from '../systems/exploitation';
 import { processPhysicalAlbums } from '../systems/physical';
 import { processTours } from '../systems/tours';
 import { processLegacyArtists } from '../systems/prestige';
-import { processPlatformIncome, updateControlProgress } from '../systems/monopoly';
+import { updateControlProgress } from '../systems/monopoly';
 import { checkPhaseUnlocks } from '../systems/unlocks';
 
 /**

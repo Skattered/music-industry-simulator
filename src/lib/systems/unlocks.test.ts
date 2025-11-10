@@ -2,7 +2,7 @@
  * Unit tests for System Unlocks and Phase Progression
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
 	checkPhaseProgression,
 	checkPhaseUnlocks,

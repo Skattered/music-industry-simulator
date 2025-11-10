@@ -11,6 +11,7 @@
 	import PrestigePanel from '$lib/components/PrestigePanel.svelte';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	import VictoryModal from '$lib/components/VictoryModal.svelte';
+	import SettingsModal from '$lib/components/SettingsModal.svelte';
 
 	// Import game engine and state management
 	import { GameEngine } from '$lib/game/engine';
@@ -26,6 +27,7 @@
 	let gameEngine: GameEngine | null = null;
 	let isLoading = $state(true);
 	let showVictoryModal = $state(false);
+	let showSettingsModal = $state(false);
 
 	// Derived state for UI
 	const artistName = $derived(gameState.currentArtist.name);
@@ -74,14 +76,17 @@
 		}
 	});
 
-	// Manual save function for settings button (future)
-	function handleSave() {
-		if (gameEngine) {
-			gameEngine.forceSave();
-		}
+	// Open settings modal
+	function handleOpenSettings() {
+		showSettingsModal = true;
 	}
 
-	// Handle starting a new game after victory
+	// Close settings modal
+	function handleCloseSettings() {
+		showSettingsModal = false;
+	}
+
+	// Handle starting a new game after victory or hard reset
 	function handleNewGame() {
 		if (gameEngine) {
 			gameEngine.stop();
@@ -94,6 +99,7 @@
 		// Create new game state
 		gameState = createNewGameState();
 		showVictoryModal = false;
+		showSettingsModal = false;
 
 		// Restart engine with new state
 		gameEngine = new GameEngine(gameState);
@@ -127,6 +133,15 @@
 		<VictoryModal gameState={gameState} onNewGame={handleNewGame} />
 	{/if}
 
+	<!-- Settings Modal -->
+	{#if showSettingsModal}
+		<SettingsModal
+			{gameState}
+			onClose={handleCloseSettings}
+			onHardReset={handleNewGame}
+		/>
+	{/if}
+
 	<div class="min-h-screen bg-gray-900 text-white">
 		<!-- Header -->
 		<header class="bg-gray-800 border-b border-gray-700 p-4">
@@ -135,7 +150,7 @@
 				<div class="flex items-center gap-4">
 					<span class="text-gray-300">Artist: {artistName}</span>
 					<button
-						onclick={handleSave}
+						onclick={handleOpenSettings}
 						class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
 					>
 						Settings

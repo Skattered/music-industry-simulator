@@ -9,7 +9,8 @@ import {
 	processSongQueue,
 	calculateSongCost,
 	calculateSongIncome,
-	calculateFanGeneration
+	calculateFanGeneration,
+	getSongGenerationSpeed
 } from './songs';
 import type { GameState, Genre, TechTier, Artist, UnlockedSystems, ActiveBoost } from '../game/types';
 import {
@@ -301,11 +302,9 @@ describe('queueSongs', () => {
 
 		expect(state.songQueue[0].id).toBe('test-uuid-0');
 		expect(state.songQueue[0].progress).toBe(0);
-		expect(state.songQueue[0].totalTime).toBe(15000);
 
 		expect(state.songQueue[1].id).toBe('test-uuid-1');
 		expect(state.songQueue[1].progress).toBe(0);
-		expect(state.songQueue[1].totalTime).toBe(15000);
 	});
 
 	it('should not deduct money when songs are free', () => {
@@ -339,7 +338,10 @@ describe('queueSongs', () => {
 		queueSongs(state, 1);
 
 		// tier1_improved sets songSpeed to 12000
-		expect(state.songQueue[0].totalTime).toBe(12000);
+		const generationSpeed = getSongGenerationSpeed(state);
+		expect(generationSpeed).toBe(12000);
+		// Queue no longer stores totalTime, processes at current speed
+		expect(state.songQueue[0].progress).toBe(0);
 	});
 });
 
@@ -382,7 +384,7 @@ describe('processSongQueue', () => {
 		expect(state.songQueue.length).toBe(3);
 	});
 
-	it('should complete a song when progress reaches totalTime', () => {
+	it('should complete a song when progress reaches current generation speed', () => {
 		const state = createTestGameState({
 			money: 100,
 			songGenerationSpeed: 10000

@@ -431,11 +431,13 @@ describe('GameEngine', () => {
 
 	describe('Song Generation Queue', () => {
 		it('should process song queue', () => {
+			// Set a fast generation speed for testing
+			gameState.songGenerationSpeed = 1000;
+			
 			gameState.songQueue = [
 				{
 					id: 'queued1',
-					progress: 0,
-					totalTime: 1000
+					progress: 0
 				}
 			];
 

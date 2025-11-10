@@ -39,7 +39,8 @@
 	const progressPercent = $derived(
 		(() => {
 			if (!currentSong) return 0;
-			return (currentSong.progress / currentSong.totalTime) * 100;
+			const currentSpeed = getSongGenerationSpeed(gameState);
+			return (currentSong.progress / currentSpeed) * 100;
 		})()
 	);
 

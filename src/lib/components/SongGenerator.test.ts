@@ -139,9 +139,9 @@ describe('SongGenerator - Rendering', () => {
 	it('should display queue count', () => {
 		const gameState = createTestGameState({
 			songQueue: [
-				{ id: '1', progress: 0, totalTime: 10000 },
-				{ id: '2', progress: 0, totalTime: 10000 },
-				{ id: '3', progress: 0, totalTime: 10000 }
+				{ id: '1', progress: 0 },
+				{ id: '2', progress: 0 },
+				{ id: '3', progress: 0 }
 			]
 		});
 		const { container } = render(SongGenerator, { props: { gameState } });
@@ -347,7 +347,7 @@ describe('SongGenerator - Progress Bar', () => {
 
 	it('should show progress bar when song is in queue', () => {
 		const gameState = createTestGameState({
-			songQueue: [{ id: '1', progress: 5000, totalTime: 10000 }]
+			songQueue: [{ id: '1', progress: 5000 }]
 		});
 		const { container } = render(SongGenerator, { props: { gameState } });
 
@@ -357,7 +357,8 @@ describe('SongGenerator - Progress Bar', () => {
 
 	it('should calculate progress percentage correctly', () => {
 		const gameState = createTestGameState({
-			songQueue: [{ id: '1', progress: 5000, totalTime: 10000 }]
+			songQueue: [{ id: '1', progress: 5000 }],
+			songGenerationSpeed: 10000
 		});
 		const { container } = render(SongGenerator, { props: { gameState } });
 
@@ -367,7 +368,7 @@ describe('SongGenerator - Progress Bar', () => {
 
 	it('should show 0% progress for new song', () => {
 		const gameState = createTestGameState({
-			songQueue: [{ id: '1', progress: 0, totalTime: 10000 }]
+			songQueue: [{ id: '1', progress: 0 }]
 		});
 		const { container } = render(SongGenerator, { props: { gameState } });
 
@@ -377,7 +378,8 @@ describe('SongGenerator - Progress Bar', () => {
 
 	it('should show 100% progress for completed song', () => {
 		const gameState = createTestGameState({
-			songQueue: [{ id: '1', progress: 10000, totalTime: 10000 }]
+			songQueue: [{ id: '1', progress: 10000 }],
+			songGenerationSpeed: 10000
 		});
 		const { container } = render(SongGenerator, { props: { gameState } });
 
@@ -387,7 +389,8 @@ describe('SongGenerator - Progress Bar', () => {
 
 	it('should display percentage text', () => {
 		const gameState = createTestGameState({
-			songQueue: [{ id: '1', progress: 7500, totalTime: 10000 }]
+			songQueue: [{ id: '1', progress: 7500 }],
+			songGenerationSpeed: 10000
 		});
 		const { container } = render(SongGenerator, { props: { gameState } });
 

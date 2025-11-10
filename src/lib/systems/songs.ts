@@ -262,15 +262,11 @@ export function queueSongs(state: GameState, count: number): boolean {
 	// Deduct cost
 	state.money -= totalCost;
 
-	// Get generation speed
-	const generationSpeed = getSongGenerationSpeed(state);
-
 	// Add songs to queue
 	for (let i = 0; i < count; i++) {
 		const queuedSong: QueuedSong = {
 			id: crypto.randomUUID(),
-			progress: 0,
-			totalTime: generationSpeed
+			progress: 0
 		};
 		state.songQueue.push(queuedSong);
 	}
@@ -291,18 +287,21 @@ export function processSongQueue(state: GameState, deltaTime: number): void {
 		return;
 	}
 
+	// Get current generation speed
+	const currentSpeed = getSongGenerationSpeed(state);
+
 	// Process only the first song in the queue
 	const currentSong = state.songQueue[0];
 	currentSong.progress += deltaTime;
 
 	// Check if song is complete
-	if (currentSong.progress >= currentSong.totalTime) {
+	if (currentSong.progress >= currentSpeed) {
 		// Generate completed song
 		const completedSong = generateSong(state);
 		state.songs.push(completedSong);
 
 		// Calculate remaining time
-		const remainingTime = currentSong.progress - currentSong.totalTime;
+		const remainingTime = currentSong.progress - currentSpeed;
 
 		// Remove from queue
 		state.songQueue.shift();

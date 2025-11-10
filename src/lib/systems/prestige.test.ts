@@ -276,8 +276,8 @@ describe('performPrestige', () => {
 	it('should clear song queue', () => {
 		const state = createTestGameState({
 			songQueue: [
-				{ id: '1', progress: 5000, totalTime: 10000 },
-				{ id: '2', progress: 0, totalTime: 10000 }
+				{ id: '1', progress: 5000 },
+				{ id: '2', progress: 0 }
 			],
 			unlockedSystems: {
 				...INITIAL_UNLOCKED_SYSTEMS,

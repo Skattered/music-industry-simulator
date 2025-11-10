@@ -60,8 +60,6 @@ export interface QueuedSong {
   id: string;
   /** Current generation progress (ms) */
   progress: number;
-  /** Total time required to complete generation (ms) */
-  totalTime: number;
 }
 
 /**

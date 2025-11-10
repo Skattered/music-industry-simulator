@@ -154,8 +154,7 @@ describe('Prestige Flow Integration', () => {
 			gameState.songQueue = [
 				{
 					id: 'queued1',
-					progress: 5000,
-					totalTime: 10000
+					progress: 5000
 				}
 			];
 

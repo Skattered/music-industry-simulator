@@ -14,7 +14,6 @@ import { GameEngine } from '../game/engine';
 import type { GameState } from '../game/types';
 import { GAME_VERSION, INITIAL_UNLOCKED_SYSTEMS } from '../game/config';
 import { performPrestige, canPrestige } from '../systems/prestige';
-import { queueSongs } from '../systems/songs';
 import { purchaseTechUpgrade } from '../systems/tech';
 
 /**

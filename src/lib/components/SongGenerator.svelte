@@ -198,8 +198,8 @@
 	}
 
 	.queue-button {
-		padding: 0.75rem 1rem;
-		font-size: 1rem;
+		padding: 0.75rem 0.5rem;
+		font-size: 0.875rem;
 		font-weight: 600;
 		background: #2196f3;
 		color: white;
@@ -207,6 +207,10 @@
 		border-radius: 6px;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 0;
 	}
 
 	.queue-button:hover:not(:disabled) {

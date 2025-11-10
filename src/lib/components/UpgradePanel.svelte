@@ -16,26 +16,33 @@
 		{
 			id: 'streaming',
 			name: 'Streaming',
+			phase: 1,
 			boostIds: ['bot_streams', 'playlist_placement', 'social_media']
 		},
 		{
 			id: 'physical',
 			name: 'Physical',
+			phase: 2,
 			boostIds: ['limited_variants', 'shut_down_competitors', 'exclusive_deals']
 		},
 		{
 			id: 'concerts',
 			name: 'Concerts',
+			phase: 3,
 			boostIds: ['scalp_records', 'limit_tickets', 'scalp_tickets', 'fomo_marketing']
 		},
 		{
 			id: 'platform',
 			name: 'Platform',
+			phase: 4,
 			boostIds: ['dynamic_pricing']
 		}
 	] as const;
 
-	let selectedCategory = $state<string>('streaming');
+	// Get current phase's category
+	let currentCategory = $derived(
+		CATEGORIES.find(c => c.phase === gameState.phase) || CATEGORIES[0]
+	);
 	let currentTime = $state(Date.now());
 	let timerInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -88,13 +95,11 @@
 		onActivateBoost(boostId);
 	}
 
-	// Get boosts for the selected category
+	// Get boosts for the current phase's category
 	let categoryBoosts = $derived(
 		(() => {
-			const category = CATEGORIES.find((c) => c.id === selectedCategory);
-			if (!category) return [];
 			return BOOSTS.filter((boost) => {
-				const boostIds = category.boostIds as readonly string[];
+				const boostIds = currentCategory.boostIds as readonly string[];
 				return boostIds.includes(boost.id);
 			});
 		})()
@@ -103,22 +108,8 @@
 
 <div class="upgrade-panel">
 	<div class="panel-header">
-		<h2 class="panel-title">Exploitation Abilities</h2>
-		<p class="panel-subtitle">Morally questionable but profitable tactics</p>
-	</div>
-
-	<!-- Category Tabs -->
-	<div class="category-tabs">
-		{#each CATEGORIES as category}
-			<button
-				class="tab"
-				class:active={selectedCategory === category.id}
-				onclick={() => (selectedCategory = category.id)}
-				type="button"
-			>
-				{category.name}
-			</button>
-		{/each}
+		<h2 class="panel-title">Exploitation Abilities - {currentCategory.name}</h2>
+		<p class="panel-subtitle">Phase {gameState.phase}: Morally questionable but profitable tactics</p>
 	</div>
 
 	<!-- Active Boosts Section -->
@@ -246,40 +237,6 @@
 	.panel-subtitle {
 		font-size: 1rem;
 		color: #6b7280;
-	}
-
-	/* Category Tabs */
-	.category-tabs {
-		display: flex;
-		gap: 0.5rem;
-		margin-bottom: 2rem;
-		border-bottom: 2px solid #e5e7eb;
-		overflow-x: auto;
-	}
-
-	.tab {
-		padding: 0.75rem 1.5rem;
-		font-size: 1rem;
-		font-weight: 500;
-		color: #6b7280;
-		background: transparent;
-		border: none;
-		border-bottom: 2px solid transparent;
-		cursor: pointer;
-		transition: all 0.2s;
-		white-space: nowrap;
-		margin-bottom: -2px;
-	}
-
-	.tab:hover {
-		color: #374151;
-		background-color: #f9fafb;
-	}
-
-	.tab.active {
-		color: #7c3aed;
-		border-bottom-color: #7c3aed;
-		background-color: #f5f3ff;
 	}
 
 	/* Section Titles */

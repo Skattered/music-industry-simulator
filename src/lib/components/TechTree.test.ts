@@ -69,65 +69,52 @@ function createTestGameState(overrides?: Partial<GameState>): GameState {
 
 describe('TechTree Component', () => {
 	describe('Tier Display Logic', () => {
-		it('should render all 7 tiers', () => {
-			const gameState = createTestGameState();
+		it('should render only the current tier', () => {
+			const gameState = createTestGameState({ techTier: 1 });
 			render(TechTree, { props: { gameState } });
 
-			// Check for all 7 tier headers
-			for (let tier = 1; tier <= 7; tier++) {
-				const tierElement = screen.getByText(`Tier ${tier}:`, { exact: false });
-				expect(tierElement).toBeTruthy();
-			}
+			// Check that current tier is shown in header
+			const tierElement = screen.getByText('Tech Tree - Tier 1: Third-party Web Services');
+			expect(tierElement).toBeTruthy();
 		});
 
-		it('should show tier names correctly', () => {
-			const gameState = createTestGameState();
-			render(TechTree, { props: { gameState } });
+		it('should show current tier name in header', () => {
+			const gameState1 = createTestGameState({ techTier: 1 });
+			const { unmount } = render(TechTree, { props: { gameState: gameState1 } });
 
-			// Verify tier names
 			expect(screen.getByText(/Third-party Web Services/)).toBeTruthy();
-			expect(screen.getByText(/Lifetime Licenses\/Subscriptions/)).toBeTruthy();
+			unmount();
+
+			const gameState3 = createTestGameState({ techTier: 3 });
+			render(TechTree, { props: { gameState: gameState3 } });
+
 			expect(screen.getByText(/Local AI Models/)).toBeTruthy();
-			expect(screen.getByText(/Fine-tuned Models/)).toBeTruthy();
-			expect(screen.getByText(/Train Your Own Models/)).toBeTruthy();
-			expect(screen.getByText(/Build Your Own Software/)).toBeTruthy();
-			expect(screen.getByText(/AI Agent Automation/)).toBeTruthy();
 		});
 
-		it('should show 3 upgrades per tier', () => {
-			const gameState = createTestGameState();
+		it('should show 3 upgrades for current tier', () => {
+			const gameState = createTestGameState({ techTier: 1 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			// Check each tier section has 3 upgrade cards
-			for (let tier = 1; tier <= 7; tier++) {
-				const tierSection = container.querySelector(`[data-tier="${tier}"]`);
-				expect(tierSection).toBeTruthy();
-
-				const upgradeCards = tierSection!.querySelectorAll('.upgrade-card');
-				expect(upgradeCards.length).toBe(3);
-			}
+			// Check that current tier section has 3 upgrade cards
+			const upgradeCards = container.querySelectorAll('.upgrade-card');
+			expect(upgradeCards.length).toBe(3);
 		});
 
-		it('should highlight current tier', () => {
+		it('should show current tier with highlighted styling', () => {
 			const gameState = createTestGameState({ techTier: 3 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			// Check tier 3 is highlighted
-			const tier3Section = container.querySelector('[data-tier="3"]');
-			expect(tier3Section?.classList.contains('border-blue-500')).toBe(true);
-			expect(tier3Section?.classList.contains('bg-blue-50')).toBe(true);
-
-			// Check tier 1 is not highlighted
-			const tier1Section = container.querySelector('[data-tier="1"]');
-			expect(tier1Section?.classList.contains('border-blue-500')).toBe(false);
+			// Check tier section is highlighted
+			const tierSection = container.querySelector('.tier-section');
+			expect(tierSection?.classList.contains('border-blue-500')).toBe(true);
+			expect(tierSection?.classList.contains('bg-blue-50')).toBe(true);
 		});
 
-		it('should show "Current Tier" label on current tier only', () => {
+		it('should show current tier number in header', () => {
 			const gameState = createTestGameState({ techTier: 2 });
 			render(TechTree, { props: { gameState } });
 
-			const currentTierLabels = screen.getAllByText('Current Tier');
-			expect(currentTierLabels.length).toBe(1);
+			expect(screen.getByText('Tech Tree - Tier 2: Lifetime Licenses/Subscriptions')).toBeTruthy();
 		});
 	});
 
@@ -221,8 +208,7 @@ describe('TechTree Component', () => {
 			const gameState = createTestGameState({ money: 100, techTier: 1 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			const tier1Section = container.querySelector('[data-tier="1"]');
-			const upgradeCards = tier1Section?.querySelectorAll('.upgrade-card');
+			const upgradeCards = container.querySelectorAll('.upgrade-card');
 
 			expect(upgradeCards?.length).toBe(3);
 			expect(container.querySelector('[data-upgrade-id="tier1_basic"]')).toBeTruthy();
@@ -230,18 +216,16 @@ describe('TechTree Component', () => {
 			expect(container.querySelector('[data-upgrade-id="tier1_advanced"]')).toBeTruthy();
 		});
 
-		it('should show future tier upgrades as locked', () => {
+		it('should not show future tier upgrades', () => {
 			const gameState = createTestGameState({ money: 1000000, techTier: 1 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			// tier2_basic should be locked because tier1_advanced is not purchased
+			// tier2_basic should not be visible since we're on tier 1
 			const tier2BasicCard = container.querySelector('[data-upgrade-id="tier2_basic"]');
-			const button = tier2BasicCard?.querySelector('.purchase-button') as HTMLButtonElement;
-
-			expect(button?.textContent?.trim()).toBe('Locked');
+			expect(tier2BasicCard).toBeNull();
 		});
 
-		it('should show past tier upgrades as purchased if purchased', () => {
+		it('should show only current tier upgrades', () => {
 			const gameState = createTestGameState({
 				money: 100000,
 				techTier: 2,
@@ -255,14 +239,13 @@ describe('TechTree Component', () => {
 			});
 			const { container } = render(TechTree, { props: { gameState } });
 
-			// All tier 1 upgrades should show as purchased
-			const tier1Basic = container.querySelector('[data-upgrade-id="tier1_basic"]');
-			const tier1Improved = container.querySelector('[data-upgrade-id="tier1_improved"]');
-			const tier1Advanced = container.querySelector('[data-upgrade-id="tier1_advanced"]');
+			// Tier 2 upgrades should be visible
+			const tier2Basic = container.querySelector('[data-upgrade-id="tier2_basic"]');
+			expect(tier2Basic).toBeTruthy();
 
-			expect(tier1Basic?.querySelector('.purchased-badge')).toBeTruthy();
-			expect(tier1Improved?.querySelector('.purchased-badge')).toBeTruthy();
-			expect(tier1Advanced?.querySelector('.purchased-badge')).toBeTruthy();
+			// Tier 1 upgrades should NOT be visible
+			const tier1Basic = container.querySelector('[data-upgrade-id="tier1_basic"]');
+			expect(tier1Basic).toBeNull();
 		});
 	});
 
@@ -327,7 +310,7 @@ describe('TechTree Component', () => {
 		});
 
 		it('should format large costs correctly', () => {
-			const gameState = createTestGameState({ money: 10000000000 });
+			const gameState = createTestGameState({ money: 10000000000, techTier: 7 });
 			const { container } = render(TechTree, { props: { gameState } });
 
 			// tier7_basic costs $125M
@@ -380,7 +363,7 @@ describe('TechTree Component', () => {
 		});
 
 		it('should show income multiplier in effects', () => {
-			const gameState = createTestGameState({ money: 100000 });
+			const gameState = createTestGameState({ money: 100000, techTier: 2 });
 			const { container } = render(TechTree, { props: { gameState } });
 
 			const tier2ImprovedCard = container.querySelector('[data-upgrade-id="tier2_improved"]');
@@ -418,7 +401,7 @@ describe('TechTree Component', () => {
 	});
 
 	describe('Progressive Unlocking', () => {
-		it('should allow purchasing all upgrades in sequence', async () => {
+		it('should allow purchasing all upgrades in current tier sequence', async () => {
 			const gameState = createTestGameState({ money: 1000000 });
 			const { container } = render(TechTree, { props: { gameState } });
 
@@ -441,16 +424,6 @@ describe('TechTree Component', () => {
 			button = card?.querySelector('.purchase-button') as HTMLButtonElement;
 			await fireEvent.click(button);
 			expect(button?.textContent?.trim()).toBe('Purchased');
-
-			// Purchase tier2_basic (should unlock tier 2)
-			card = container.querySelector('[data-upgrade-id="tier2_basic"]');
-			button = card?.querySelector('.purchase-button') as HTMLButtonElement;
-			await fireEvent.click(button);
-			expect(button?.textContent?.trim()).toBe('Purchased');
-
-			// Verify tier 2 is now current
-			const tier2Section = container.querySelector('[data-tier="2"]');
-			expect(tier2Section?.classList.contains('border-blue-500')).toBe(true);
 		});
 	});
 
@@ -499,8 +472,9 @@ describe('TechTree Component', () => {
 			const gameState = createTestGameState({ techTier: 7, techSubTier: 2 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			const tier7Section = container.querySelector('[data-tier="7"]');
-			expect(tier7Section?.classList.contains('border-blue-500')).toBe(true);
+			const tierSection = container.querySelector('.tier-section');
+			expect(tierSection?.classList.contains('border-blue-500')).toBe(true);
+			expect(screen.getByText(/AI Agent Automation/)).toBeTruthy();
 		});
 	});
 });

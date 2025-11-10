@@ -120,7 +120,7 @@
 				data-tier={tier}
 			>
 				<div class="tier-header mb-4">
-					<h2 class="text-2xl font-semibold">
+					<h2 class="text-2xl font-semibold text-gray-900">
 						Tier {tier}: {TECH_TIER_NAMES[tier]}
 					</h2>
 					{#if isCurrentTier(tier)}
@@ -144,7 +144,7 @@
 							data-upgrade-id={upgrade.id}
 						>
 							<div class="flex justify-between items-start mb-2">
-								<h3 class="font-semibold text-lg">{upgrade.name}</h3>
+								<h3 class="font-semibold text-lg text-gray-900">{upgrade.name}</h3>
 								{#if purchased}
 									<span class="purchased-badge text-green-600 text-xl" title="Purchased">✓</span>
 								{/if}

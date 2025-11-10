@@ -176,6 +176,18 @@ export const PHASE_REQUIREMENTS: Record<Phase, PhaseRequirements> = {
 	}
 };
 
+/**
+ * Phase display names
+ * Used for UI display across the application
+ */
+export const PHASE_NAMES: Record<Phase, string> = {
+	1: 'Streaming',
+	2: 'Physical Albums',
+	3: 'Tours & Concerts',
+	4: 'Platform Ownership',
+	5: 'Total Automation'
+};
+
 // ============================================================================
 // TECH TIER UPGRADE DEFINITIONS
 // ============================================================================

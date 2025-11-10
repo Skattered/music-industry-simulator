@@ -507,8 +507,8 @@ describe('UpgradePanel', () => {
 		// Playlist Payola: 375K
 		expect(container.textContent).toContain('$375K');
 
-		// Social Media: 1.125M
-		expect(container.textContent).toContain('$1.125M');
+		// Social Media: 1.125M rounded to 1.13M by formatMoney
+		expect(container.textContent).toContain('$1.13M');
 	});
 
 	it('shows all boosts in concerts category', async () => {

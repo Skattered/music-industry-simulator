@@ -107,11 +107,11 @@
 		</button>
 		<button
 			class="queue-button"
-			onclick={() => handleQueue(maxAffordable())}
-			disabled={maxAffordable() === 0}
+			onclick={() => handleQueue(maxAffordable)}
+			disabled={maxAffordable === 0}
 			data-testid="queue-max"
 		>
-			Max ({maxAffordable()})
+			Max ({maxAffordable})
 		</button>
 	</div>
 </div>

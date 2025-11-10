@@ -666,8 +666,8 @@ describe('Physical Album System Integration', () => {
 			fans: 5_000
 		});
 		const indiePayout = calculateAlbumPayout(indie);
-		// (5 * 50,000) + (5,000 * 0.5) = 252,500 * 1 variant = 252,500
-		expect(indiePayout).toBe(252_500);
+		// (5 * 25,000) + (5,000 * 1.0) = 125,000 + 5,000 = 130,000 * 1 variant = 130,000
+		expect(indiePayout).toBe(130_000);
 
 		// Medium artist (100K fans, 10 songs)
 		const medium = createTestGameState({
@@ -675,8 +675,8 @@ describe('Physical Album System Integration', () => {
 			fans: 100_000
 		});
 		const mediumPayout = calculateAlbumPayout(medium);
-		// (10 * 50,000) + (100,000 * 0.5) = 550,000 * 3 variants = 1,650,000
-		expect(mediumPayout).toBe(1_650_000);
+		// (10 * 25,000) + (100,000 * 1.0) = 250,000 + 100,000 = 350,000 * 3 variants = 1,050,000
+		expect(mediumPayout).toBe(1_050_000);
 
 		// Superstar (10M fans, 15 songs)
 		const superstar = createTestGameState({
@@ -684,7 +684,7 @@ describe('Physical Album System Integration', () => {
 			fans: 10_000_000
 		});
 		const superstarPayout = calculateAlbumPayout(superstar);
-		// (15 * 50,000) + (10,000,000 * 0.5) = 5,750,000 * 4 variants = 23,000,000
-		expect(superstarPayout).toBe(23_000_000);
+		// (15 * 25,000) + (10,000,000 * 1.0) = 375,000 + 10,000,000 = 10,375,000 * 4 variants = 41,500,000
+		expect(superstarPayout).toBe(41_500_000);
 	});
 });

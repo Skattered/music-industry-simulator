@@ -253,8 +253,8 @@ describe('calculateSongCost', () => {
 		});
 
 		const cost = calculateSongCost(state, 1);
-		// tier1_basic sets songCost to 2
-		expect(cost).toBe(2);
+		// tier1_basic sets songCost to 1.5
+		expect(cost).toBe(1.5);
 	});
 });
 
@@ -338,8 +338,8 @@ describe('queueSongs', () => {
 
 		queueSongs(state, 1);
 
-		// tier1_improved sets songSpeed to 20000
-		expect(state.songQueue[0].totalTime).toBe(20000);
+		// tier1_improved sets songSpeed to 15000
+		expect(state.songQueue[0].totalTime).toBe(15000);
 	});
 });
 

@@ -15,6 +15,7 @@ import type { GameState } from '../game/types';
 import { GAME_VERSION, INITIAL_UNLOCKED_SYSTEMS } from '../game/config';
 import { performPrestige, canPrestige } from '../systems/prestige';
 import { purchaseTechUpgrade } from '../systems/tech';
+import { checkPhaseUnlocks } from '../systems/unlocks';
 
 /**
  * Create a minimal game state for testing
@@ -94,6 +95,9 @@ describe('Prestige Flow Integration', () => {
 			purchaseTechUpgrade(gameState, 'tier2_improved');
 			purchaseTechUpgrade(gameState, 'tier2_advanced');
 			purchaseTechUpgrade(gameState, 'tier3_basic');
+
+			// Unlocks are now handled in unlocks.ts, so we need to call it
+			checkPhaseUnlocks(gameState);
 
 			expect(gameState.unlockedSystems.prestige).toBe(true);
 			expect(canPrestige(gameState)).toBe(true);

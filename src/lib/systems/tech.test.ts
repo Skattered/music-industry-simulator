@@ -14,7 +14,6 @@ import {
 	canAffordUpgrade,
 	applyTechEffects,
 	getTechUpgrades,
-	unlockPrestigePoints,
 	getAvailableTechUpgrades,
 	getSongGenerationCost,
 	getTechIncomeMultiplier,
@@ -213,33 +212,9 @@ describe('Tech Upgrade System', () => {
 			expect(state.songGenerationSpeed).toBe(15000);
 		});
 
-		it('should unlock GPU system when specified', () => {
-			const state = createTestGameState();
-			const upgrade = getUpgradeById('tier3_basic');
 
-			applyTechEffects(state, upgrade!);
-
-			expect(state.unlockedSystems.gpu).toBe(true);
-		});
-
-		it('should unlock prestige system when specified', () => {
-			const state = createTestGameState();
-			const upgrade = getUpgradeById('tier3_basic');
-
-			applyTechEffects(state, upgrade!);
-
-			expect(state.unlockedSystems.prestige).toBe(true);
-		});
-
-		it('should unlock physical albums when specified', () => {
-			const state = createTestGameState();
-			const upgrade = getUpgradeById('tier2_improved');
-
-			applyTechEffects(state, upgrade!);
-
-			expect(state.unlockedSystems.physicalAlbums).toBe(true);
-		});
-
+		// NOTE: System unlocks (GPU, Prestige, Physical Albums, Trend Research) are now
+		// handled in unlocks.ts to prevent duplicate toasts. These tests are moved there.
 
 		it('should unlock monopoly mechanics when specified', () => {
 			const state = createTestGameState();
@@ -249,60 +224,9 @@ describe('Tech Upgrade System', () => {
 
 			expect(state.unlockedSystems.monopoly).toBe(true);
 		});
-
-		it('should unlock trend research when specified', () => {
-			const state = createTestGameState();
-			const upgrade = getUpgradeById('tier1_advanced');
-
-			applyTechEffects(state, upgrade!);
-
-			expect(state.unlockedSystems.trendResearch).toBe(true);
-		});
 	});
 
-	describe('unlockPrestigePoints', () => {
-		it('should unlock prestige at tier 3', () => {
-			const state = createTestGameState({ techTier: 3 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(true);
-		});
-
-		it('should unlock prestige at tier 5', () => {
-			const state = createTestGameState({ techTier: 5 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(true);
-		});
-
-		it('should unlock prestige at tier 6', () => {
-			const state = createTestGameState({ techTier: 6 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(true);
-		});
-
-		it('should unlock prestige at tier 7', () => {
-			const state = createTestGameState({ techTier: 7 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(true);
-		});
-
-		it('should not unlock prestige at tier 1', () => {
-			const state = createTestGameState({ techTier: 1 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(false);
-		});
-
-		it('should not unlock prestige at tier 2', () => {
-			const state = createTestGameState({ techTier: 2 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(false);
-		});
-
-		it('should not unlock prestige at tier 4', () => {
-			const state = createTestGameState({ techTier: 4 });
-			unlockPrestigePoints(state);
-			expect(state.unlockedSystems.prestige).toBe(false);
-		});
-	});
+	// NOTE: unlockPrestigePoints tests removed - prestige unlocking now handled in unlocks.ts
 
 	describe('Progressive Tier Unlocking', () => {
 		it('should allow purchasing all upgrades in tier 1 sequentially', () => {
@@ -501,7 +425,7 @@ describe('Tech Upgrade System', () => {
 			expect(state.songGenerationSpeed).toBe(6000);
 		});
 
-		it('should unlock all major systems through tier progression', () => {
+		it('should unlock monopoly through tier progression', () => {
 			const state = createTestGameState({ money: 1000000000 });
 
 			const allUpgrades = [
@@ -532,17 +456,12 @@ describe('Tech Upgrade System', () => {
 				purchaseTechUpgrade(state, upgradeId);
 			}
 
-			// These systems unlock via upgrade effects
-			expect(state.unlockedSystems.trendResearch).toBe(true);
-			expect(state.unlockedSystems.physicalAlbums).toBe(true);
-			expect(state.unlockedSystems.gpu).toBe(true);
-			expect(state.unlockedSystems.prestige).toBe(true);
+			// Monopoly unlocks directly in tech.ts (no additional conditions)
 			expect(state.unlockedSystems.monopoly).toBe(true);
 
-			// Tours and platform ownership require additional milestone checks in unlocks.ts
-			// They won't be unlocked just by purchasing upgrades
-			expect(state.unlockedSystems.tours).toBe(false);
-			expect(state.unlockedSystems.platformOwnership).toBe(false);
+			// NOTE: Other system unlocks (trendResearch, physicalAlbums, gpu, prestige)
+			// are now handled in unlocks.ts to prevent duplicate toasts.
+			// Tours and platform ownership also require additional milestone checks in unlocks.ts
 		});
 	});
 });

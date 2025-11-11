@@ -14,6 +14,7 @@ import {
 	doesTierUnlockPrestige
 } from '../data/tech-upgrades';
 import { BASE_SONG_COST } from '../game/config';
+import { toastStore } from '../stores/toasts.svelte';
 
 /**
  * Get all available tech upgrades
@@ -111,26 +112,39 @@ export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): 
 	// Income multiplier is applied by the income calculation system using getTechIncomeMultiplier.
 	// Not applied here to avoid incorrect stacking and ensure new songs get the multiplier.
 
-	// Unlock systems
+	// Unlock systems that only require the upgrade (no additional conditions)
 	if (effects.unlockGPU) {
 		state.unlockedSystems.gpu = true;
+		console.log('💻 System Unlocked: GPU Resources! Run AI models locally on your hardware.');
+		toastStore.unlock(
+			'GPU Resources Unlocked!',
+			'Run AI models locally on your hardware',
+			'💻'
+		);
 	}
 
 	if (effects.unlockPrestige) {
 		state.unlockedSystems.prestige = true;
+		console.log('⭐ System Unlocked: Prestige! Reset your progress to gain permanent bonuses.');
+		toastStore.unlock(
+			'Prestige Unlocked!',
+			'Reset your progress to gain permanent bonuses',
+			'⭐'
+		);
 	}
 
 	if (effects.unlockPhysicalAlbums) {
 		state.unlockedSystems.physicalAlbums = true;
+		console.log('🎵 System Unlocked: Physical Albums! Release albums for massive one-time payouts.');
+		toastStore.unlock(
+			'Physical Albums Unlocked!',
+			'Release albums for massive one-time payouts',
+			'🎵'
+		);
 	}
 
-	if (effects.unlockTours) {
-		state.unlockedSystems.tours = true;
-	}
-
-	if (effects.unlockPlatformOwnership) {
-		state.unlockedSystems.platformOwnership = true;
-	}
+	// Note: Tours require 10 albums + 100K fans in addition to upgrade - handled by checkTourUnlock in unlocks.ts
+	// Note: Platform ownership requires 50 tours + 1M fans - handled by checkPlatformUnlock in unlocks.ts
 
 	if (effects.unlockMonopoly) {
 		state.unlockedSystems.monopoly = true;
@@ -138,6 +152,12 @@ export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): 
 
 	if (effects.unlockTrendResearch) {
 		state.unlockedSystems.trendResearch = true;
+		console.log('🔍 System Unlocked: Trend Research! Discover trending genres for 2x income and fans.');
+		toastStore.unlock(
+			'Trend Research Unlocked!',
+			'Discover trending genres for 2x income and fans',
+			'🔍'
+		);
 	}
 }
 

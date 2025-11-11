@@ -21,6 +21,8 @@ import {
 	MAX_LEGACY_ARTISTS,
 	PRESTIGE_MULTIPLIER_PER_LEVEL,
 	LEGACY_ARTIST_INCOME_RATIO,
+	LEGACY_ARTIST_INCOME_CONVERSION_RATIO,
+	CROSS_PROMOTION_RATE,
 	INITIAL_MONEY,
 	INITIAL_FANS
 } from '../game/config';
@@ -50,14 +52,14 @@ export function canPrestige(state: GameState): boolean {
 
 /**
  * Calculate income rate for legacy artist
- * Uses 80% of current total song income
+ * Uses LEGACY_ARTIST_INCOME_CONVERSION_RATIO (80%) of current total song income
  *
  * @param state - Current game state
  * @returns Income per second for the legacy artist
  */
 function calculateLegacyArtistIncomeRate(state: GameState): number {
 	const currentSongIncome = calculateSongIncome(state);
-	return currentSongIncome * 0.8;
+	return currentSongIncome * LEGACY_ARTIST_INCOME_CONVERSION_RATIO;
 }
 
 /**
@@ -194,13 +196,6 @@ export function calculateLegacyIncome(state: GameState): number {
 // ============================================================================
 // CROSS-PROMOTION MECHANICS
 // ============================================================================
-
-/**
- * Cross-promotion rate: fans per second transferred from legacy artists to new artist
- * Balance: 0.001% of legacy artist peak fans per second
- * Example: 100M peak fans = 1,000 fans/sec to new artist
- */
-const CROSS_PROMOTION_RATE = 0.00001;
 
 /**
  * Process legacy artists: cross-promotion fans to new artist

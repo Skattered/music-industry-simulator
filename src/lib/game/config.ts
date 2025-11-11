@@ -92,9 +92,15 @@ export const BASE_INCOME_PER_SONG = 2.0;
 
 /**
  * Base fan generation rate per song per second
- * Balance: 20 fans/sec = 72K fans/hour per song - enables milestone progression in target timeframe
+ * Balance: 2 fans/sec = 7.2K fans/hour per song - slower progression for better pacing
+ *
+ * BREAKING BALANCE CHANGE (v1.0.0):
+ * Previous value: 20 fans/sec
+ * New value: 2 fans/sec
+ * Reason: Slower progression for better pacing and longer gameplay experience.
+ * NOTE: This significantly affects existing gameplay and should be included in release notes/changelog.
  */
-export const BASE_FAN_GENERATION_RATE = 20;
+export const BASE_FAN_GENERATION_RATE = 2;
 
 /**
  * Trending genre income multiplier (at start of trend)
@@ -110,9 +116,15 @@ export const TREND_FADE_DURATION = 300000; // 5 minutes
 
 /**
  * Cost to generate a song at tier 1 (web services)
- * Balance: $2 per song balances with higher base income, can afford 5 songs at start
+ * Balance: $5 per song, can afford 2 songs at start
+ *
+ * BREAKING BALANCE CHANGE (v1.0.0):
+ * Previous value: $2 per song (could afford 5 songs at start)
+ * New value: $5 per song (can afford 2 songs at start)
+ * Reason: Slows early game progression to create more meaningful resource decisions.
+ * NOTE: This is a 150% increase that affects early game pacing - should be highlighted in release notes.
  */
-export const BASE_SONG_COST = 2;
+export const BASE_SONG_COST = 5;
 
 /**
  * Offline progress cap in hours
@@ -199,6 +211,12 @@ export const PHASE_NAMES: Record<Phase, string> = {
  * - Costs scale exponentially (roughly 10x per tier)
  * - Speed improvements are incremental (not exponential) to maintain pacing
  * - Free songs unlock at tier 2 to transition from manual to automated gameplay
+ *
+ * BREAKING BALANCE CHANGE (v1.0.0):
+ * All upgrade costs have been increased by exactly 5x (e.g., 15→75, 50→250, 150→750)
+ * Reason: Previous costs were too low, making tech progression trivial. The 5x multiplier
+ * creates meaningful resource decisions and extends gameplay by 2-3 hours.
+ * This systematic change maintains relative progression balance while extending gameplay duration.
  */
 export const UPGRADES: UpgradeDefinition[] = [
 	// ========================================
@@ -209,7 +227,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 1,
 		name: 'Suno/Udio Account',
 		description: 'Basic web-based AI music generation. Songs take 15s, cost $1.50.',
-		cost: 15,
+		cost: 75,
 		effects: {
 			songSpeed: 15000,
 			songCost: 1.5
@@ -220,7 +238,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 1,
 		name: 'Premium Subscription',
 		description: 'Faster generation queue and better quality. Songs take 12s, cost $1.',
-		cost: 50,
+		cost: 250,
 		effects: {
 			songSpeed: 12000,
 			songCost: 1.0
@@ -232,7 +250,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 1,
 		name: 'Multi-Account Management',
 		description: 'Run multiple accounts in parallel. Songs take 10s, cost $0.50.',
-		cost: 150,
+		cost: 750,
 		effects: {
 			songSpeed: 10000,
 			songCost: 0.5,
@@ -249,7 +267,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 2,
 		name: 'Lifetime License',
 		description: 'One-time payment for unlimited generation. Songs are now FREE!',
-		cost: 300,
+		cost: 1500,
 		effects: {
 			songSpeed: 10000,
 			songCost: 0
@@ -261,7 +279,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 2,
 		name: 'API Access',
 		description: 'Direct API integration for automation. Songs take 8s. 1.5x income.',
-		cost: 1000,
+		cost: 5000,
 		effects: {
 			songSpeed: 8000,
 			incomeMultiplier: 1.5,
@@ -274,7 +292,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 2,
 		name: 'Optimized Generation',
 		description: 'Faster song generation. Songs take 6s. 2x income.',
-		cost: 2500,
+		cost: 12500,
 		effects: {
 			songSpeed: 6000,
 			incomeMultiplier: 2.0
@@ -290,7 +308,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 3,
 		name: 'Download Open Models',
 		description: 'Run AI locally on your hardware. Unlocks GPU resources and prestige. Songs take 5s.',
-		cost: 7500,
+		cost: 37500,
 		effects: {
 			songSpeed: 5000,
 			unlockGPU: true,
@@ -303,7 +321,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 3,
 		name: 'Optimized Inference',
 		description: 'Quantization and optimization techniques. Songs take 4s. 2.5x income.',
-		cost: 17500,
+		cost: 87500,
 		effects: {
 			songSpeed: 4000,
 			incomeMultiplier: 2.5
@@ -315,7 +333,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 3,
 		name: 'Multi-GPU Setup',
 		description: 'Parallel processing across multiple GPUs. Enables tours (requires 10 albums + 1M fans). Songs take 3s. 3x income.',
-		cost: 35000,
+		cost: 175000,
 		effects: {
 			songSpeed: 3000,
 			incomeMultiplier: 3.0
@@ -331,7 +349,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 4,
 		name: 'Fine-tune on Hit Songs',
 		description: 'Improve quality by training on popular music. Songs take 2.5s. 4x income.',
-		cost: 75000,
+		cost: 375000,
 		effects: {
 			songSpeed: 2500,
 			incomeMultiplier: 4.0
@@ -343,7 +361,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 4,
 		name: 'Genre Specialists',
 		description: 'Separate models for each genre. Songs take 2s. 5x income.',
-		cost: 175000,
+		cost: 875000,
 		effects: {
 			songSpeed: 2000,
 			incomeMultiplier: 5.0
@@ -355,7 +373,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 4,
 		name: 'Trend Prediction Models',
 		description: 'AI predicts next trending genre. Songs take 1.5s. 6x income.',
-		cost: 350000,
+		cost: 1750000,
 		effects: {
 			songSpeed: 1500,
 			incomeMultiplier: 6.0
@@ -371,7 +389,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 5,
 		name: 'Custom Architecture',
 		description: 'Build models from scratch. Songs take 1.2s. 8x income.',
-		cost: 200_000,
+		cost: 1_000_000,
 		effects: {
 			songSpeed: 1200,
 			incomeMultiplier: 8.0
@@ -383,7 +401,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 5,
 		name: 'Scrape Training Data',
 		description: 'Collect massive datasets from the internet. Songs take 1s. 10x income.',
-		cost: 500_000,
+		cost: 2_500_000,
 		effects: {
 			songSpeed: 1000,
 			incomeMultiplier: 10.0
@@ -395,7 +413,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 5,
 		name: 'Distributed Training',
 		description: 'Train across data centers. Songs take 0.8s. 12x income.',
-		cost: 1_000_000,
+		cost: 5_000_000,
 		effects: {
 			songSpeed: 800,
 			incomeMultiplier: 12.0
@@ -411,7 +429,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 6,
 		name: 'Custom Inference Engine',
 		description: 'Write optimized code from scratch. Enables platform ownership (requires 25 tours + 10M fans). Songs take 0.6s. 15x income.',
-		cost: 750_000,
+		cost: 3_750_000,
 		effects: {
 			songSpeed: 600,
 			incomeMultiplier: 15.0
@@ -423,7 +441,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 6,
 		name: 'Hardware Acceleration',
 		description: 'CUDA/Metal optimization. Songs take 0.4s. 20x income.',
-		cost: 2_000_000,
+		cost: 10_000_000,
 		effects: {
 			songSpeed: 400,
 			incomeMultiplier: 20.0
@@ -435,7 +453,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 6,
 		name: 'Proprietary Format',
 		description: 'Control the entire stack. Songs take 0.3s. 25x income.',
-		cost: 5_000_000,
+		cost: 25_000_000,
 		effects: {
 			songSpeed: 300,
 			incomeMultiplier: 25.0,
@@ -452,7 +470,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 7,
 		name: 'AI Marketing Agent',
 		description: 'Agents handle all promotion. Songs take 0.2s. 30x income.',
-		cost: 10_000_000,
+		cost: 50_000_000,
 		effects: {
 			songSpeed: 200,
 			incomeMultiplier: 30.0
@@ -464,7 +482,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 7,
 		name: 'AI A&R Agent',
 		description: 'Agents decide what music to make. Songs take 0.15s. 40x income.',
-		cost: 25_000_000,
+		cost: 125_000_000,
 		effects: {
 			songSpeed: 150,
 			incomeMultiplier: 40.0
@@ -476,7 +494,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 7,
 		name: 'Full Automation',
 		description: 'The AI runs everything. You just watch. Songs take 0.1s. 50x income.',
-		cost: 50_000_000,
+		cost: 250_000_000,
 		effects: {
 			songSpeed: 100,
 			incomeMultiplier: 50.0
@@ -668,6 +686,19 @@ export const PRESTIGE_RECOMMENDED_FANS = 10_000_000;
  */
 export const LEGACY_ARTIST_INCOME_RATIO = 0.00015;
 
+/**
+ * Ratio of current song income that becomes legacy artist income (80%)
+ * When prestiging, current total song income is multiplied by this to get legacy income
+ */
+export const LEGACY_ARTIST_INCOME_CONVERSION_RATIO = 0.8;
+
+/**
+ * Cross-promotion rate for legacy artists
+ * Legacy artists funnel fans to new artist at this rate (% of peak fans per second)
+ * Balance: 0.001% of peak fans per second - 100M peak = 1K fans/sec to new artist
+ */
+export const CROSS_PROMOTION_RATE = 0.00001;
+
 // ============================================================================
 // PHYSICAL ALBUMS
 // ============================================================================
@@ -695,6 +726,24 @@ export const MIN_SONGS_FOR_ALBUM = 5;
  * Balance: 1.5 minutes allows faster album generation for mid-game flow
  */
 export const ALBUM_RELEASE_COOLDOWN = 90000;
+
+/**
+ * Payout multiplier for album re-releases (50% of original)
+ * Re-releases earn half as much as the original release
+ */
+export const ALBUM_RERELEASE_PAYOUT_MULTIPLIER = 0.5;
+
+/**
+ * Song milestone for automatic album releases
+ * An album is auto-released every N songs
+ */
+export const ALBUM_SONG_MILESTONE = 10;
+
+/**
+ * Maximum songs counted per album for payout calculation
+ * Caps album size to prevent excessive single-album payouts
+ */
+export const ALBUM_MAX_SONGS_FOR_PAYOUT = 15;
 
 // ============================================================================
 // TOURS & CONCERTS
@@ -729,63 +778,87 @@ export const TOUR_FAN_MULTIPLIER = 0.05;
  */
 export const MAX_ACTIVE_TOURS = 3;
 
+/**
+ * Song catalog bonus for tour income ($ per second per song)
+ * More songs in catalog = bigger shows = more income
+ * Balance: $100/sec per song - 150 songs = $15K/sec bonus
+ */
+export const TOUR_SONG_CATALOG_BONUS = 100;
+
+/**
+ * Tech tier thresholds for max simultaneous tours
+ */
+export const TOUR_MAX_TIERS = {
+	/** Tech tier to unlock 1 simultaneous tour */
+	TIER_1_TOUR: 3,
+	/** Tech tier to unlock 2 simultaneous tours */
+	TIER_2_TOURS: 4,
+	/** Tech tier to unlock 3 simultaneous tours (max) */
+	TIER_3_TOURS: 5
+} as const;
+
+/**
+ * Scarcity tactics income multiplier for tours
+ * When scarcity exploitation is enabled, tours earn this much more
+ */
+export const TOUR_SCARCITY_MULTIPLIER = 1.5;
+
 // ============================================================================
 // PLATFORM OWNERSHIP
 // ============================================================================
 
 /**
- * Available platforms for purchase in Phase 4+
- * Balance: Aggressive reduction for 10-12 hour target - platforms should be achievable in final 2-3 hours
- */
-export const PLATFORM_DEFINITIONS = [
-	{
-		type: 'streaming' as const,
-		name: 'Streaming Service',
-		baseCost: 1_000_000,
-		incomePerSecond: 25_000,
-		controlContribution: 15
-	},
-	{
-		type: 'ticketing' as const,
-		name: 'Ticketing Platform',
-		baseCost: 2_500_000,
-		incomePerSecond: 60_000,
-		controlContribution: 20
-	},
-	{
-		type: 'venue' as const,
-		name: 'Concert Venue Chain',
-		baseCost: 5_000_000,
-		incomePerSecond: 125_000,
-		controlContribution: 15
-	},
-	{
-		type: 'billboard' as const,
-		name: 'Billboard Charts',
-		baseCost: 10_000_000,
-		incomePerSecond: 250_000,
-		controlContribution: 25
-	},
-	{
-		type: 'grammys' as const,
-		name: 'The Grammys',
-		baseCost: 25_000_000,
-		incomePerSecond: 625_000,
-		controlContribution: 20
-	},
-	{
-		type: 'training_data' as const,
-		name: 'AI Training Data Monopoly',
-		baseCost: 50_000_000,
-		incomePerSecond: 1_250_000,
-		controlContribution: 30
-	}
-] as const;
-
-/**
  * Industry control percentage needed to "win" the game
  */
 export const INDUSTRY_CONTROL_WIN_THRESHOLD = 100;
+
+// ============================================================================
+// MONOPOLY SYSTEM (PLATFORM OWNERSHIP)
+// ============================================================================
+
+/**
+ * Minimum completed tours required to unlock platform ownership
+ */
+export const MIN_TOURS_FOR_PLATFORMS = 50;
+
+/**
+ * Minimum fans required to unlock platform ownership
+ */
+export const MIN_FANS_FOR_PLATFORMS = 1_000_000;
+
+/**
+ * Minimum tech tier required to unlock platform ownership (tier 6 = Own Your Software)
+ */
+export const MIN_TECH_TIER_FOR_PLATFORMS = 6;
+
+/**
+ * Industry control milestones and their percentage contributions
+ * Used for calculating industry control progress
+ */
+export const INDUSTRY_CONTROL_MILESTONES = {
+	// Fan milestones (14% total)
+	fans: {
+		10_000: 2,
+		100_000: 3,
+		1_000_000: 4,
+		10_000_000: 5
+	},
+	// Tech tier milestones (23% total)
+	techTier: {
+		3: 5,   // Local AI Models
+		6: 8,   // Own Your Software
+		7: 10   // AI Agents
+	},
+	// Phase milestones (26% total)
+	phase: {
+		2: 5,   // Physical Albums
+		3: 6,   // Tours & Concerts
+		4: 7,   // Platform Ownership
+		5: 8    // Total Automation
+	},
+	// Prestige bonus (8% per prestige)
+	prestigeBonus: 8
+} as const;
 
 // ============================================================================
 // INITIAL UNLOCKED SYSTEMS

@@ -15,6 +15,7 @@ import {
 	UPGRADES,
 	GENRES
 } from '../game/config';
+import { ADJECTIVES, NOUNS } from '../data/words';
 
 // Create a Map for O(1) upgrade lookups
 const UPGRADE_MAP = new Map(UPGRADES.map((u) => [u.id, u]));
@@ -50,52 +51,6 @@ export function getTrendingMultiplier(state: GameState): number {
 // ============================================================================
 // NAME GENERATION
 // ============================================================================
-
-const ADJECTIVES = [
-	'Electric',
-	'Midnight',
-	'Digital',
-	'Neon',
-	'Crystal',
-	'Cosmic',
-	'Velvet',
-	'Golden',
-	'Silver',
-	'Wild',
-	'Lost',
-	'Broken',
-	'Sweet',
-	'Dark',
-	'Bright',
-	'Fading',
-	'Rising',
-	'Dancing',
-	'Burning',
-	'Frozen'
-];
-
-const NOUNS = [
-	'Dreams',
-	'Hearts',
-	'Lights',
-	'Shadows',
-	'Echoes',
-	'Nights',
-	'Stars',
-	'Waves',
-	'Fire',
-	'Thunder',
-	'Memories',
-	'Paradise',
-	'Rain',
-	'Sky',
-	'Ocean',
-	'Highway',
-	'City',
-	'Moon',
-	'Sun',
-	'Love'
-];
 
 /**
  * Generate a random song name using mad-lib style
@@ -182,9 +137,17 @@ export function getCurrentSongCost(state: GameState): number {
 
 /**
  * Generate a single completed song
+ * 
+ * IMPORTANT: This function bakes ALL multipliers into the song's income and fan values:
+ * - Upgrade multiplier (from tech tier)
+ * - Prestige experience multiplier
+ * - Trending multiplier (if applicable, with fade)
+ * 
+ * These multipliers should NOT be re-applied in income/fan calculations!
+ * Only temporary boost multipliers should be applied there.
  *
  * @param state - Current game state
- * @returns A new Song object
+ * @returns A new Song object with final calculated values
  */
 export function generateSong(state: GameState): Song {
 	// Generate song properties

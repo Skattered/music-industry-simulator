@@ -10,8 +10,7 @@ import {
 	getAllTechUpgrades,
 	getUpgradeById,
 	getAvailableUpgrades,
-	calculateTechTier,
-	doesTierUnlockPrestige
+	calculateTechTier
 } from '../data/tech-upgrades';
 import { BASE_SONG_COST } from '../game/config';
 
@@ -82,9 +81,6 @@ export function purchaseTechUpgrade(state: GameState, upgradeId: string): boolea
 	state.techTier = tier;
 	state.techSubTier = subTier;
 
-	// Check for prestige unlock
-	unlockPrestigePoints(state);
-
 	return true;
 }
 
@@ -111,44 +107,17 @@ export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): 
 	// Income multiplier is applied by the income calculation system using getTechIncomeMultiplier.
 	// Not applied here to avoid incorrect stacking and ensure new songs get the multiplier.
 
-	// Unlock systems
-	if (effects.unlockGPU) {
-		state.unlockedSystems.gpu = true;
-	}
+	// NOTE: All system unlocks are handled in unlocks.ts to prevent duplicate toasts
+	// Tours require: upgrade + 10 albums + 100K fans
+	// Platform ownership requires: upgrade + 50 tours + 1M fans
+	// All other systems unlock immediately when upgrade is purchased (checked in unlocks.ts)
 
-	if (effects.unlockPrestige) {
-		state.unlockedSystems.prestige = true;
-	}
-
-	if (effects.unlockPhysicalAlbums) {
-		state.unlockedSystems.physicalAlbums = true;
-	}
-
-	if (effects.unlockTours) {
-		state.unlockedSystems.tours = true;
-	}
-
-	if (effects.unlockPlatformOwnership) {
-		state.unlockedSystems.platformOwnership = true;
-	}
-
+	// Monopoly unlock is handled here (not in unlocks.ts) because:
+	// 1. It unlocks immediately upon upgrade purchase with no additional requirements
+	// 2. It does not trigger a toast notification (monopoly is part of platform ownership system)
+	// 3. It's a simple boolean flag that doesn't need conditional checking or state validation
 	if (effects.unlockMonopoly) {
 		state.unlockedSystems.monopoly = true;
-	}
-
-	if (effects.unlockTrendResearch) {
-		state.unlockedSystems.trendResearch = true;
-	}
-}
-
-/**
- * Check if prestige should be unlocked based on current tech tier
- * Prestige unlocks at tiers 3, 5, 6, and 7
- * @param state - Current game state (will be mutated if prestige unlocked)
- */
-export function unlockPrestigePoints(state: GameState): void {
-	if (doesTierUnlockPrestige(state.techTier)) {
-		state.unlockedSystems.prestige = true;
 	}
 }
 

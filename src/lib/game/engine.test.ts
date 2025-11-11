@@ -273,14 +273,15 @@ describe('GameEngine', () => {
 
 		it('should apply trending multiplier to income', () => {
 			gameState.currentTrendingGenre = 'pop';
+			// Song's incomePerSecond already includes the trending multiplier (200 instead of 100)
 			gameState.songs = [
 				{
 					id: 'song1',
 					name: 'Trending Song',
 					genre: 'pop',
 					createdAt: Date.now(),
-					incomePerSecond: 100,
-					fanGenerationRate: 10,
+					incomePerSecond: 200, // Already has 2x trending baked in
+					fanGenerationRate: 20, // Already has 2x trending baked in
 					isTrending: true
 				}
 			];
@@ -291,7 +292,7 @@ describe('GameEngine', () => {
 			// Advance 1 second
 			vi.advanceTimersByTime(1000);
 
-			// Should have earned 200 dollars (100 * 2x trending multiplier)
+			// Should have earned 200 dollars (song already has trending multiplier baked in)
 			expect(gameState.money).toBeCloseTo(initialMoney + 200, 0);
 
 			engine.stop();
@@ -347,14 +348,15 @@ describe('GameEngine', () => {
 		});
 
 		it('should apply experience multiplier from prestige', () => {
+			// Song's incomePerSecond already includes the experience multiplier (200 instead of 100)
 			gameState.songs = [
 				{
 					id: 'song1',
 					name: 'Test Song',
 					genre: 'pop',
 					createdAt: Date.now(),
-					incomePerSecond: 100,
-					fanGenerationRate: 10,
+					incomePerSecond: 200, // Already has 2.0x experience multiplier baked in
+					fanGenerationRate: 20, // Already has 2.0x experience multiplier baked in
 					isTrending: false
 				}
 			];
@@ -366,7 +368,7 @@ describe('GameEngine', () => {
 			// Advance 1 second
 			vi.advanceTimersByTime(1000);
 
-			// Should have earned 200 dollars (100 * 2x experience multiplier)
+			// Should have earned 200 dollars (song already has experience multiplier baked in)
 			expect(gameState.money).toBeCloseTo(initialMoney + 200, 0);
 
 			engine.stop();

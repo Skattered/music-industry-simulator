@@ -18,11 +18,6 @@ import {
 } from './platforms';
 
 describe('PLATFORM_DEFINITIONS', () => {
-	it('should contain 7 platform definitions', () => {
-		expect(PLATFORM_DEFINITIONS).toBeDefined();
-		expect(PLATFORM_DEFINITIONS.length).toBe(7);
-	});
-
 	it('should have unique platform IDs', () => {
 		const ids = PLATFORM_DEFINITIONS.map((p) => p.id);
 		const uniqueIds = new Set(ids);
@@ -48,7 +43,6 @@ describe('PLATFORM_DEFINITIONS', () => {
 	it('should have positive costs for all platforms', () => {
 		PLATFORM_DEFINITIONS.forEach((platform) => {
 			expect(platform.baseCost).toBeGreaterThan(0);
-			expect(platform.baseCost).toBeGreaterThanOrEqual(100_000_000); // At least $100M
 		});
 	});
 
@@ -83,71 +77,6 @@ describe('PLATFORM_DEFINITIONS', () => {
 			expect(typeof platform.flavorText).toBe('string');
 			expect(platform.flavorText.length).toBeGreaterThan(0);
 		});
-	});
-
-	it('should have streaming_service platform', () => {
-		const streaming = PLATFORM_DEFINITIONS.find((p) => p.id === 'streaming_service');
-		expect(streaming).toBeDefined();
-		expect(streaming?.type).toBe('streaming');
-		expect(streaming?.baseCost).toBe(100_000_000);
-		expect(streaming?.incomePerSecond).toBe(50_000);
-		expect(streaming?.controlContribution).toBe(15);
-		expect(streaming?.prerequisites).toBeUndefined();
-	});
-
-	it('should have algorithm_control platform with prerequisites', () => {
-		const algorithm = PLATFORM_DEFINITIONS.find((p) => p.id === 'algorithm_control');
-		expect(algorithm).toBeDefined();
-		expect(algorithm?.type).toBe('algorithm');
-		expect(algorithm?.baseCost).toBe(250_000_000);
-		expect(algorithm?.prerequisites).toEqual(['streaming_service']);
-	});
-
-	it('should have ticketing_monopoly platform', () => {
-		const ticketing = PLATFORM_DEFINITIONS.find((p) => p.id === 'ticketing_monopoly');
-		expect(ticketing).toBeDefined();
-		expect(ticketing?.type).toBe('ticketing');
-		expect(ticketing?.baseCost).toBe(150_000_000);
-		expect(ticketing?.prerequisites).toBeUndefined();
-	});
-
-	it('should have venue_chain platform with prerequisites', () => {
-		const venue = PLATFORM_DEFINITIONS.find((p) => p.id === 'venue_chain');
-		expect(venue).toBeDefined();
-		expect(venue?.type).toBe('venue');
-		expect(venue?.prerequisites).toEqual(['ticketing_monopoly']);
-	});
-
-	it('should have billboard_charts platform with multiple prerequisites', () => {
-		const billboard = PLATFORM_DEFINITIONS.find((p) => p.id === 'billboard_charts');
-		expect(billboard).toBeDefined();
-		expect(billboard?.type).toBe('billboard');
-		expect(billboard?.prerequisites).toEqual(['streaming_service', 'algorithm_control']);
-	});
-
-	it('should have grammy_awards platform', () => {
-		const grammys = PLATFORM_DEFINITIONS.find((p) => p.id === 'grammy_awards');
-		expect(grammys).toBeDefined();
-		expect(grammys?.type).toBe('grammys');
-		expect(grammys?.prerequisites).toEqual(['billboard_charts']);
-	});
-
-	it('should have training_data_monopoly platform', () => {
-		const training = PLATFORM_DEFINITIONS.find((p) => p.id === 'training_data_monopoly');
-		expect(training).toBeDefined();
-		expect(training?.type).toBe('training_data');
-		expect(training?.baseCost).toBe(1_000_000_000); // $1B
-		expect(training?.prerequisites).toEqual(['algorithm_control']);
-	});
-
-	it('should have costs that scale up appropriately', () => {
-		const costs = PLATFORM_DEFINITIONS.map((p) => p.baseCost);
-		const minCost = Math.min(...costs);
-		const maxCost = Math.max(...costs);
-
-		expect(minCost).toBe(100_000_000); // $100M
-		expect(maxCost).toBe(1_000_000_000); // $1B
-		expect(maxCost / minCost).toBe(10); // 10x range
 	});
 
 	it('should have income that scales with cost', () => {

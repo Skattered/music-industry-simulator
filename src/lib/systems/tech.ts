@@ -13,7 +13,6 @@ import {
 	calculateTechTier
 } from '../data/tech-upgrades';
 import { BASE_SONG_COST } from '../game/config';
-import { toastStore } from '../stores/toasts.svelte';
 
 /**
  * Get all available tech upgrades

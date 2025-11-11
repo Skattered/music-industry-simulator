@@ -76,8 +76,9 @@ describe('Game Loop Integration', () => {
 
 	describe('Basic Song → Income → Fan Loop', () => {
 		it('should generate income and fans from completed songs', () => {
-			// Set up initial state
+			// Set up initial state with fans so songs can generate income
 			gameState.money = 100;
+			gameState.fans = 100_000; // Add fans so songs generate income
 
 			// Queue a song
 			queueSongs(gameState, 1);

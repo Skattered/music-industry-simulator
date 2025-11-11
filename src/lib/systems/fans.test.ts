@@ -89,13 +89,13 @@ describe('Fan System', () => {
 					peakFans: 100,
 					createdAt: Date.now()
 				},
-				songs: [createTestSong({ fanGenerationRate: 10 })]
+				songs: [createTestSong({ fanGenerationRate: 5 })]
 			});
 
-			// 1 second elapsed = 10 fans
+			// 1 second elapsed = 5 fans
 			generateFans(state, 1000);
-			expect(state.fans).toBe(110);
-			expect(state.currentArtist.fans).toBe(110);
+			expect(state.fans).toBe(105);
+			expect(state.currentArtist.fans).toBe(105);
 		});
 
 		it('should be frame-independent', () => {
@@ -108,7 +108,7 @@ describe('Fan System', () => {
 					peakFans: 100,
 					createdAt: Date.now()
 				},
-				songs: [createTestSong({ fanGenerationRate: 10 })]
+				songs: [createTestSong({ fanGenerationRate: 5 })]
 			});
 			const state2 = createTestState({
 				fans: 100,
@@ -119,7 +119,7 @@ describe('Fan System', () => {
 					peakFans: 100,
 					createdAt: Date.now()
 				},
-				songs: [createTestSong({ fanGenerationRate: 10 })]
+				songs: [createTestSong({ fanGenerationRate: 5 })]
 			});
 
 			// 1 second in one tick
@@ -137,12 +137,12 @@ describe('Fan System', () => {
 		it('should handle fractional deltaTime correctly', () => {
 			const state = createTestState({
 				fans: 0,
-				songs: [createTestSong({ fanGenerationRate: 10 })]
+				songs: [createTestSong({ fanGenerationRate: 5 })]
 			});
 
-			// 0.5 seconds = 5 fans
+			// 0.5 seconds = 2.5 fans
 			generateFans(state, 500);
-			expect(state.fans).toBe(5);
+			expect(state.fans).toBe(2.5);
 		});
 
 		it('should update peak fans automatically', () => {

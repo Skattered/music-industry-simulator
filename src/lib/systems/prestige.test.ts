@@ -12,7 +12,6 @@ import {
 } from './prestige';
 import type { GameState, Artist, UnlockedSystems, Song } from '../game/types';
 import {
-	BASE_INCOME_PER_SONG,
 	INITIAL_MONEY,
 	INITIAL_FANS,
 	INITIAL_GPU,

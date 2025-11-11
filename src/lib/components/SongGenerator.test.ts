@@ -445,6 +445,7 @@ describe('SongGenerator - User Interactions', () => {
 	});
 
 	it('should queue max affordable songs when Max button clicked', async () => {
+		// With $17 and BASE_SONG_COST of $5, player can afford 3 songs (17/5 = 3.4, floor to 3)
 		const gameState = createTestGameState({ money: 17 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
@@ -453,6 +454,7 @@ describe('SongGenerator - User Interactions', () => {
 		await fireEvent.click(getByTestId('queue-max'));
 		await tick();
 
+		// Should queue 3 songs (max affordable with $17 at $5 per song)
 		expect(container.textContent).toContain('3 songs queued');
 	});
 

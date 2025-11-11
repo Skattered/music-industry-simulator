@@ -93,6 +93,12 @@ export const BASE_INCOME_PER_SONG = 2.0;
 /**
  * Base fan generation rate per song per second
  * Balance: 2 fans/sec = 7.2K fans/hour per song - slower progression for better pacing
+ *
+ * BREAKING BALANCE CHANGE (v1.0.0):
+ * Previous value: 20 fans/sec
+ * New value: 2 fans/sec
+ * Reason: Slower progression for better pacing and longer gameplay experience.
+ * NOTE: This significantly affects existing gameplay and should be included in release notes/changelog.
  */
 export const BASE_FAN_GENERATION_RATE = 2;
 
@@ -111,6 +117,12 @@ export const TREND_FADE_DURATION = 300000; // 5 minutes
 /**
  * Cost to generate a song at tier 1 (web services)
  * Balance: $5 per song, can afford 2 songs at start
+ *
+ * BREAKING BALANCE CHANGE (v1.0.0):
+ * Previous value: $2 per song (could afford 5 songs at start)
+ * New value: $5 per song (can afford 2 songs at start)
+ * Reason: Slows early game progression to create more meaningful resource decisions.
+ * NOTE: This is a 150% increase that affects early game pacing - should be highlighted in release notes.
  */
 export const BASE_SONG_COST = 5;
 
@@ -199,6 +211,12 @@ export const PHASE_NAMES: Record<Phase, string> = {
  * - Costs scale exponentially (roughly 10x per tier)
  * - Speed improvements are incremental (not exponential) to maintain pacing
  * - Free songs unlock at tier 2 to transition from manual to automated gameplay
+ *
+ * BREAKING BALANCE CHANGE (v1.0.0):
+ * All upgrade costs have been increased by exactly 5x (e.g., 15→75, 50→250, 150→750)
+ * Reason: Previous costs were too low, making tech progression trivial. The 5x multiplier
+ * creates meaningful resource decisions and extends gameplay by 2-3 hours.
+ * This systematic change maintains relative progression balance while extending gameplay duration.
  */
 export const UPGRADES: UpgradeDefinition[] = [
 	// ========================================

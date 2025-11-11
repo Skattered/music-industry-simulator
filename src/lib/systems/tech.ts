@@ -112,6 +112,10 @@ export function applyTechEffects(state: GameState, upgrade: UpgradeDefinition): 
 	// Platform ownership requires: upgrade + 50 tours + 1M fans
 	// All other systems unlock immediately when upgrade is purchased (checked in unlocks.ts)
 
+	// Monopoly unlock is handled here (not in unlocks.ts) because:
+	// 1. It unlocks immediately upon upgrade purchase with no additional requirements
+	// 2. It does not trigger a toast notification (monopoly is part of platform ownership system)
+	// 3. It's a simple boolean flag that doesn't need conditional checking or state validation
 	if (effects.unlockMonopoly) {
 		state.unlockedSystems.monopoly = true;
 	}

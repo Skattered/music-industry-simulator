@@ -60,8 +60,6 @@ export interface QueuedSong {
   id: string;
   /** Current generation progress (ms) */
   progress: number;
-  /** Total time required to complete generation (ms) */
-  totalTime: number;
 }
 
 /**
@@ -329,12 +327,12 @@ export interface UpgradeDefinition {
  * Effects that an upgrade can apply
  */
 export interface UpgradeEffects {
-  /** Set song generation cost (0 = free) */
-  songCost?: number;
-  /** Set song generation speed (ms) */
-  songSpeed?: number;
-  /** Multiply income by this amount */
-  incomeMultiplier?: number;
+	/** Set song generation cost (0 = free) */
+	songCost?: number;
+	/** Set song generation speed (ms) */
+	songSpeed?: number;
+	/** Multiply income by this amount */
+	incomeMultiplier?: number;
   /** Unlock GPU resource system */
   unlockGPU?: boolean;
   /** Unlock prestige system */

@@ -39,7 +39,8 @@
 	const progressPercent = $derived(
 		(() => {
 			if (!currentSong) return 0;
-			return (currentSong.progress / currentSong.totalTime) * 100;
+			const currentSpeed = getSongGenerationSpeed(gameState);
+			return (currentSong.progress / currentSpeed) * 100;
 		})()
 	);
 
@@ -57,10 +58,6 @@
 
 <div class="song-generator">
 	<div class="stats">
-		<div class="stat">
-			<span class="label">Money:</span>
-			<span class="value">${gameState.money.toFixed(2)}</span>
-		</div>
 		<div class="stat">
 			<span class="label">Cost per song:</span>
 			<span class="value">{formatCost(costPerSong)}</span>
@@ -133,7 +130,7 @@
 
 	.stats {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 		gap: 1rem;
 	}
 
@@ -198,8 +195,8 @@
 	}
 
 	.queue-button {
-		padding: 0.75rem 1rem;
-		font-size: 1rem;
+		padding: 0.75rem 0.5rem;
+		font-size: 0.875rem;
 		font-weight: 600;
 		background: #2196f3;
 		color: white;
@@ -207,6 +204,10 @@
 		border-radius: 6px;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 0;
 	}
 
 	.queue-button:hover:not(:disabled) {

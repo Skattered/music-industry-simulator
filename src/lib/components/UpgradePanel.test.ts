@@ -66,7 +66,7 @@ describe('UpgradePanel', () => {
 		vi.useRealTimers();
 	});
 
-	it('renders the component with correct title', () => {
+	it('renders the component with correct title for current phase', () => {
 		const gameState = createTestGameState();
 		const mockCallback = vi.fn();
 
@@ -77,25 +77,37 @@ describe('UpgradePanel', () => {
 			}
 		});
 
-		expect(screen.getByText('Exploitation Abilities')).toBeTruthy();
-		expect(screen.getByText('Morally questionable but profitable tactics')).toBeTruthy();
+		expect(screen.getByText('Exploitation Abilities - Streaming')).toBeTruthy();
+		expect(screen.getByText('Phase 1: Morally questionable but profitable tactics')).toBeTruthy();
 	});
 
-	it('renders all category tabs', () => {
-		const gameState = createTestGameState();
+	it('shows only boosts for current phase', () => {
+		// Test Phase 1 (Streaming)
+		const gameState1 = createTestGameState({ phase: 1 });
 		const mockCallback = vi.fn();
 
-		render(UpgradePanel, {
+		const { unmount } = render(UpgradePanel, {
 			props: {
-				gameState,
+				gameState: gameState1,
 				onActivateBoost: mockCallback
 			}
 		});
 
-		expect(screen.getByText('Streaming')).toBeTruthy();
-		expect(screen.getByText('Physical')).toBeTruthy();
-		expect(screen.getByText('Concerts')).toBeTruthy();
-		expect(screen.getByText('Platform')).toBeTruthy();
+		expect(screen.getByText('Exploitation Abilities - Streaming')).toBeTruthy();
+		expect(screen.getByText('Bot Streams')).toBeTruthy();
+		unmount();
+
+		// Test Phase 2 (Physical)
+		const gameState2 = createTestGameState({ phase: 2 });
+		render(UpgradePanel, {
+			props: {
+				gameState: gameState2,
+				onActivateBoost: mockCallback
+			}
+		});
+
+		expect(screen.getByText('Exploitation Abilities - Physical')).toBeTruthy();
+		expect(screen.getByText('Limited Edition Variants')).toBeTruthy();
 	});
 
 	it('renders available boosts in streaming category by default', () => {
@@ -413,9 +425,10 @@ describe('UpgradePanel', () => {
 		expect(container.textContent).toMatch(/\+\s*50%/);
 	});
 
-	it('switches categories when tab is clicked', async () => {
+	it('shows boosts for physical phase when in phase 2', async () => {
 		const gameState = createTestGameState({
-			money: 100_000_000, // Enough for all boosts
+			phase: 2,
+			money: 100_000_000,
 			boostUsageCounts: {}
 		});
 		const mockCallback = vi.fn();
@@ -429,15 +442,7 @@ describe('UpgradePanel', () => {
 
 		await tick();
 
-		// Initially shows streaming boosts
-		expect(screen.getByText('Bot Streams')).toBeTruthy();
-
-		// Click Physical tab
-		const physicalTab = screen.getByText('Physical');
-		physicalTab.click();
-		await tick();
-
-		// Should now show physical boosts
+		// Should show physical boosts for phase 2
 		expect(screen.getByText('Limited Edition Variants')).toBeTruthy();
 		expect(screen.getByText('Shut Down Competitors')).toBeTruthy();
 	});
@@ -511,9 +516,10 @@ describe('UpgradePanel', () => {
 		expect(container.textContent).toContain('$1.13M');
 	});
 
-	it('shows all boosts in concerts category', async () => {
+	it('shows all boosts in concerts phase when in phase 3', async () => {
 		const gameState = createTestGameState({
-			money: 1_000_000_000, // Enough for expensive boosts
+			phase: 3,
+			money: 1_000_000_000,
 			boostUsageCounts: {}
 		});
 		const mockCallback = vi.fn();
@@ -527,21 +533,17 @@ describe('UpgradePanel', () => {
 
 		await tick();
 
-		// Click Concerts tab
-		const concertsTab = screen.getByText('Concerts');
-		concertsTab.click();
-		await tick();
-
-		// Should show all concert-related boosts
+		// Should show all concert-related boosts for phase 3
 		expect(screen.getByText('Scalp Your Own Records')).toBeTruthy();
 		expect(screen.getByText('Artificial Ticket Scarcity')).toBeTruthy();
 		expect(screen.getByText('Scalp Your Own Tickets')).toBeTruthy();
 		expect(screen.getByText('FOMO Marketing')).toBeTruthy();
 	});
 
-	it('shows platform boost in platform category', async () => {
+	it('shows platform boost when in phase 4', async () => {
 		const gameState = createTestGameState({
-			money: 1_000_000_000, // Enough for expensive boost
+			phase: 4,
+			money: 1_000_000_000,
 			boostUsageCounts: {}
 		});
 		const mockCallback = vi.fn();
@@ -555,12 +557,7 @@ describe('UpgradePanel', () => {
 
 		await tick();
 
-		// Click Platform tab
-		const platformTab = screen.getByText('Platform');
-		platformTab.click();
-		await tick();
-
-		// Should show dynamic pricing
+		// Should show dynamic pricing for phase 4
 		expect(screen.getByText('Dynamic Pricing')).toBeTruthy();
 	});
 

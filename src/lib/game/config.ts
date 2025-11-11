@@ -668,6 +668,19 @@ export const PRESTIGE_RECOMMENDED_FANS = 10_000_000;
  */
 export const LEGACY_ARTIST_INCOME_RATIO = 0.00015;
 
+/**
+ * Ratio of current song income that becomes legacy artist income (80%)
+ * When prestiging, current total song income is multiplied by this to get legacy income
+ */
+export const LEGACY_ARTIST_INCOME_CONVERSION_RATIO = 0.8;
+
+/**
+ * Cross-promotion rate for legacy artists
+ * Legacy artists funnel fans to new artist at this rate (% of peak fans per second)
+ * Balance: 0.001% of peak fans per second - 100M peak = 1K fans/sec to new artist
+ */
+export const CROSS_PROMOTION_RATE = 0.00001;
+
 // ============================================================================
 // PHYSICAL ALBUMS
 // ============================================================================
@@ -695,6 +708,24 @@ export const MIN_SONGS_FOR_ALBUM = 5;
  * Balance: 1.5 minutes allows faster album generation for mid-game flow
  */
 export const ALBUM_RELEASE_COOLDOWN = 90000;
+
+/**
+ * Payout multiplier for album re-releases (50% of original)
+ * Re-releases earn half as much as the original release
+ */
+export const ALBUM_RERELEASE_PAYOUT_MULTIPLIER = 0.5;
+
+/**
+ * Song milestone for automatic album releases
+ * An album is auto-released every N songs
+ */
+export const ALBUM_SONG_MILESTONE = 10;
+
+/**
+ * Maximum songs counted per album for payout calculation
+ * Caps album size to prevent excessive single-album payouts
+ */
+export const ALBUM_MAX_SONGS_FOR_PAYOUT = 15;
 
 // ============================================================================
 // TOURS & CONCERTS
@@ -729,63 +760,87 @@ export const TOUR_FAN_MULTIPLIER = 0.05;
  */
 export const MAX_ACTIVE_TOURS = 3;
 
+/**
+ * Song catalog bonus for tour income ($ per second per song)
+ * More songs in catalog = bigger shows = more income
+ * Balance: $100/sec per song - 150 songs = $15K/sec bonus
+ */
+export const TOUR_SONG_CATALOG_BONUS = 100;
+
+/**
+ * Tech tier thresholds for max simultaneous tours
+ */
+export const TOUR_MAX_TIERS = {
+	/** Tech tier to unlock 1 simultaneous tour */
+	TIER_1_TOUR: 3,
+	/** Tech tier to unlock 2 simultaneous tours */
+	TIER_2_TOURS: 4,
+	/** Tech tier to unlock 3 simultaneous tours (max) */
+	TIER_3_TOURS: 5
+} as const;
+
+/**
+ * Scarcity tactics income multiplier for tours
+ * When scarcity exploitation is enabled, tours earn this much more
+ */
+export const TOUR_SCARCITY_MULTIPLIER = 1.5;
+
 // ============================================================================
 // PLATFORM OWNERSHIP
 // ============================================================================
 
 /**
- * Available platforms for purchase in Phase 4+
- * Balance: Aggressive reduction for 10-12 hour target - platforms should be achievable in final 2-3 hours
- */
-export const PLATFORM_DEFINITIONS = [
-	{
-		type: 'streaming' as const,
-		name: 'Streaming Service',
-		baseCost: 1_000_000,
-		incomePerSecond: 25_000,
-		controlContribution: 15
-	},
-	{
-		type: 'ticketing' as const,
-		name: 'Ticketing Platform',
-		baseCost: 2_500_000,
-		incomePerSecond: 60_000,
-		controlContribution: 20
-	},
-	{
-		type: 'venue' as const,
-		name: 'Concert Venue Chain',
-		baseCost: 5_000_000,
-		incomePerSecond: 125_000,
-		controlContribution: 15
-	},
-	{
-		type: 'billboard' as const,
-		name: 'Billboard Charts',
-		baseCost: 10_000_000,
-		incomePerSecond: 250_000,
-		controlContribution: 25
-	},
-	{
-		type: 'grammys' as const,
-		name: 'The Grammys',
-		baseCost: 25_000_000,
-		incomePerSecond: 625_000,
-		controlContribution: 20
-	},
-	{
-		type: 'training_data' as const,
-		name: 'AI Training Data Monopoly',
-		baseCost: 50_000_000,
-		incomePerSecond: 1_250_000,
-		controlContribution: 30
-	}
-] as const;
-
-/**
  * Industry control percentage needed to "win" the game
  */
 export const INDUSTRY_CONTROL_WIN_THRESHOLD = 100;
+
+// ============================================================================
+// MONOPOLY SYSTEM (PLATFORM OWNERSHIP)
+// ============================================================================
+
+/**
+ * Minimum completed tours required to unlock platform ownership
+ */
+export const MIN_TOURS_FOR_PLATFORMS = 50;
+
+/**
+ * Minimum fans required to unlock platform ownership
+ */
+export const MIN_FANS_FOR_PLATFORMS = 1_000_000;
+
+/**
+ * Minimum tech tier required to unlock platform ownership (tier 6 = Own Your Software)
+ */
+export const MIN_TECH_TIER_FOR_PLATFORMS = 6;
+
+/**
+ * Industry control milestones and their percentage contributions
+ * Used for calculating industry control progress
+ */
+export const INDUSTRY_CONTROL_MILESTONES = {
+	// Fan milestones (14% total)
+	fans: {
+		10_000: 2,
+		100_000: 3,
+		1_000_000: 4,
+		10_000_000: 5
+	},
+	// Tech tier milestones (23% total)
+	techTier: {
+		3: 5,   // Local AI Models
+		6: 8,   // Own Your Software
+		7: 10   // AI Agents
+	},
+	// Phase milestones (26% total)
+	phase: {
+		2: 5,   // Physical Albums
+		3: 6,   // Tours & Concerts
+		4: 7,   // Platform Ownership
+		5: 8    // Total Automation
+	},
+	// Prestige bonus (8% per prestige)
+	prestigeBonus: 8
+} as const;
 
 // ============================================================================
 // INITIAL UNLOCKED SYSTEMS

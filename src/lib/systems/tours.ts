@@ -22,58 +22,16 @@ import {
 	TOUR_DURATION,
 	TOUR_BASE_INCOME_PER_SECOND,
 	TOUR_FAN_MULTIPLIER,
-	MAX_ACTIVE_TOURS
+	MAX_ACTIVE_TOURS,
+	TOUR_SONG_CATALOG_BONUS,
+	TOUR_MAX_TIERS,
+	TOUR_SCARCITY_MULTIPLIER
 } from '../game/config';
+import { TOUR_ADJECTIVES, TOUR_NOUNS } from '../data/words';
 
 // ============================================================================
 // TOUR NAME GENERATION
 // ============================================================================
-
-const TOUR_ADJECTIVES = [
-	'World',
-	'Stadium',
-	'Arena',
-	'Festival',
-	'Global',
-	'International',
-	'Ultimate',
-	'Legendary',
-	'Epic',
-	'Massive',
-	'Grand',
-	'Supreme',
-	'Infinite',
-	'Eternal',
-	'Virtual',
-	'Digital',
-	'Holographic',
-	'AI-Generated',
-	'Synthetic',
-	'Algorithmic'
-];
-
-const TOUR_NOUNS = [
-	'Tour',
-	'Experience',
-	'Concert Series',
-	'Live Show',
-	'Performance',
-	'Spectacle',
-	'Event',
-	'Roadshow',
-	'Music Festival',
-	'Concert Experience',
-	'Live Experience',
-	'Tour de Force',
-	'Extravaganza',
-	'Showcase',
-	'Domination',
-	'Takeover',
-	'Revolution',
-	'Invasion',
-	'Conquest',
-	'Empire Tour'
-];
 
 /**
  * Generate a random tour name using mad-lib style
@@ -154,17 +112,17 @@ export function getMaxActiveTours(state: GameState): number {
 
 	// Tech tier upgrades increase max tours
 	// Tier 3+: Can run 1 tour
-	if (state.techTier >= 3) {
+	if (state.techTier >= TOUR_MAX_TIERS.TIER_1_TOUR) {
 		maxTours = 1;
 	}
 
 	// Tier 4+: Can run 2 tours
-	if (state.techTier >= 4) {
+	if (state.techTier >= TOUR_MAX_TIERS.TIER_2_TOURS) {
 		maxTours = 2;
 	}
 
 	// Tier 5+: Can run 3 tours (max)
-	if (state.techTier >= 5) {
+	if (state.techTier >= TOUR_MAX_TIERS.TIER_3_TOURS) {
 		maxTours = MAX_ACTIVE_TOURS;
 	}
 
@@ -200,7 +158,7 @@ export function calculateTourIncomePerSecond(state: GameState): number {
 	incomePerSecond += state.fans * TOUR_FAN_MULTIPLIER;
 
 	// Scale with song catalog size (more songs = bigger shows)
-	const songCatalogBonus = state.songs.length * 100; // $100/sec per song
+	const songCatalogBonus = state.songs.length * TOUR_SONG_CATALOG_BONUS;
 	incomePerSecond += songCatalogBonus;
 
 	// Apply prestige multiplier
@@ -318,8 +276,8 @@ export function enableScarcityTactics(state: GameState): void {
 	for (const tour of state.tours) {
 		if (tour.completedAt === null) {
 			tour.usesScarcity = true;
-			// Scarcity increases income by 50%
-			tour.incomePerSecond *= 1.5;
+			// Scarcity increases income by TOUR_SCARCITY_MULTIPLIER
+			tour.incomePerSecond *= TOUR_SCARCITY_MULTIPLIER;
 		}
 	}
 }

@@ -5,16 +5,15 @@
  * Income is frame-independent and uses deltaTime for smooth progression.
  *
  * Income sources:
- * - Songs: Base income per song with trending bonuses
+ * - Songs: Base income per song (multipliers already baked in at creation)
  * - Legacy Artists: Passive income from prestiged artists
  * - Platforms: Passive income from owned infrastructure
  * - Tours: Active income from ongoing tours
  *
  * Multipliers applied:
- * - Upgrade income multipliers (stacked additively)
- * - Prestige experience multiplier
- * - Active boost multipliers (stacked multiplicatively)
- * - Trending genre bonuses (2x for matching songs)
+ * - Upgrade and prestige multipliers: Baked into song values at creation
+ * - Trending genre bonuses: Baked into song values at creation (2x for matching songs)
+ * - Active boost multipliers: Applied here (temporary, multiplicative stacking)
  */
 
 import type { GameState } from '../game/types';
@@ -60,19 +59,15 @@ export function calculateTotalIncome(state: GameState): number {
 /**
  * Apply all income multipliers to base income
  *
+ * NOTE: Upgrade and prestige multipliers are already baked into song values
+ * during song creation. Only apply temporary boost multipliers here.
+ *
  * @param state - The current game state
  * @param baseIncome - Base income before multipliers
  * @returns Income after all multipliers applied
  */
 export function applyIncomeMultipliers(state: GameState, baseIncome: number): number {
 	let income = baseIncome;
-
-	// Apply upgrade multipliers (additive stacking)
-	const upgradeMultiplier = calculateUpgradeMultiplier(state);
-	income *= upgradeMultiplier;
-
-	// Apply prestige experience multiplier
-	income *= state.experienceMultiplier;
 
 	// Apply active boost multipliers (multiplicative stacking)
 	const boostMultiplier = calculateBoostMultiplier(state, 'incomeMultiplier');
@@ -83,20 +78,16 @@ export function applyIncomeMultipliers(state: GameState, baseIncome: number): nu
 
 /**
  * Calculate income from all songs
- * Includes trending bonuses for songs matching current trend
+ * 
+ * NOTE: Songs already have trending bonus baked in when created.
+ * song.incomePerSecond already includes trending multiplier if applicable.
  */
 function calculateSongIncome(state: GameState): number {
 	let income = 0;
 
 	for (const song of state.songs) {
-		let songIncome = song.incomePerSecond;
-
-		// Apply trending multiplier if song matches current trending genre and is marked as trending
-		if (state.currentTrendingGenre === song.genre && song.isTrending) {
-			songIncome *= TRENDING_MULTIPLIER;
-		}
-
-		income += songIncome;
+		// Songs already have all multipliers (trending, prestige, upgrades) baked in
+		income += song.incomePerSecond;
 	}
 
 	return income;
@@ -145,17 +136,5 @@ function calculateTourIncome(state: GameState): number {
 	return income;
 }
 
-/**
- * Calculate total income multiplier from upgrades
- * Stacks additively (1.0 base + sum of all upgrade multipliers)
- */
-function calculateUpgradeMultiplier(state: GameState): number {
-	let multiplier = 1.0;
 
-	// Note: In a full implementation, we would look up upgrade definitions
-	// and sum their incomeMultiplier effects. For now, we return base multiplier.
-	// This will be implemented when the upgrade system is added.
-
-	return multiplier;
-}
 

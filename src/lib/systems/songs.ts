@@ -182,9 +182,17 @@ export function getCurrentSongCost(state: GameState): number {
 
 /**
  * Generate a single completed song
+ * 
+ * IMPORTANT: This function bakes ALL multipliers into the song's income and fan values:
+ * - Upgrade multiplier (from tech tier)
+ * - Prestige experience multiplier
+ * - Trending multiplier (if applicable, with fade)
+ * 
+ * These multipliers should NOT be re-applied in income/fan calculations!
+ * Only temporary boost multipliers should be applied there.
  *
  * @param state - Current game state
- * @returns A new Song object
+ * @returns A new Song object with final calculated values
  */
 export function generateSong(state: GameState): Song {
 	// Generate song properties

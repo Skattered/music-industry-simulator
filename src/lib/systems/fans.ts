@@ -5,13 +5,13 @@
  * Fan growth is frame-independent and uses deltaTime for smooth progression.
  *
  * Fan sources:
- * - Songs: Each song generates fans per second based on fanGenerationRate
- * - Trending songs: Get additional fan generation when matching current trend
+ * - Songs: Each song generates fans per second (multipliers baked in at creation)
+ * - Trending songs: Get trending bonus baked into fanGenerationRate at creation
  *
  * Features:
  * - Passive fan accumulation from all songs
- * - Boost multipliers for temporary fan growth
- * - Prestige experience multiplier for enhanced growth
+ * - Boost multipliers for temporary fan growth (applied here)
+ * - Prestige experience multiplier (baked into songs at creation)
  * - Peak fan tracking for prestige bonuses
  * - Current artist fan tracking separate from total fans
  */
@@ -70,20 +70,16 @@ export function updatePeakFans(state: GameState): void {
 
 /**
  * Calculate fan generation from all songs
- * Includes trending bonuses for songs matching current trend
+ * 
+ * NOTE: Songs already have trending bonus baked in when created.
+ * song.fanGenerationRate already includes trending multiplier if applicable.
  */
 function calculateSongFanGeneration(state: GameState): number {
 	let fanGeneration = 0;
 
 	for (const song of state.songs) {
-		let songFanGen = song.fanGenerationRate;
-
-		// Apply trending multiplier if song matches current trending genre and is marked as trending
-		if (state.currentTrendingGenre === song.genre && song.isTrending) {
-			songFanGen *= TRENDING_MULTIPLIER;
-		}
-
-		fanGeneration += songFanGen;
+		// Songs already have all multipliers (trending, prestige) baked in
+		fanGeneration += song.fanGenerationRate;
 	}
 
 	return fanGeneration;
@@ -91,22 +87,17 @@ function calculateSongFanGeneration(state: GameState): number {
 
 /**
  * Apply all fan generation multipliers
- * Applies prestige experience multiplier and active boost multipliers
+ * 
+ * NOTE: Prestige multiplier is already baked into song fan generation rates
+ * during song creation. Only apply temporary boost multipliers here.
  *
  * @param state - The current game state
  * @param baseFanGeneration - Base fan generation before multipliers
  * @returns Fan generation after all multipliers applied
  */
 function applyFanMultipliers(state: GameState, baseFanGeneration: number): number {
-	let fanGeneration = baseFanGeneration;
-
-	// Apply prestige experience multiplier
-	fanGeneration *= state.experienceMultiplier;
-
 	// Apply active boost multipliers (multiplicative stacking)
 	const boostMultiplier = calculateBoostMultiplier(state, 'fanMultiplier');
-	fanGeneration *= boostMultiplier;
-
-	return fanGeneration;
+	return baseFanGeneration * boostMultiplier;
 }
 

@@ -119,15 +119,16 @@ function selectRandomGenre(): Genre {
 
 /**
  * Get the current income multiplier from purchased upgrades
+ * Takes the HIGHEST multiplier from all purchased upgrades (they don't stack)
  */
 function getIncomeMultiplier(state: GameState): number {
 	let multiplier = 1.0;
 
-	// Apply upgrade income multipliers
+	// Find the highest income multiplier among all upgrades (they replace, not multiply)
 	for (const upgradeId in state.upgrades) {
 		const upgrade = UPGRADE_MAP.get(upgradeId);
 		if (upgrade?.effects.incomeMultiplier) {
-			multiplier *= upgrade.effects.incomeMultiplier;
+			multiplier = Math.max(multiplier, upgrade.effects.incomeMultiplier);
 		}
 	}
 

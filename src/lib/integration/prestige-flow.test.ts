@@ -367,8 +367,8 @@ describe('Prestige Flow Integration', () => {
 					name: 'Song',
 					genre: 'pop',
 					createdAt: Date.now(),
-					incomePerSecond: 100,
-					fanGenerationRate: 10,
+					incomePerSecond: 115, // Already has 1.15x experience multiplier baked in
+					fanGenerationRate: 11.5, // Already has 1.15x experience multiplier baked in
 					isTrending: false
 				}
 			];
@@ -379,7 +379,7 @@ describe('Prestige Flow Integration', () => {
 			vi.advanceTimersByTime(1000); // 1 second
 			engine.stop();
 
-			// Should earn 115 (100 * 1.15)
+			// Should earn 115 (song already has experience multiplier baked in)
 			expect(gameState.money).toBeCloseTo(initialMoney + 115, 15);
 		});
 
@@ -393,8 +393,8 @@ describe('Prestige Flow Integration', () => {
 					name: 'Song',
 					genre: 'pop',
 					createdAt: Date.now(),
-					incomePerSecond: 100,
-					fanGenerationRate: 10,
+					incomePerSecond: 145, // Already has 1.45x experience multiplier baked in
+					fanGenerationRate: 14.5, // Already has 1.45x experience multiplier baked in
 					isTrending: false
 				}
 			];
@@ -405,7 +405,7 @@ describe('Prestige Flow Integration', () => {
 			vi.advanceTimersByTime(1000); // 1 second
 			engine.stop();
 
-			// Should earn 145 (100 * 1.45)
+			// Should earn 145 (song already has experience multiplier baked in)
 			expect(gameState.money).toBeCloseTo(initialMoney + 145, 15);
 		});
 
@@ -430,8 +430,8 @@ describe('Prestige Flow Integration', () => {
 			vi.advanceTimersByTime(1000); // 1 second
 			engine.stop();
 
-			// Should earn 130 (100 * 1.3)
-			expect(gameState.money).toBeCloseTo(initialMoney + 130, 15);
+			// Should earn 100 (legacy artist has fixed income rate)
+			expect(gameState.money).toBeCloseTo(initialMoney + 100, 15);
 		});
 	});
 

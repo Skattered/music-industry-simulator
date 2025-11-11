@@ -147,16 +147,17 @@ describe('Income System', () => {
 			expect(calculateTotalIncome(state)).toBe(30);
 		});
 
-		it('should apply trending multiplier to matching songs', () => {
+		it('should NOT apply trending multiplier (already in songs)', () => {
 			const state = createTestState({
 				currentTrendingGenre: 'pop',
 				trendDiscoveredAt: null,
 				songs: [
-					createTestSong({ incomePerSecond: 10, genre: 'pop', isTrending: true }),
+					// Songs already have trending multiplier baked into their incomePerSecond
+					createTestSong({ incomePerSecond: 20, genre: 'pop', isTrending: true }),
 					createTestSong({ incomePerSecond: 10, genre: 'rock', isTrending: false })
 				]
 			});
-			// Pop song: 10 * 2 (trending) = 20, Rock song: 10, Total: 30
+			// Pop song: 20 (already includes trending), Rock song: 10, Total: 30
 			expect(calculateTotalIncome(state)).toBe(30);
 		});
 
@@ -276,11 +277,12 @@ describe('Income System', () => {
 			expect(applyIncomeMultipliers(state, 100)).toBe(100);
 		});
 
-		it('should apply prestige experience multiplier', () => {
+		it('should NOT apply prestige multiplier (already in songs)', () => {
 			const state = createTestState({
 				experienceMultiplier: 1.5
 			});
-			expect(applyIncomeMultipliers(state, 100)).toBe(150);
+			// Prestige is baked into song values, not applied here
+			expect(applyIncomeMultipliers(state, 100)).toBe(100);
 		});
 
 		it('should apply active boost multipliers', () => {
@@ -333,7 +335,7 @@ describe('Income System', () => {
 			expect(applyIncomeMultipliers(state, 100)).toBe(100);
 		});
 
-		it('should apply both prestige and boost multipliers', () => {
+		it('should apply only boost multipliers (prestige already in base)', () => {
 			const boost = createTestBoost({
 				activatedAt: Date.now() - 1000,
 				duration: 30000,
@@ -345,8 +347,9 @@ describe('Income System', () => {
 				activeBoosts: [boost]
 			});
 
-			// 100 * 1.5 (prestige) * 2.0 (boost) = 300
-			expect(applyIncomeMultipliers(state, 100)).toBe(300);
+			// 100 * 2.0 (boost only) = 200
+			// Prestige is already baked into the base value
+			expect(applyIncomeMultipliers(state, 100)).toBe(200);
 		});
 	});
 });

@@ -261,14 +261,15 @@ describe('Game Loop Integration', () => {
 		});
 
 		it('should apply experience multiplier from prestige', () => {
+			// Song's incomePerSecond already includes the experience multiplier
 			gameState.songs = [
 				{
 					id: 'song1',
 					name: 'Song',
 					genre: 'pop',
 					createdAt: Date.now(),
-					incomePerSecond: 100,
-					fanGenerationRate: 10,
+					incomePerSecond: 130, // Already has 1.3x experience multiplier baked in
+					fanGenerationRate: 13, // Already has 1.3x experience multiplier baked in
 					isTrending: false
 				}
 			];
@@ -282,7 +283,7 @@ describe('Game Loop Integration', () => {
 			vi.advanceTimersByTime(1000); // 1 second
 			engine.stop();
 
-			// Income: 100 * 1.3 = 130/sec
+			// Income: 130/sec (experience already baked in)
 			expect(gameState.money).toBeCloseTo(initialMoney + 130, 20);
 		});
 
@@ -295,8 +296,8 @@ describe('Game Loop Integration', () => {
 					name: 'Song',
 					genre: 'pop',
 					createdAt: now,
-					incomePerSecond: 100,
-					fanGenerationRate: 10,
+					incomePerSecond: 150, // Already has 1.5x experience multiplier baked in
+					fanGenerationRate: 15, // Already has 1.5x experience multiplier baked in
 					isTrending: false
 				}
 			];
@@ -321,7 +322,8 @@ describe('Game Loop Integration', () => {
 			vi.advanceTimersByTime(1000); // 1 second
 			engine.stop();
 
-			// Income: 100 * 2.0 (boost) * 1.5 (experience) = 300/sec
+			// Income: 150 * 2.0 (boost) = 300/sec
+			// Experience is already baked into the base 150
 			expect(gameState.money).toBeCloseTo(initialMoney + 300, 30);
 		});
 	});

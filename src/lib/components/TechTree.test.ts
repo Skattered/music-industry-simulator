@@ -313,11 +313,11 @@ describe('TechTree Component', () => {
 			const gameState = createTestGameState({ money: 10000000000, techTier: 7 });
 			const { container } = render(TechTree, { props: { gameState } });
 
-			// tier7_basic costs $125M
+			// tier7_basic costs $10M
 			const tier7BasicCard = container.querySelector('[data-upgrade-id="tier7_basic"]');
 			const costText = tier7BasicCard?.querySelector('.cost')?.textContent;
 
-			expect(costText).toContain('$125.00M');
+			expect(costText).toContain('$10.00M');
 		});
 	});
 

@@ -411,7 +411,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 6,
 		name: 'Custom Inference Engine',
 		description: 'Write optimized code from scratch. Enables platform ownership (requires 25 tours + 10M fans). Songs take 0.6s. 15x income.',
-		cost: 2_000_000,
+		cost: 750_000,
 		effects: {
 			songSpeed: 600,
 			incomeMultiplier: 15.0
@@ -423,7 +423,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 6,
 		name: 'Hardware Acceleration',
 		description: 'CUDA/Metal optimization. Songs take 0.4s. 20x income.',
-		cost: 5_000_000,
+		cost: 2_000_000,
 		effects: {
 			songSpeed: 400,
 			incomeMultiplier: 20.0
@@ -435,7 +435,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 6,
 		name: 'Proprietary Format',
 		description: 'Control the entire stack. Songs take 0.3s. 25x income.',
-		cost: 10_000_000,
+		cost: 5_000_000,
 		effects: {
 			songSpeed: 300,
 			incomeMultiplier: 25.0,
@@ -452,7 +452,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 7,
 		name: 'AI Marketing Agent',
 		description: 'Agents handle all promotion. Songs take 0.2s. 30x income.',
-		cost: 20_000_000,
+		cost: 10_000_000,
 		effects: {
 			songSpeed: 200,
 			incomeMultiplier: 30.0
@@ -464,7 +464,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 7,
 		name: 'AI A&R Agent',
 		description: 'Agents decide what music to make. Songs take 0.15s. 40x income.',
-		cost: 50_000_000,
+		cost: 25_000_000,
 		effects: {
 			songSpeed: 150,
 			incomeMultiplier: 40.0
@@ -476,7 +476,7 @@ export const UPGRADES: UpgradeDefinition[] = [
 		tier: 7,
 		name: 'Full Automation',
 		description: 'The AI runs everything. You just watch. Songs take 0.1s. 50x income.',
-		cost: 100_000_000,
+		cost: 50_000_000,
 		effects: {
 			songSpeed: 100,
 			incomeMultiplier: 50.0
@@ -735,48 +735,48 @@ export const MAX_ACTIVE_TOURS = 3;
 
 /**
  * Available platforms for purchase in Phase 4+
- * Balance: Reduced costs by 60% total (additional 50% from earlier cut), increased income by 2.5x for more satisfying late-game progression
+ * Balance: Aggressive reduction for 10-12 hour target - platforms should be achievable in final 2-3 hours
  */
 export const PLATFORM_DEFINITIONS = [
 	{
 		type: 'streaming' as const,
 		name: 'Streaming Service',
-		baseCost: 2_000_000,
+		baseCost: 1_000_000,
 		incomePerSecond: 25_000,
 		controlContribution: 15
 	},
 	{
 		type: 'ticketing' as const,
 		name: 'Ticketing Platform',
-		baseCost: 5_000_000,
+		baseCost: 2_500_000,
 		incomePerSecond: 60_000,
 		controlContribution: 20
 	},
 	{
 		type: 'venue' as const,
 		name: 'Concert Venue Chain',
-		baseCost: 10_000_000,
+		baseCost: 5_000_000,
 		incomePerSecond: 125_000,
 		controlContribution: 15
 	},
 	{
 		type: 'billboard' as const,
 		name: 'Billboard Charts',
-		baseCost: 20_000_000,
+		baseCost: 10_000_000,
 		incomePerSecond: 250_000,
 		controlContribution: 25
 	},
 	{
 		type: 'grammys' as const,
 		name: 'The Grammys',
-		baseCost: 50_000_000,
+		baseCost: 25_000_000,
 		incomePerSecond: 625_000,
 		controlContribution: 20
 	},
 	{
 		type: 'training_data' as const,
 		name: 'AI Training Data Monopoly',
-		baseCost: 100_000_000,
+		baseCost: 50_000_000,
 		incomePerSecond: 1_250_000,
 		controlContribution: 30
 	}

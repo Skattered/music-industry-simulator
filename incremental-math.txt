@@ -1,419 +1,86 @@
-Kongregate Developers
-MAKE GAMES
- 
-DOCS
- 
-FORUMS
- 
-BLOG
- 
-FAQ
-GAME DEVELOPMENT
-The Math of Idle Games, Part I
-— OCTOBER 04, 2016
- 
-I’ve given a few talks in the past about the appeal and general mechanics of idle games, but what if you actually wanted to make one? Theory and patterns are nice, but there’s some complicated math running behind it. And how on earth do you balance a game that has insanely large numbers?
+# 1
 
-This article is Part I of what will be a three-part series detailing topics covered in my most-recent talk. Part I discusses core ideas of growth, cost, prestige, and generator balancing. Part II will look into alternate growth methods (especially derivative-based). Part III will look at prestige cycles and balance.
+Kongregate Developers — The Math of Idle Games, Part I
+October 4, 2016
 
-The models for all of the charts produced in these articles are available as spreadsheets. Please feel free to duplicate, peruse, experiment, extend, etc.!
+This is a concise extraction of the original article focusing on the core ideas and useful formulas for designing and balancing incremental / idle games.
 
-Let’s start by specifying some terminology to make talking about this easier.
+Key concepts
+- Primary currency: The main resource that increments (usually "money").
+- Generator: An item that produces primary currency; income is measured in currency per second.
+- Primary exchange currency: Sometimes generators produce a different resource that is exchanged for the primary currency.
+- Multiplier: Any upgrade or mechanic that multiplies generator output (temporary or persistent).
+- Prestige: A reset of many game elements (generators, multipliers) in exchange for a prestige currency or persistent multiplier that accelerates future runs.
 
-Primary Currency: This is the main number that is being incremented, generally the goal of the game. Usually it’s some form of money.
-Generator: The items in the game that produce primary currency. The rate of production, or income, is measured as currency per second.
-Primary Exchange Currency: In some cases generators produce a different currency that is exchanged for primary currency. For example, in Clicker Heroes the generators produce DPS, which is then converted into gold by killing monsters. That layer of separation can give you a bit more control over the growth of the primary currency in the game, since you can modify the “exchange rate” over time.
-Multiplier: Any of a variety of upgrades that multiplies your generator power. These can be explicit upgrades, based on number of generators owned, etc. Their purpose is to (temporarily) get production closer to, or ahead of, costs.
-Prestige: A reset of most elements of the game (especially generators and multipliers), but gaining currency (prestige currency) and/or persistent multipliers to accelerate the next time through. Similar to a “New Game+”.
-At the most basic level, idle games are a seesaw between production rates and costs. Early on in a run, your production will exceed costs while eventually costs will become prohibitive. This is typically accomplished by having costs grow exponentially while production grows at a linear or polynomial rate. To put that into formulas:
+Core model
+At a basic level idle games balance production rates and costs. Generators usually follow exponential cost growth and linear (or near-linear) production growth, and players decide how to allocate currency between buying more generators and investing in multipliers or prestige.
 
-c
-o
-s
-t
-n
-e
-x
-t
-=
-c
-o
-s
-t
-b
-a
-s
-e
-×
-(
-r
-a
-t
-e
-g
-r
-o
-w
-t
-h
-)
-o
-w
-n
-e
-d
+Typical formulas:
+- Cost of next unit:
+  cost_next = cost_base * (rate_growth)^owned
 
-p
-r
-o
-d
-u
-c
-t
-i
-o
-n
-t
-o
-t
-a
-l
-=
-(
-p
-r
-o
-d
-u
-c
-t
-i
-o
-n
-b
-a
-s
-e
-×
-o
-w
-n
-e
-d
-)
-×
-m
-u
-l
-t
-i
-p
-l
-i
-e
-r
-s
+- Total production:
+  production_total = (production_base * owned) * multipliers
 
-With AdVenture Capitalist Lemonade Stands, the 
-r
-a
-t
-e
-g
-r
-o
-w
-t
-h
-=
-1.07
-, 
-c
-o
-s
-t
-b
-a
-s
-e
-=
-4
-∗
-, and 
-p
-r
-o
-d
-u
-c
-t
-i
-o
-n
-b
-a
-s
-e
-=
-1.67
-/
-s
-e
-c
-. So if you own 10 Lemonade Stands:
+Example: AdVenture Capitalist (Lemonade Stands)
+- rate_growth = 1.07
+- cost_base ≈ 4 (note: first stand may be free so the effective first paid cost can be different)
+- production_base = 1.67 / sec
 
-c
-o
-s
-t
-n
-e
-x
-t
-=
-4
-×
-(
-1.07
-)
-10
-=
-7.87
+If you own 10 lemonade stands:
+- cost_next = 4 * (1.07)^10 ≈ 7.87
+- production_total = (1.67 * 10) * 1 = 16.7 / sec
 
-Meanwhile, the production rate is:
+Observations about growth and balance
+- Exponential functions (n^x for n > 1) eventually outpace any polynomial (x^k); this explains why generator costs eventually become prohibitive and why prestige mechanics are useful.
+- Early in a run, production can exceed the cost of new generators, enabling rapid growth. Over time, costs slow progress and force strategic decisions (when to prestige, which generators to buy, and when to buy multipliers).
+- With multiple generators that have different costs and production rates, players choose investments; newer generators often dominate income once they can be afforded unless multipliers or generator design create non-trivial choice.
 
-p
-r
-o
-d
-u
-c
-t
-i
-o
-n
-t
-o
-t
-a
-l
-=
-(
-1.67
-×
-10
-)
-×
-1
-=
-16.7
-/
-s
-e
-c
+Design notes
+- Stacking multipliers (for example, x2 at 25 and 50 owned) produce purchase spikes and can lengthen the phase where a generator is relevant.
+- Without purchasable upgrades, the newest generator tends to become dominant; adding multiplier upgrades or varying multiplier effectiveness across generators can create more interesting priorities and trade-offs.
+- Tweaking multiplier values, rates, and base production can change the ordering of which generators matter as the game progresses, creating richer player decisions.
 
-∗
-It’s technically 3.738, since you get the first one for free and it’s actually the second one that costs 4.
+Bulk-buy formulas (avoid brute-force loops)
+Variables:
+- n = number of generators to buy
+- b = base price (cost_base)
+- r = price growth rate (rate_growth)
+- k = number currently owned
+- c = amount of currency owned
 
-Here are the actual values for AdVenture Capitalist (thank you AdCap wiki!):
+Cost to buy n generators starting from k owned:
+  cost = b * r^k * (r^n - 1) / (r - 1)
+
+Maximum number you can buy with currency c:
+  max = floor( log_r( c * (r - 1) / (b * r^k) + 1 ) )
+
+If your language does not support log base r, use:
+  max = floor( ln( c * (r - 1) / (b * r^k) + 1 ) / ln(r) )
+
+Closing
+These formulas and observations give a compact toolkit for modeling generator costs, production, and bulk purchases. They also clarify why exponential cost growth necessitates prestige mechanics and careful multiplier design to keep gameplay interesting.
 
 
+# 2
+Another consideration is how closely to approximate the cost curve. For example, in cookie clicker with a 1.15 multiplier, the cost of successive buildings might be:
 
-So early on you’re earning well beyond the cost of a new generator every second. Let’s look at that in graph form. Note that when you own 25 and 50 Lemonade Stands, the rate gets a (stacking) x2 multiplier.
+100, 115, 132, 152, 174, 201, 231, 266, ...
 
+But you could also have a similar effect with this:
 
+100, 100, 100, 100, 100, 200, 200, 200, ...
 
-And we can see a slightly bigger picture if we use a log scale y-axis.
+Doubling every five purchases yields a similar price curve. But there are plateaus followed by larger cliffs. Why might you do this?
 
+First, to make the prices more comprehensible. If you stick to round numbers and roughly double between them (100, 200, 500, 1000, etc.) then it is easier for the user to see at a glance how much it costs because you don't have too much precision which acts as a distraction.
 
+But, second, it is important to feel a sense of progress as well as a sense of increasing challenge. By keeping the cost the same for successive upgrades for a little while, the player can have the sense of getting ahead of the curve. Buying a new building feels more effective since it makes the next building more affordable. The cliff at the end increases the requirements more dramatically and marks a new obstacle to be overcome.
 
-Early on, your production rate is high and you can keep buying, and the multipliers bump you back up whenever it gets close. But eventually the costs become overwhelming, and the time you would have to wait to be able to afford the next generator gets prohibitively long.
+Scaling can also communicate the the user which choices are more appropriate. Often, you'll have two different upgrades which are multiplied together to provide an effect. The best strategy here is to generally upgrade them both at about the same rate because 5*5 is bigger than 1*10. You can use scaling as a kind of nudge to push the user in the right direction here. The cost of one could be multiplied by the relative difference between them.
 
-Mathematically, exponential growth (anything of the form 
-n
-x
-, for 
-n
->
-1
-) will eventually catch and far exceed any polynomial growth (
-x
-k
-) no matter how big 
-k
- is or how small 
-n
- is. This can take a very long time in some cases, but that’s where balancing comes in. (If you want a great overview about tiers of quickly growing functions, check out this post by Eclipse1agg, the developer of True Exponential.)
+One other thing to consider is discount scaling. A number of incremental games provides some kind of discount upgrade which reduces the prices of other upgrades. The key thing to remember here is that a discount multiplier can be tricky. So having things that provide flat discounts can have unintended effects.
 
-In this example, once things really start to slow down, you would be looking to do a prestige to multiply your production rate. Doing that looks like this, with each successive prestige sliding up on the graph. The result is that each prestige allows the player to get farther through the cost curve before falling behind.
+The relative difference between a 1% discount and a 2% discount is small. But the relative difference between a 98% discount and a 99% discount is huge. The latter halves all my costs! So however you scale your discounts, make sure that they have a larger headline effect lower levels and a smaller headline effect at larger levels. And your discount must never get to 100%.
 
-
-
-But that’s for a single generator. What happens when you have multiple generators, each with different costs and rates? Now the player has choices about what to invest in, and things get more complicated. Fortunately, we can model optimal behavior too! In this model we define “optimal” as having the best income:cost ratio, and we determine that at every purchase opportunity.
-
-Players aren’t going to follow this exactly because the optimal choice will often be far too micromanage-y for a human. "Buy one Generator 2, then three Generator 1s, then a Generator 3, then another Generator 1," etc. Instead, players usually buy in bulk to simplify the decision process...or to be super OCD (always keeping at multiples of 100). But over the long run, players will roughly be in this ballpark.
-
-Here’s what it looks like for the first 5 generators in AdVenture Capitalist, with x2 multipliers kicking in when you own 25 and 50 of a generator. You can see the expected spikes in purchases right around 25 and 50 multipliers kicking in, since those are temporarily overvalued. Note: this model simplifies income to be per-second instead of requiring a timer to complete, so higher-end, slower generators get over-favored.
-
-
-
-If we look at a log scale of income rates, though, you’ll notice that the newest generator is nearly always dominant once it can be purchased. That’s not very interesting for the player, though. It means that older generators are largely irrelevant and removes any interesting decisions. Even if smaller generators are technically “optimal,” they may not matter. For example, it may be that you can buy a lemonade stand that generates 10 currency/sec for 5 currency or a car wash that generates 10,000 currency/sec for 7,500 currency. Lemonade is a better deal, but as a player you’re not going to “feel” the impact and so it doesn’t seem worth purchasing, or perhaps more accurately not worth the effort to consider purchasing.
-
-
-
-However, even with a simple model like this one, we can start to emulate the shifting priorities of the various generators. In the above image we don’t have any purchasable multiplier upgrades, and every generator gets the same multiplier count bonuses shown in the table below (only Gen 1 hits 100):
-
-
-
-If we modify these numbers and keep everything else the same (including still not having any purchasable upgrades), we can create a very different picture. We’ll use these multiplier values instead:
-
-
-
-And here’s the resulting income graph:
-
-
-
-Now that’s much more interesting! As you progress through the game, different generators take priority and have the biggest impact on income. The player gets to try to identify these priorities (they won’t always be obvious right away), and this provides more variety and less predictability. And if you have purchasable upgrades, you have even more options for providing this sort of variation for the players.
-
-BONUS CONTENT!
-
-While putting all this together, I derived two very useful formulas that will save you from brute-forcing with some lengthy for-loops. The first will calculate the cost of bulk-buying generators, the second will calculate the max generators you can buy with your current funds. These will only work for simple exponential growth that doesn't have shifting costs or exponents, so make sure your particular application works for it. For both of these, the variables are:
-
-n
- = the number of generators to buy
-b
- = the base price
-r
- = the price growth rate exponent
-k
- = the number of generators currently owned
-c
- = the amount of currency owned
-
-c
-o
-s
-t
-=
-b
-∗
-r
-k
-(
-r
-n
-−
-1
-)
-r
-−
-1
-
-m
-a
-x
-=
-f
-l
-o
-o
-r
-(
-l
-o
-g
-r
-(
-c
-(
-r
-−
-1
-)
-b
-(
-r
-k
-)
-+
-1
-)
-)
-
-Or, if your language can't do a non-standard 
-l
-o
-g
- base, you can use a standard 
-l
-o
-g
- or 
-l
-n
- and divide it like this:
-
-m
-a
-x
-=
-f
-l
-o
-o
-r
-(
-l
-o
-g
-(
-c
-(
-r
-−
-1
-)
-b
-(
-r
-k
-)
-+
-1
-)
-l
-o
-g
-(
-r
-)
-)
-
-(For those who are curious, all formulas in this post were created dynamically with an embedded script called MathJax that lets you render LaTeX or MathML very easily and cleanly.)
-
-If you have questions, find a bug, decide to make an extension to a sheet, or have an awesome new idle game you want to share, please feel free to reach out and email me at anthony@kongregate.com.
-
-Follow us on Twitter to keep up-to-date with our weekly blog posts.
-
-
-KONGREGATE
-
-Read more posts by this author »
-More articles you might like:
-
-Feb 14, 2024
-Developer Spotlight & Updated Integration Documents
-Updated Integration Docs To make our onboarding process more efficient, we've updated our integration documentation here. We also created a Photoshop file for previewing how your game icon & screenshots will look on the new game cards on our platform. The link can be found here! Developer Spotlight | Rogue Sword Watch our video spotlight on Rogue Sword, creators of Dungeoneers. If you're interested in being featured in a livestream or dev spotlight video, please reach out to marketing@kon
-READ MORE
-Jan 17, 2024
-Game On—With the New Achievements Page!
-We're thrilled to unveil exciting updates to our Achievements page, designed to elevate your experience in discovering and celebrating your gaming milestones. These enhancements are already live—dive right in and explore our latest features! Weekly Kongpanion Banner Redesigned The Weekly Kongpanion Banner got a facelift, sporting a new look and introducing mini badges. These new elements add a charming touch to each edition and shiny state. Animations now celebrate your achievements with exci
-READ MORE
-Jan 17, 2024
-Beyond the Pixels: Exploring the Artistic Vision of Bit Heroes Quest
-Bit Heroes Quest stands out for many things, including its freedom to include any theme in the game and multiple game modes, but there is one visual theme that is intrinsic to the game - and that is BIT. Pixel art is an art form that uses singular pixels to construct a 2D digital image block by block, and is one of the most distinctive features of the game. To talk about the art, inspiration, and challenges of Bit Heroes Quest, we have with us the project's art director, Octo. Would you like
-READ MORE
-Kongregate
-We update our developers blog on a weekly basis, aiming to be a shared source of learnings, data, and information for developers. Follow us on Twitter for the latest posts.
-
-© Kongregate 2017
+Diablo 1/2 had a discount system for elemental damage. And it avoided this problem by capping the discount at 75%. Sandcastle Builder has a single discount boost that provides a permanent 80% discount but you can't buy multiple levels of it.

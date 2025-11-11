@@ -15,29 +15,23 @@
 
 import type { GameState, Platform } from '../game/types';
 import {
+	MIN_TOURS_FOR_PLATFORMS,
+	MIN_FANS_FOR_PLATFORMS,
+	MIN_TECH_TIER_FOR_PLATFORMS,
+	INDUSTRY_CONTROL_MILESTONES
+} from '../game/config';
+import {
 	PLATFORM_DEFINITIONS,
 	getPlatformDefinition,
 	canPurchasePlatform
 } from '../data/platforms';
 
+// Re-export constants for backwards compatibility
+export { MIN_TOURS_FOR_PLATFORMS, MIN_FANS_FOR_PLATFORMS, MIN_TECH_TIER_FOR_PLATFORMS };
+
 // ============================================================================
 // UNLOCK CONDITIONS
 // ============================================================================
-
-/**
- * Minimum tours completed to unlock platform ownership
- */
-export const MIN_TOURS_FOR_PLATFORMS = 50;
-
-/**
- * Minimum fans required to unlock platform ownership
- */
-export const MIN_FANS_FOR_PLATFORMS = 1_000_000;
-
-/**
- * Minimum tech tier required to unlock platform ownership (tier 6 = Own Your Software)
- */
-export const MIN_TECH_TIER_FOR_PLATFORMS = 6;
 
 /**
  * Check if platform ownership system is unlocked
@@ -146,24 +140,24 @@ export function calculateIndustryControl(state: GameState): number {
 	let control = 0;
 
 	// Fan milestones (14% total)
-	if (state.fans >= 10_000) control += 2;
-	if (state.fans >= 100_000) control += 3;
-	if (state.fans >= 1_000_000) control += 4;
-	if (state.fans >= 10_000_000) control += 5;
+	if (state.fans >= 10_000) control += INDUSTRY_CONTROL_MILESTONES.fans[10_000];
+	if (state.fans >= 100_000) control += INDUSTRY_CONTROL_MILESTONES.fans[100_000];
+	if (state.fans >= 1_000_000) control += INDUSTRY_CONTROL_MILESTONES.fans[1_000_000];
+	if (state.fans >= 10_000_000) control += INDUSTRY_CONTROL_MILESTONES.fans[10_000_000];
 
 	// Tech tier achievements (23% total)
-	if (state.techTier >= 3) control += 5; // Local AI Models
-	if (state.techTier >= 6) control += 8; // Own Your Software
-	if (state.techTier >= 7) control += 10; // AI Agents
+	if (state.techTier >= 3) control += INDUSTRY_CONTROL_MILESTONES.techTier[3]; // Local AI Models
+	if (state.techTier >= 6) control += INDUSTRY_CONTROL_MILESTONES.techTier[6]; // Own Your Software
+	if (state.techTier >= 7) control += INDUSTRY_CONTROL_MILESTONES.techTier[7]; // AI Agents
 
 	// Phase unlocks (26% total)
-	if (state.phase >= 2) control += 5; // Physical Albums
-	if (state.phase >= 3) control += 6; // Tours & Concerts
-	if (state.phase >= 4) control += 7; // Platform Ownership
-	if (state.phase >= 5) control += 8; // Total Automation
+	if (state.phase >= 2) control += INDUSTRY_CONTROL_MILESTONES.phase[2]; // Physical Albums
+	if (state.phase >= 3) control += INDUSTRY_CONTROL_MILESTONES.phase[3]; // Tours & Concerts
+	if (state.phase >= 4) control += INDUSTRY_CONTROL_MILESTONES.phase[4]; // Platform Ownership
+	if (state.phase >= 5) control += INDUSTRY_CONTROL_MILESTONES.phase[5]; // Total Automation
 
 	// Prestige bonuses (8% per prestige)
-	control += state.prestigeCount * 8;
+	control += state.prestigeCount * INDUSTRY_CONTROL_MILESTONES.prestigeBonus;
 
 	// Platform ownership (15-30% per platform, 125% total available)
 	for (const platform of state.ownedPlatforms) {

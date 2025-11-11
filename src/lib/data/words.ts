@@ -433,6 +433,18 @@ export const ALBUM_NOUNS = [
   "Symphony", "Concerto", "Sonata", "Requiem", "Anthem", "Hymn", "Ballad", "Opera",
 ];
 
+export const TOUR_ADJECTIVES = [
+  "World", "Stadium", "Arena", "Festival", "Global", "International", "Ultimate", "Legendary",
+  "Epic", "Massive", "Grand", "Supreme", "Infinite", "Eternal", "Virtual", "Digital",
+  "Holographic", "AI-Generated", "Synthetic", "Algorithmic"
+];
+
+export const TOUR_NOUNS = [
+  "Tour", "Experience", "Concert Series", "Live Show", "Performance", "Spectacle", "Event", "Roadshow",
+  "Music Festival", "Concert Experience", "Live Experience", "Tour de Force", "Extravaganza", "Showcase",
+  "Domination", "Takeover", "Revolution", "Invasion", "Conquest", "Empire Tour"
+];
+
 export const GENRE_WORDS: Record<Genre, { adjectives: string[]; nouns: string[]; verbs: string[] }> = {
   pop: {
     adjectives: ["Sparkle", "Bright", "Happy", "Sweet", "Fresh", "Clean", "Pure", "Innocent"],

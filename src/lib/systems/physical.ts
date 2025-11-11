@@ -10,8 +10,12 @@ import {
 	ALBUM_PAYOUT_PER_SONG,
 	ALBUM_FAN_MULTIPLIER,
 	MIN_SONGS_FOR_ALBUM,
-	ALBUM_RELEASE_COOLDOWN
+	ALBUM_RELEASE_COOLDOWN,
+	ALBUM_RERELEASE_PAYOUT_MULTIPLIER,
+	ALBUM_SONG_MILESTONE,
+	ALBUM_MAX_SONGS_FOR_PAYOUT
 } from '../game/config';
+import { ALBUM_ADJECTIVES, ALBUM_NOUNS } from '../data/words';
 
 // ============================================================================
 // UNLOCK SYSTEM
@@ -73,7 +77,7 @@ export function generateVariants(state: GameState): number {
  * @returns Total album payout in dollars
  */
 export function calculateAlbumPayout(state: GameState): number {
-	const songCount = Math.min(state.songs.length, MIN_SONGS_FOR_ALBUM + 10); // Cap at 15 songs per album
+	const songCount = Math.min(state.songs.length, ALBUM_MAX_SONGS_FOR_PAYOUT);
 	const variantCount = generateVariants(state);
 
 	// Base payout from songs
@@ -91,42 +95,6 @@ export function calculateAlbumPayout(state: GameState): number {
 // ============================================================================
 // NAME GENERATION
 // ============================================================================
-
-const ALBUM_ADJECTIVES = [
-	'Greatest',
-	'Ultimate',
-	'Essential',
-	'Complete',
-	'Definitive',
-	'Best Of',
-	'Collected',
-	'Anthology',
-	'Legendary',
-	'Timeless',
-	'Classic',
-	'Golden',
-	'Platinum',
-	'Deluxe',
-	'Limited'
-];
-
-const ALBUM_NOUNS = [
-	'Hits',
-	'Works',
-	'Tracks',
-	'Sessions',
-	'Collection',
-	'Archive',
-	'Vault',
-	'Classics',
-	'Essentials',
-	'Selection',
-	'Masterpieces',
-	'Recordings',
-	'Anthology',
-	'Legacy',
-	'Chronicles'
-];
 
 /**
  * Generate a random album name using mad-lib style
@@ -152,7 +120,7 @@ function generateAlbumName(): string {
  */
 export function releaseAlbum(state: GameState): PhysicalAlbum {
 	// Calculate album properties
-	const songCount = Math.min(state.songs.length, MIN_SONGS_FOR_ALBUM + 10);
+	const songCount = Math.min(state.songs.length, ALBUM_MAX_SONGS_FOR_PAYOUT);
 	const variantCount = generateVariants(state);
 	const payout = calculateAlbumPayout(state);
 
@@ -179,7 +147,7 @@ export function releaseAlbum(state: GameState): PhysicalAlbum {
 /**
  * Re-release an existing album for additional payout
  *
- * Creates a new album entry marked as a re-release with reduced payout (50%)
+ * Creates a new album entry marked as a re-release with reduced payout (from ALBUM_RERELEASE_PAYOUT_MULTIPLIER)
  *
  * @param state - Current game state (will be modified)
  * @param originalAlbumId - ID of the album to re-release
@@ -192,11 +160,11 @@ export function rereleaseAlbum(state: GameState, originalAlbumId: string): Physi
 		return null;
 	}
 
-	// Calculate re-release payout (50% of current payout potential)
+	// Calculate re-release payout (ALBUM_RERELEASE_PAYOUT_MULTIPLIER of current payout potential)
 	const variantCount = generateVariants(state);
 	const basePayout = original.songCount * ALBUM_PAYOUT_PER_SONG;
 	const fanPayout = state.fans * ALBUM_FAN_MULTIPLIER;
-	const rereleasePayout = ((basePayout + fanPayout) * variantCount) * 0.5;
+	const rereleasePayout = ((basePayout + fanPayout) * variantCount) * ALBUM_RERELEASE_PAYOUT_MULTIPLIER;
 
 	// Create re-release album
 	const rerelease: PhysicalAlbum = {
@@ -241,7 +209,7 @@ const lastAlbumSongCount = new WeakMap<GameState, number>();
  * 1. Physical albums are unlocked
  * 2. Player has minimum songs for an album
  * 3. Cooldown period has elapsed
- * 4. Song milestone reached (every 10 songs)
+ * 4. Song milestone reached (every ALBUM_SONG_MILESTONE songs)
  *
  * @param state - Current game state (will be modified)
  * @param deltaTime - Time elapsed since last update in milliseconds
@@ -266,14 +234,13 @@ export function processPhysicalAlbums(state: GameState, deltaTime: number): void
 		return;
 	}
 
-	// Check if song milestone reached (every 10 songs)
+	// Check if song milestone reached (every ALBUM_SONG_MILESTONE songs)
 	const lastSongCount = lastAlbumSongCount.get(state) || 0;
 	const currentSongCount = state.songs.length;
-	const songMilestone = 10; // Release album every 10 songs
 
 	// Calculate how many milestones have been passed
-	const lastMilestone = Math.floor(lastSongCount / songMilestone);
-	const currentMilestone = Math.floor(currentSongCount / songMilestone);
+	const lastMilestone = Math.floor(lastSongCount / ALBUM_SONG_MILESTONE);
+	const currentMilestone = Math.floor(currentSongCount / ALBUM_SONG_MILESTONE);
 
 	if (currentMilestone > lastMilestone) {
 		// Milestone reached! Release album

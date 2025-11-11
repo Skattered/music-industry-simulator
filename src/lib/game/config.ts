@@ -85,22 +85,31 @@ export const INITIAL_EXPERIENCE_MULTIPLIER = 1.0;
 export const BASE_SONG_GENERATION_TIME = 20000;
 
 /**
- * Base income per song per second in dollars
- * Balance: At $2/sec, one song earns $7,200/hour - scales with multipliers for 8-12hr gameplay
+ * Base income per song per second in dollars (fan-based calculation)
+ * Balance: Income is calculated as $0.000001 * total fans per song per second
+ * This creates a dynamic scaling system where songs become more valuable as fanbase grows
+ * 
+ * BREAKING BALANCE CHANGE (v1.1.0):
+ * Previous: Fixed $2/sec per song
+ * New: $0.000001 * total fans per song per second
+ * Reason: Make income scale with fan count for more interesting progression.
+ * Example: With 100,000 fans, each song earns $0.10/sec (was $2/sec)
+ *          With 1,000,000 fans, each song earns $1.00/sec (was $2/sec)
+ *          With 10,000,000 fans, each song earns $10.00/sec (was $2/sec)
  */
-export const BASE_INCOME_PER_SONG = 2.0;
+export const INCOME_PER_FAN_PER_SONG = 0.000001;
 
 /**
  * Base fan generation rate per song per second
- * Balance: 2 fans/sec = 7.2K fans/hour per song - slower progression for better pacing
+ * Balance: 1 fan/sec = 3.6K fans/hour per song - slower progression for better pacing
  *
- * BREAKING BALANCE CHANGE (v1.0.0):
- * Previous value: 20 fans/sec
- * New value: 2 fans/sec
- * Reason: Slower progression for better pacing and longer gameplay experience.
+ * BREAKING BALANCE CHANGE (v1.1.0):
+ * Previous value: 2 fans/sec
+ * New value: 1 fan/sec
+ * Reason: Further reduced to balance with new fan-based income calculation.
  * NOTE: This significantly affects existing gameplay and should be included in release notes/changelog.
  */
-export const BASE_FAN_GENERATION_RATE = 2;
+export const BASE_FAN_GENERATION_RATE = 1;
 
 /**
  * Trending genre income multiplier (at start of trend)

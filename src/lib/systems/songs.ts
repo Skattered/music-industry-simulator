@@ -7,7 +7,7 @@
 
 import type { GameState, Song, QueuedSong, Genre } from '../game/types';
 import {
-	BASE_INCOME_PER_SONG,
+	INCOME_PER_FAN_PER_SONG,
 	BASE_FAN_GENERATION_RATE,
 	BASE_SONG_COST,
 	TRENDING_MULTIPLIER,
@@ -142,6 +142,7 @@ export function getCurrentSongCost(state: GameState): number {
  * - Upgrade multiplier (from tech tier)
  * - Prestige experience multiplier
  * - Trending multiplier (if applicable, with fade)
+ * - Fan-based income (income scales with total fans at creation time)
  * 
  * These multipliers should NOT be re-applied in income/fan calculations!
  * Only temporary boost multipliers should be applied there.
@@ -162,9 +163,10 @@ export function generateSong(state: GameState): Song {
 	// Determine if song is trending
 	const isTrending = state.currentTrendingGenre !== null && genre === state.currentTrendingGenre;
 
-	// Calculate base income per second
+	// Calculate base income per second based on current fan count
+	// Income = $0.000001 * fans * upgrade multiplier * experience multiplier
 	const upgradeMultiplier = getIncomeMultiplier(state);
-	let incomePerSecond = BASE_INCOME_PER_SONG * upgradeMultiplier * state.experienceMultiplier;
+	let incomePerSecond = state.fans * INCOME_PER_FAN_PER_SONG * upgradeMultiplier * state.experienceMultiplier;
 
 	// Apply fading trending multiplier if applicable (starts at 2.0x, fades to 1.0x over 5 minutes)
 	if (isTrending) {

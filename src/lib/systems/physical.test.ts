@@ -18,7 +18,7 @@ import {
 	ALBUM_FAN_MULTIPLIER,
 	MIN_SONGS_FOR_ALBUM,
 	ALBUM_RELEASE_COOLDOWN,
-	BASE_INCOME_PER_SONG,
+	INCOME_PER_FAN_PER_SONG,
 	BASE_FAN_GENERATION_RATE,
 	INITIAL_MONEY,
 	INITIAL_FANS,
@@ -97,7 +97,7 @@ function createTestSongs(count: number): Song[] {
 			name: `Test Song ${i}`,
 			genre: 'pop',
 			createdAt: now,
-			incomePerSecond: BASE_INCOME_PER_SONG,
+			incomePerSecond: 1.0, // Test value
 			fanGenerationRate: BASE_FAN_GENERATION_RATE,
 			isTrending: false
 		});

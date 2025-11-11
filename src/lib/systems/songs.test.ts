@@ -14,7 +14,7 @@ import {
 } from './songs';
 import type { GameState, Genre, TechTier, Artist, UnlockedSystems, ActiveBoost } from '../game/types';
 import {
-	BASE_INCOME_PER_SONG,
+	INCOME_PER_FAN_PER_SONG,
 	BASE_FAN_GENERATION_RATE,
 	BASE_SONG_COST,
 	BASE_SONG_GENERATION_TIME,
@@ -109,7 +109,8 @@ describe('generateSong', () => {
 		expect(song.name).toBeTruthy();
 		expect(song.genre).toBeTruthy();
 		expect(song.createdAt).toBeGreaterThan(0);
-		expect(song.incomePerSecond).toBe(BASE_INCOME_PER_SONG);
+		// Income is now based on fans: 0 fans * 0.000001 = 0
+		expect(song.incomePerSecond).toBe(0);
 		expect(song.fanGenerationRate).toBe(BASE_FAN_GENERATION_RATE);
 		expect(song.isTrending).toBe(false);
 	});
@@ -129,59 +130,70 @@ describe('generateSong', () => {
 	it('should apply trending multiplier to income and fan generation', () => {
 		const state = createTestGameState({
 			currentTrendingGenre: 'pop',
-			trendDiscoveredAt: Date.now() // Set to now for full multiplier strength
+			trendDiscoveredAt: Date.now(), // Set to now for full multiplier strength
+			fans: 1_000_000 // Add fans so income is non-zero
 		});
 
 		// When currentTrendingGenre is set, all songs are generated in that genre
 		const song = generateSong(state);
 		expect(song.genre).toBe('pop');
 		expect(song.isTrending).toBe(true);
-		expect(song.incomePerSecond).toBeCloseTo(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
+		// Income = fans * INCOME_PER_FAN_PER_SONG * TRENDING_MULTIPLIER
+		// 1,000,000 * 0.000001 * 2.0 = 2.0
+		expect(song.incomePerSecond).toBeCloseTo(1_000_000 * INCOME_PER_FAN_PER_SONG * TRENDING_MULTIPLIER);
 		expect(song.fanGenerationRate).toBeCloseTo(BASE_FAN_GENERATION_RATE * TRENDING_MULTIPLIER);
 	});
 
 	it('should fade trending multiplier over time', () => {
 		const now = Date.now();
+		const testFans = 1_000_000; // Use 1M fans for consistent test values
 
 		// Test at start of trend (full multiplier)
 		const stateStart = createTestGameState({
 			currentTrendingGenre: 'pop',
-			trendDiscoveredAt: now
+			trendDiscoveredAt: now,
+			fans: testFans
 		});
 		const songStart = generateSong(stateStart);
-		expect(songStart.incomePerSecond).toBeCloseTo(BASE_INCOME_PER_SONG * TRENDING_MULTIPLIER);
+		expect(songStart.incomePerSecond).toBeCloseTo(testFans * INCOME_PER_FAN_PER_SONG * TRENDING_MULTIPLIER);
 
 		// Test at halfway through fade (1.5x multiplier: midpoint between 2.0 and 1.0)
 		const stateHalf = createTestGameState({
 			currentTrendingGenre: 'pop',
-			trendDiscoveredAt: now - 150000 // 2.5 minutes ago (half of 5 minute fade)
+			trendDiscoveredAt: now - 150000, // 2.5 minutes ago (half of 5 minute fade)
+			fans: testFans
 		});
 		const songHalf = generateSong(stateHalf);
 		const expectedHalfMultiplier = 1.5; // Halfway between 2.0 and 1.0
-		expect(songHalf.incomePerSecond).toBeCloseTo(BASE_INCOME_PER_SONG * expectedHalfMultiplier);
+		expect(songHalf.incomePerSecond).toBeCloseTo(testFans * INCOME_PER_FAN_PER_SONG * expectedHalfMultiplier);
 
 		// Test after fade complete (1.0x multiplier - no bonus)
 		const stateFaded = createTestGameState({
 			currentTrendingGenre: 'pop',
-			trendDiscoveredAt: now - 300000 // 5 minutes ago (fully faded)
+			trendDiscoveredAt: now - 300000, // 5 minutes ago (fully faded)
+			fans: testFans
 		});
 		const songFaded = generateSong(stateFaded);
-		expect(songFaded.incomePerSecond).toBe(BASE_INCOME_PER_SONG * 1.0);
+		expect(songFaded.incomePerSecond).toBe(testFans * INCOME_PER_FAN_PER_SONG * 1.0);
 	});
 
 	it('should apply experience multiplier to income', () => {
 		const experienceMultiplier = 1.5;
+		const testFans = 1_000_000;
 		const state = createTestGameState({
 			experienceMultiplier,
-			currentTrendingGenre: null
+			currentTrendingGenre: null,
+			fans: testFans
 		});
 
 		const song = generateSong(state);
-		expect(song.incomePerSecond).toBe(BASE_INCOME_PER_SONG * experienceMultiplier);
+		expect(song.incomePerSecond).toBe(testFans * INCOME_PER_FAN_PER_SONG * experienceMultiplier);
 	});
 
 	it('should apply upgrade income multiplier', () => {
+		const testFans = 1_000_000;
 		const state = createTestGameState({
+			fans: testFans,
 			upgrades: {
 				tier2_improved: {
 					purchasedAt: Date.now(),
@@ -192,12 +204,14 @@ describe('generateSong', () => {
 
 		const song = generateSong(state);
 		// tier2_improved has incomeMultiplier: 1.5
-		expect(song.incomePerSecond).toBe(BASE_INCOME_PER_SONG * 1.5);
+		expect(song.incomePerSecond).toBe(testFans * INCOME_PER_FAN_PER_SONG * 1.5);
 	});
 
 	it('should stack experience and upgrade multipliers', () => {
+		const testFans = 1_000_000;
 		const state = createTestGameState({
 			experienceMultiplier: 1.5,
+			fans: testFans,
 			upgrades: {
 				tier2_improved: {
 					purchasedAt: Date.now(),
@@ -207,7 +221,7 @@ describe('generateSong', () => {
 		});
 
 		const song = generateSong(state);
-		expect(song.incomePerSecond).toBe(BASE_INCOME_PER_SONG * 1.5 * 1.5);
+		expect(song.incomePerSecond).toBe(testFans * INCOME_PER_FAN_PER_SONG * 1.5 * 1.5);
 	});
 });
 

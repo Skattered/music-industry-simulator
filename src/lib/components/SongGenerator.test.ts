@@ -192,7 +192,7 @@ describe('SongGenerator - Button States', () => {
 	});
 
 	it('should enable 5x button when can afford 5 songs', () => {
-		const gameState = createTestGameState({ money: 10 }); // 5 songs * $2 = $10
+		const gameState = createTestGameState({ money: 25 }); // 5 songs * $5 = $25
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
 		const button = getByTestId('queue-5x') as HTMLButtonElement;
@@ -208,7 +208,7 @@ describe('SongGenerator - Button States', () => {
 	});
 
 	it('should enable 10x button when can afford 10 songs', () => {
-		const gameState = createTestGameState({ money: 20 }); // 10 songs * $2 = $20
+		const gameState = createTestGameState({ money: 50 }); // 10 songs * $5 = $50
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
 		const button = getByTestId('queue-10x') as HTMLButtonElement;
@@ -216,12 +216,12 @@ describe('SongGenerator - Button States', () => {
 	});
 
 	it('should enable Max button and show correct count', () => {
-		const gameState = createTestGameState({ money: 7 }); // 7 / 2 = 3.5 → 3 songs
+		const gameState = createTestGameState({ money: 7 }); // 7 / 5 = 1.4 → 1 song
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
 		const button = getByTestId('queue-max') as HTMLButtonElement;
 		expect(button.disabled).toBe(false);
-		expect(button.textContent).toContain('Max (3)');
+		expect(button.textContent).toContain('Max (1)');
 	});
 
 	it('should disable Max button when count would be 0', () => {
@@ -286,9 +286,9 @@ describe('SongGenerator - Cost Display', () => {
 		const gameState = createTestGameState({ money: 100 });
 		const { getByTestId } = render(SongGenerator, { props: { gameState } });
 
-		expect(getByTestId('queue-1x').textContent).toContain('($2)');
-		expect(getByTestId('queue-5x').textContent).toContain('($10)');
-		expect(getByTestId('queue-10x').textContent).toContain('($20)');
+		expect(getByTestId('queue-1x').textContent).toContain('($5)');
+		expect(getByTestId('queue-5x').textContent).toContain('($25)');
+		expect(getByTestId('queue-10x').textContent).toContain('($50)');
 	});
 
 	it('should show FREE on buttons when songs are free', () => {
@@ -311,10 +311,10 @@ describe('SongGenerator - Cost Display', () => {
 	it('should calculate Max button correctly with various money amounts', () => {
 		const testCases = [
 			{ money: 0, expected: 0 },
-			{ money: 1, expected: 0 }, // Can't afford $2 song
-			{ money: 7, expected: 3 }, // 7 / 2 = 3.5 → 3
-			{ money: 15, expected: 7 }, // 15 / 2 = 7.5 → 7
-			{ money: 100, expected: 50 } // 100 / 2 = 50
+			{ money: 1, expected: 0 }, // Can't afford $5 song
+			{ money: 7, expected: 1 }, // 7 / 5 = 1.4 → 1
+			{ money: 15, expected: 3 }, // 15 / 5 = 3
+			{ money: 100, expected: 20 } // 100 / 5 = 20
 		];
 
 		testCases.forEach(({ money, expected }) => {
@@ -421,7 +421,7 @@ describe('SongGenerator - User Interactions', () => {
 	});
 
 	it('should queue 5 songs and deduct correct money when 5x button clicked', async () => {
-		const gameState = createTestGameState({ money: 20 });
+		const gameState = createTestGameState({ money: 25 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
 		expect(container.textContent).toContain('0 songs queued');
@@ -445,7 +445,7 @@ describe('SongGenerator - User Interactions', () => {
 	});
 
 	it('should queue max affordable songs when Max button clicked', async () => {
-		const gameState = createTestGameState({ money: 7 });
+		const gameState = createTestGameState({ money: 17 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
 		expect(container.textContent).toContain('0 songs queued');
@@ -523,7 +523,7 @@ describe('SongGenerator - User Interactions', () => {
 	});
 
 	it('should handle multiple queue actions correctly', async () => {
-		const gameState = createTestGameState({ money: 20 });
+		const gameState = createTestGameState({ money: 35 });
 		const { getByTestId, container } = render(SongGenerator, { props: { gameState } });
 
 		// Initial state
